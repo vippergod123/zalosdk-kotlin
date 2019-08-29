@@ -1,0 +1,9 @@
+<resources>
+    <string name="zalosdk_app_name">ZaloSDK</string>
+    <string name="zalosdk_processing">Đang xử lý</string>
+    <string name="txt_regis_acc">Đăng ký</string>
+    <string name="txt_title_login_zalo">Đăng nhập</string>
+    <string name="zalo_app_not_installed">Bạn chưa cài Zalo!</string>
+    <string name="zalo_app_out_of_date">Bản Zalo hiện tại không tương thích!</string>
+    <string name="no_network">Mạng không ổn định, vui lòng thử lại sau</string>
+</resources>

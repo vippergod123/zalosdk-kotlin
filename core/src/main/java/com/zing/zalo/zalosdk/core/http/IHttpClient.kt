@@ -1,9 +1,9 @@
 package com.zing.zalo.zalosdk.core.http
 
-import org.json.JSONObject
-
 enum class HttpMethod {
-    GET, POST
+    GET,
+    POST,
+    POST_MULIIPART
 }
 
 interface IHttpRequest {
@@ -11,7 +11,7 @@ interface IHttpRequest {
     fun addParameter(key: String, value: String)
     fun addQueryStringParameter(key: String, value: String)
     fun addHeader(key: String, value: String)
-    fun setMethod(method: HttpMethod)
+    fun setMethod(httpMethod: HttpMethod)
 }
 
 interface IMultipartHttpRequest : IHttpRequest {
@@ -20,9 +20,9 @@ interface IMultipartHttpRequest : IHttpRequest {
 
 interface IHttpResponse {
     fun getStatusCode(): Int
-    fun getJSONData(): JSONObject
+    fun getText(): String?
 }
 
 interface IHttpClient {
-    fun send(request: IHttpRequest) : IHttpResponse
+    fun send(): IHttpResponse
 }
