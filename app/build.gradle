@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId "com.zing.zalo.zalosdk.demo"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -62,7 +62,7 @@ dependencies {
     testImplementation 'org.powermock:powermock-api-mockito2:1.7.0RC2'
 
 
-
+    testImplementation "com.google.truth:truth:0.43"
     testImplementation 'io.mockk:mockk:1.9'
 
 }

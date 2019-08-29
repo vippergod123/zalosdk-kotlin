@@ -3,6 +3,7 @@ package com.zing.zalo.zalosdk.core
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
+import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpClientFactory
 import com.zing.zalo.zalosdk.core.http.HttpMethod
 import io.mockk.MockKAnnotations
@@ -39,23 +40,28 @@ class HttpTest
      @Test
      fun `create post http request`()
      {
-          val requestAuth =
+          val authRequest =
                httpClientFactory.newRequest(HttpMethod.POST, "https://oauth.zaloapp.com/v2/mobile/validate_oauth_code")
-          requestAuth.addQueryStringParameter("app_id", "1829577289837795818")
-          requestAuth.addQueryStringParameter("version", "4.0")
-          requestAuth.addQueryStringParameter("frm", "sdk")
-          requestAuth.addQueryStringParameter(
+          authRequest.addQueryStringParameter("app_id", "1829577289837795818")
+          authRequest.addQueryStringParameter("version", "4.0")
+          authRequest.addQueryStringParameter("frm", "sdk")
+          authRequest.addQueryStringParameter(
                "code",
                "F7p3WdJVJWnYLfUqVCrj2aSQcCasat883X_Iuo-rIoLUAjURVQC691K2_-iKvG4hOsxlxbZTPJvvJ_tv1TfdHoDJl_Wzpcm93n6gtacbGG1sASNwRRz6EHmZoxe9tq9ULnhQZqJN25OnIFhgKfWbMKGRtPCi_1vwJIkVbaMnGbXDJiFe9RaW21atge51_MiK9XQKs02MDtaf6lc6Ai4KTIzspeq5psT0MbANaHJqEZcmscEnc7QGRlhf2hhwSe9lf99nWjmRbLlRb6Y7Y7kZIeI5TU1UMIRXxJPx5THkSm"
           )
+          val serviceMapRequest = httpClientFactory.newRequest(HttpMethod.GET, SERVICE_MAP_URLS[0])
 
-          val requestServiceMap = httpClientFactory.newRequest(HttpMethod.GET, SERVICE_MAP_URLS[0])
+          val authHttpClient = HttpClient()
+          val authResponse = authHttpClient.send(authRequest)
 
-          val requestAuthText = requestAuth.send().getText()
-          val requestAuthStatusCode = requestAuth.send().getStatusCode()
+          val serviceMapHttpClient = HttpClient()
+          val serviceMapResponse = serviceMapHttpClient.send(serviceMapRequest)
 
-          val requestServiceMapText = requestServiceMap.send().getText()
-          val requestServiceMapStatusCode = requestAuth.send().getStatusCode()
+          val requestAuthText = authResponse.getText()
+          val requestAuthStatusCode = authResponse.getStatusCode()
+
+          val requestServiceMapText = serviceMapResponse.getText()
+          val requestServiceMapStatusCode = serviceMapResponse.getStatusCode()
 
           assertThat(requestAuthStatusCode).isEqualTo(HttpURLConnection.HTTP_OK)
           assertThat(requestServiceMapStatusCode).isEqualTo(HttpURLConnection.HTTP_OK)
@@ -67,23 +73,29 @@ class HttpTest
      @Test
      fun `create get http request`()
      {
-          val requestAuth =
+          val authRequest =
                httpClientFactory.newRequest(HttpMethod.GET, "https://oauth.zaloapp.com/v2/mobile/validate_oauth_code")
-          requestAuth.addQueryStringParameter("app_id", "1829577289837795818")
-          requestAuth.addQueryStringParameter("version", "4.0")
-          requestAuth.addQueryStringParameter("frm", "sdk")
-          requestAuth.addQueryStringParameter(
+          authRequest.addQueryStringParameter("app_id", "1829577289837795818")
+          authRequest.addQueryStringParameter("version", "4.0")
+          authRequest.addQueryStringParameter("frm", "sdk")
+          authRequest.addQueryStringParameter(
                "code",
                "F7p3WdJVJWnYLfUqVCrj2aSQcCasat883X_Iuo-rIoLUAjURVQC691K2_-iKvG4hOsxlxbZTPJvvJ_tv1TfdHoDJl_Wzpcm93n6gtacbGG1sASNwRRz6EHmZoxe9tq9ULnhQZqJN25OnIFhgKfWbMKGRtPCi_1vwJIkVbaMnGbXDJiFe9RaW21atge51_MiK9XQKs02MDtaf6lc6Ai4KTIzspeq5psT0MbANaHJqEZcmscEnc7QGRlhf2hhwSe9lf99nWjmRbLlRb6Y7Y7kZIeI5TU1UMIRXxJPx5THkSm"
           )
 
-          val requestServiceMap = httpClientFactory.newRequest(HttpMethod.GET, SERVICE_MAP_URLS[0])
+          val serviceMapRequest = httpClientFactory.newRequest(HttpMethod.GET, SERVICE_MAP_URLS[0])
 
-          val requestAuthText = requestAuth.send().getText()
-          val requestAuthStatusCode = requestAuth.send().getStatusCode()
+          val authHttpClient = HttpClient()
+          val authResponse = authHttpClient.send(authRequest)
 
-          val requestServiceMapText = requestServiceMap.send().getText()
-          val requestServiceMapStatusCode = requestAuth.send().getStatusCode()
+          val serviceMapHttpClient = HttpClient()
+          val serviceMapResponse = serviceMapHttpClient.send(serviceMapRequest)
+
+          val requestAuthText = authResponse.getText()
+          val requestAuthStatusCode = authResponse.getStatusCode()
+
+          val requestServiceMapText = serviceMapResponse.getText()
+          val requestServiceMapStatusCode = serviceMapResponse.getStatusCode()
 
           assertThat(requestAuthStatusCode).isEqualTo(HttpURLConnection.HTTP_OK)
           assertThat(requestServiceMapStatusCode).isEqualTo(HttpURLConnection.HTTP_OK)

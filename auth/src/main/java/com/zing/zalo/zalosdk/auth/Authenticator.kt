@@ -19,7 +19,7 @@ import java.lang.ref.WeakReference
 class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
     IAuthenticator {
     private var wListener: WeakReference<IAuthenticateCompleteListener> =
-        WeakReference<IAuthenticateCompleteListener>(null)
+        WeakReference(null)
     private var bIsZaloLoginSuccessful = false
     private var bIsZaloOutOfDate: Boolean = false
 
@@ -95,7 +95,6 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
 
 
     fun loginViaApp(activity: Activity) {
-        val context = activity.applicationContext
         try {
             try {
                 activity.unregisterReceiver(receiver)
@@ -159,9 +158,8 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
     internal fun getZaloLoginStatus(callback: GetZaloLoginStatus?) {
         if (callback == null) return
         ZTaskExecutor.queueRunnable(Runnable {
-            var status = 0
             try {
-                status = ZaloService().getUserLoggedStatus(mContext)
+                val status = ZaloService().getUserLoggedStatus(mContext)
                 callback.onGetZaloLoginStatusCompleted(status)
             } catch (e: InterruptedException) {
                 Log.w(e)

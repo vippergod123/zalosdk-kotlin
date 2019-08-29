@@ -30,7 +30,7 @@ open class ServiceMapStorage(context: Context) : Storage(context)
      
      fun getExpireTime(): Long
      {
-         return getLong(prefKeyUrlExpireTime)!!
+         return getLong(prefKeyUrlExpireTime)
      }
      
      fun setKeyUrlOauth(urlOauth: String)

@@ -7,11 +7,11 @@ enum class HttpMethod {
 }
 
 interface IHttpRequest {
-    fun setPath(path: String)
+    //    fun setPath(path: String)
     fun addParameter(key: String, value: String)
     fun addQueryStringParameter(key: String, value: String)
     fun addHeader(key: String, value: String)
-    fun setMethod(httpMethod: HttpMethod)
+//    fun setMethod(httpMethod: HttpMethod)
 }
 
 interface IMultipartHttpRequest : IHttpRequest {
@@ -24,5 +24,5 @@ interface IHttpResponse {
 }
 
 interface IHttpClient {
-    fun send(): IHttpResponse
+    fun send(request: HttpClientRequest): IHttpResponse
 }

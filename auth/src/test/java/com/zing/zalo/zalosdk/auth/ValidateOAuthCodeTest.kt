@@ -4,10 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.zing.zalo.zalosdk.auth.validateauthcode.ValidateOAuthCodeCallback
 import com.zing.zalo.zalosdk.auth.validateauthcode.ValidateOAuthCodeTask
-import com.zing.zalo.zalosdk.core.http.HttpClientFactory
-import com.zing.zalo.zalosdk.core.http.HttpClientRequest
-import com.zing.zalo.zalosdk.core.http.HttpMethod
-import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
+import com.zing.zalo.zalosdk.core.http.HttpClient
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -29,13 +26,7 @@ class ValidateOAuthCodeTest {
     private lateinit var validateOAuthCodeTask: ValidateOAuthCodeTask
 
     @MockK
-    private lateinit var httpClientFactory: HttpClientFactory
-
-    @MockK
-    private lateinit var okRequest: HttpClientRequest
-
-    @MockK
-    private lateinit var failRequest: HttpClientRequest
+    private lateinit var httpClient: HttpClient
 
     @Before
     fun setup() {
@@ -53,11 +44,21 @@ class ValidateOAuthCodeTest {
 
         //2a. run & verify
         validateOAuthCodeTask =
-            ValidateOAuthCodeTask(authCode, appID, version, true, object : ValidateOAuthCodeCallback {
-                override fun onValidateComplete(validated: Boolean, errorCode: Int, userId: Long, authCode: String?) {
-                    Assert.assertEquals(7793733042068913573, userId)
-                }
-            })
+            ValidateOAuthCodeTask(
+                authCode,
+                appID,
+                version,
+                true,
+                object : ValidateOAuthCodeCallback {
+                    override fun onValidateComplete(
+                        validated: Boolean,
+                        errorCode: Int,
+                        userId: Long,
+                        authCode: String?
+                    ) {
+                        Assert.assertEquals(7793733042068913573, userId)
+                    }
+                })
         validateOAuthCodeTask.execute()
     }
 
@@ -70,35 +71,55 @@ class ValidateOAuthCodeTest {
         val version = "4.0"
 
         //2. run with mock & verify
-        val mainURL = ServiceMapManager.urlFor(ServiceMapManager.KEY_URL_OAUTH, "/v2/mobile/validate_oauth_code")
 
         //2.a ok request
-        every { httpClientFactory.newRequest(HttpMethod.POST, mainURL) } returns okRequest
-        every { okRequest.send().getText() } returns resultAuth
+        every { httpClient.send(any()).getText() } returns resultAuth
+
+        validateOAuthCodeTask =
+            ValidateOAuthCodeTask(
+                authCode,
+                appID,
+                version,
+                true,
+                object : ValidateOAuthCodeCallback {
+                    override fun onValidateComplete(
+                        validated: Boolean,
+                        errorCode: Int,
+                        userId: Long,
+                        authCode: String?
+                    ) {
+                        Assert.assertEquals(7793733042068913573, userId)
+                    }
+                })
+
+        validateOAuthCodeTask.setHttpClient(httpClient)
+        validateOAuthCodeTask.execute()
+
+        //2.b fail reques
+        every { httpClient.send(any()).getText() } returns "123"
 
 
         validateOAuthCodeTask =
-            ValidateOAuthCodeTask(authCode, appID, version, true, object : ValidateOAuthCodeCallback {
-                override fun onValidateComplete(validated: Boolean, errorCode: Int, userId: Long, authCode: String?) {
-                    Assert.assertEquals(7793733042068913573, userId)
-                }
-            })
-        validateOAuthCodeTask.setHttpClientFactory(httpClientFactory)
+            ValidateOAuthCodeTask(
+                authCode,
+                appID,
+                version,
+                true,
+                object : ValidateOAuthCodeCallback {
+                    override fun onValidateComplete(
+                        validated: Boolean,
+                        errorCode: Int,
+                        userId: Long,
+                        authCode: String?
+                    ) {
+                        Assert.assertEquals(-1, userId)
+                        Assert.assertEquals(false, validated)
+                    }
+                })
+
+        validateOAuthCodeTask.setHttpClient(httpClient)
         validateOAuthCodeTask.execute()
 
-        //2.b fail request
-        every { httpClientFactory.newRequest(HttpMethod.POST, mainURL) } returns failRequest
-        every { failRequest.send().getText() } returns "123"
 
-        validateOAuthCodeTask.setHttpClientFactory(httpClientFactory)
-        validateOAuthCodeTask =
-            ValidateOAuthCodeTask(authCode, appID, version, true, object : ValidateOAuthCodeCallback {
-                override fun onValidateComplete(validated: Boolean, errorCode: Int, userId: Long, authCode: String?) {
-                    Assert.assertEquals(-1, userId)
-                    Assert.assertEquals(false, validated)
-                }
-            })
-        validateOAuthCodeTask.setHttpClientFactory(httpClientFactory)
-        validateOAuthCodeTask.execute()
     }
 }

@@ -1,21 +1,21 @@
 package com.zing.zalo.zalosdk.core.log
 
 import android.content.Context
-import com.zing.zalo.zalosdk.core.helper.Utils
 import java.util.*
 
 
 object Log
 {
-	
-	private val LOG_TAG = "ZDK"
-	
-	val VERBOSE = android.util.Log.VERBOSE
-	val DEBUG = android.util.Log.DEBUG
-	val INFO = android.util.Log.INFO
-	val WARN = android.util.Log.WARN
-	val ERROR = android.util.Log.ERROR
-	var logLevel = android.util.Log.ERROR
+
+    private const val LOG_TAG = "ZDK"
+
+    private const val VERBOSE = android.util.Log.VERBOSE
+    private const val DEBUG = android.util.Log.DEBUG
+    private const val INFO = android.util.Log.INFO
+    private const val WARN = android.util.Log.WARN
+    private const val ERROR = android.util.Log.ERROR
+
+    private var logLevel = android.util.Log.ERROR
 	
 	fun setLogLevel(context: Context)
 	{

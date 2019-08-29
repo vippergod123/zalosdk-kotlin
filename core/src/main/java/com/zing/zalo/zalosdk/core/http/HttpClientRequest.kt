@@ -10,8 +10,8 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 
-open class HttpClientRequest(private var method: HttpMethod, private var mPath: String) : IHttpRequest,
-    IHttpClient, IMultipartHttpRequest {
+class HttpClientRequest(method: HttpMethod, mPath: String) : IHttpRequest,
+    IMultipartHttpRequest {
 
     private var mParams: MutableMap<String, String> = mutableMapOf()
     private var mQueryParams: MutableMap<String, String> = mutableMapOf()
@@ -19,6 +19,9 @@ open class HttpClientRequest(private var method: HttpMethod, private var mPath: 
     private var fileName: String? = null
     private var fileKey: String? = null
     private var data: ByteArray? = null
+
+    var method: HttpMethod = method
+    var path: String = mPath
 
     companion object {
         private const val TWO_HYPHENS = "--"
@@ -43,59 +46,18 @@ open class HttpClientRequest(private var method: HttpMethod, private var mPath: 
         mHeader[key] = value
     }
 
-    override fun setPath(path: String) {
-        mPath = path
-    }
-
-    override fun setMethod(httpMethod: HttpMethod) {
-        method = httpMethod
-    }
 
     override fun addFileParameter(key: String, fileName: String, data: ByteArray) {
         TODO("addFileParameter") //To change body of created functions use File | Settings | File Templates.
     }
     //#endregion
 
-    //#region IHttpClient
-    override fun send(): IHttpResponse {
-        //
-        return object : IHttpResponse {
-            override fun getStatusCode(): Int {
-                val connection = URL(mPath).openConnection() as HttpURLConnection
-                return connection.responseCode
-            }
-
-            override fun getText(): String? {
-                try {
-                    val inputStream = getResponse() ?: return null
-
-                    val bufferReader = BufferedReader(InputStreamReader(inputStream))
-
-                    val sb = StringBuilder()
-                    var line: String? = bufferReader.readLine()
-                    while (line != null) {
-                        sb.append(line)
-                        line = bufferReader.readLine()
-                    }
-                    bufferReader.close()
-
-                    Log.v("connect server RESPONSE getText() : $sb")
-                    return sb.toString()
-                } catch (ex: Exception) {
-                    Log.w(ex.toString())
-                    return null
-                }
-            }
-
-        }
-    }
-    //# endregion
-
-    private fun getResponse(): InputStream? {
+    //#region method
+    fun getResponse(): InputStream? {
         try {
             when (method) {
                 HttpMethod.POST -> {
-                    val connection = URL(mPath).openConnection() as HttpURLConnection
+                    val connection = URL(path).openConnection() as HttpURLConnection
 
                     connection.requestMethod = "POST"
                     connection.setRequestProperty("Accept-Charset", "UTF-8")
@@ -116,7 +78,7 @@ open class HttpClientRequest(private var method: HttpMethod, private var mPath: 
                     return connection.inputStream
                 }
                 HttpMethod.GET -> {//GET
-                    val sb = StringBuilder(mPath)
+                    val sb = StringBuilder(path)
                     val queryParam = getParamsString()
 
                     if (sb.toString().endsWith("?"))
@@ -137,7 +99,7 @@ open class HttpClientRequest(private var method: HttpMethod, private var mPath: 
                     // Open a HTTP connection to the URL
 
                     //Todo: next task
-                    val connection = URL(mPath).openConnection() as HttpURLConnection
+                    val connection = URL(path).openConnection() as HttpURLConnection
                     connection.doInput = true
                     connection.doOutput = true
                     connection.useCaches = false
@@ -199,6 +161,9 @@ open class HttpClientRequest(private var method: HttpMethod, private var mPath: 
         return null
     }
 
+    //# endregion
+
+
     private fun getParamsString(): String {
         val sb = StringBuilder("")
         if (mQueryParams.isNotEmpty()) {
@@ -216,5 +181,6 @@ open class HttpClientRequest(private var method: HttpMethod, private var mPath: 
         }
         return sb.toString()
     }
+
 
 }
