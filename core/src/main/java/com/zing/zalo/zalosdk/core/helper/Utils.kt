@@ -5,6 +5,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
+import org.json.JSONException
+import org.json.JSONObject
 import java.util.*
 
 object Utils
@@ -24,14 +26,15 @@ object Utils
 
 	fun isOnline(ctx: Context): Boolean
 	{
-		if (!isPermissionGranted(ctx, Manifest.permission.ACCESS_NETWORK_STATE)) return false
+		if (!isPermissionGranted(ctx, Manifest.permission.ACCESS_NETWORK_STATE)) return true
 
 		val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val netInfo = cm.activeNetworkInfo
         return netInfo != null && netInfo.isConnected
 	}
 
-	fun getLanguage(): String
+
+    fun getLanguage(): String
 	{
 		return if (language != null)
 		{
@@ -52,4 +55,24 @@ object Utils
 		language = lang
 	}
 
+	fun isNumber(value: String):Boolean {
+		return value.matches("-?\\d+(\\.\\d+)?".toRegex())
+	}
+
+
+	fun getBoolean(obj: JSONObject, key: String): Boolean? {
+		if (obj.has(key)) {
+			try {
+				return obj.getBoolean(key)
+			} catch (e: JSONException) {
+				try {
+					return obj.getInt(key) != 0
+				} catch (ignored: JSONException) {
+				}
+
+			}
+
+		}
+		return null
+	}
 }

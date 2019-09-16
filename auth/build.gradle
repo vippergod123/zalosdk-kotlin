@@ -5,14 +5,14 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion rootProject.ext.compileSdkVersion as Integer
+    buildToolsVersion rootProject.ext.buildToolsVersion as String
 
+    testOptions.unitTests.includeAndroidResources = true
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion rootProject.ext.minSdkVersion as Integer
+        targetSdkVersion rootProject.ext.targetSdkVersion as Integer
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -24,7 +24,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
 }
 
 dependencies {
@@ -46,6 +45,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:2.4.0'
 
     testImplementation 'org.robolectric:robolectric:4.1'
+    testImplementation "com.google.truth:truth:0.43"
 
     testImplementation 'org.powermock:powermock-core:1.7.0RC2'
     testImplementation 'org.powermock:powermock-module-junit4:1.7.0RC2'

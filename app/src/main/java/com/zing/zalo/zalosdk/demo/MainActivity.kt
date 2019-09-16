@@ -9,15 +9,17 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.zing.zalo.zalosdk.auth.*
-import com.zing.zalo.zalosdk.auth.callback.GetZaloLoginStatus
-import com.zing.zalo.zalosdk.auth.validateauthcode.ValidateOAuthCodeCallback
+import com.zing.zalo.zalosdk.oauth.*
+import com.zing.zalo.zalosdk.oauth.callback.GetZaloLoginStatus
+import com.zing.zalo.zalosdk.oauth.callback.ValidateOAuthCodeCallback
 import com.zing.zalo.zalosdk.core.helper.AppInfo
-import com.zing.zalo.zalosdk.core.helper.DeviceInfo
+import com.zing.zalo.zalosdk.core.log.Log
 import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
+import com.zing.zalo.zalosdk.oauth.helper.AuthStorage
 
 
-class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLoginStatus
+class MainActivity : AppCompatActivity(),
+    ValidateOAuthCodeCallback, GetZaloLoginStatus
 {
     private lateinit var loginWebButton: Button
     private lateinit var loginViaButton: Button
@@ -56,6 +58,7 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        Log.setLogLevel(this)
         ServiceMapManager.load(this)
         bindUI()
         configureUI()
@@ -159,7 +162,7 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
         }
 
         deviceTrackingButton.setOnClickListener {
-            DeviceInfo.getConnectionType(this)
+//            DeviceInfo.getConnectionType(this)
         }
     }
 

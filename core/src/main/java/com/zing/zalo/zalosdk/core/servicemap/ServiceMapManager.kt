@@ -6,8 +6,7 @@ import android.os.AsyncTask
 import android.text.TextUtils
 import com.zing.zalo.zalosdk.core.Constant
 import com.zing.zalo.zalosdk.core.http.HttpClient
-import com.zing.zalo.zalosdk.core.http.HttpClientFactory
-import com.zing.zalo.zalosdk.core.http.HttpClientRequest
+import com.zing.zalo.zalosdk.core.http.HttpGetRequest
 import com.zing.zalo.zalosdk.core.http.HttpMethod
 import com.zing.zalo.zalosdk.core.log.Log
 import org.json.JSONException
@@ -39,13 +38,9 @@ object ServiceMapManager {
     )
 
     private var urls: MutableMap<String, String> = HashMap()
+    var httpClient = HttpClient("")
 
-    private var httpClient = HttpClient()
-    private var httpClientFactory: HttpClientFactory? = null
-
-    @SuppressLint("StaticFieldLeak")
-    private var storage: ServiceMapStorage? = null
-
+    var storage: ServiceMapStorage? = null
 
     init {
         if (Constant.DEV_MODE) {
@@ -78,7 +73,7 @@ object ServiceMapManager {
 
                             updateMapUrls(urlOauth, urlGraph, urlCentralized)
                         } catch (e: JSONException) {
-                            Log.e(e.message.toString())
+                            Log.e("ServiceMapManager: load()", e)
                         }
                     }
                 }
@@ -87,6 +82,11 @@ object ServiceMapManager {
 
         }
     }
+
+    fun urlFor(key: String): String {
+        return urls[key] ?: key
+    }
+
 
     fun urlFor(key: String, path: String): String {
         val url = urls[key]
@@ -139,25 +139,12 @@ object ServiceMapManager {
         return currentTimeMillis >= expireTime
     }
 
-    fun setHttpClient(mHttpClient: HttpClient) {
-        this.httpClient = mHttpClient
-    }
-
-    fun setServiceMapStorage(mStorage: ServiceMapStorage) {
-        this.storage = mStorage
-    }
-
-    fun setHttpClientFactory(factory: HttpClientFactory) {
-        this.httpClientFactory = factory
-    }
-
     fun getStorage(context: Context): ServiceMapStorage {
         if (storage == null) {
-            storage = ServiceMapStorage(context)
+            storage = ServiceMapStorage(context.applicationContext)
         }
         return storage!!
     }
-
 
     class DownloadServiceMapFilesAsyncTask(
         private val httpClient: HttpClient,
@@ -169,18 +156,13 @@ object ServiceMapManager {
         override fun doInBackground(vararg p0: String?): JSONObject? {
             for (serviceMapUrl in SERVICE_MAP_URLS) {
                 try {
-                    var request = HttpClientRequest(HttpMethod.GET, serviceMapUrl)
-
-                    if (httpClientFactory != null) { // For Testing
-                        request = httpClientFactory!!.newRequest(HttpMethod.GET, serviceMapUrl)
-                    }
-
-
-                    val str = httpClient.send(request).getText() ?: return null
+                    val request = HttpGetRequest(serviceMapUrl)
+                    val response = httpClient.send(request)
+                    val str = response.getText() ?: ""
                     val decryptString = ServiceMapTools.decryptString(str)
                     return JSONObject(decryptString)
                 } catch (e: Exception) {
-                    Log.e(e)
+                    Log.w("DownloadServiceMapFilesAsyncTask" , e)
                 }
             }
             return null

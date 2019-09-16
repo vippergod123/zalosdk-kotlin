@@ -6,7 +6,6 @@ import java.util.*
 
 object Log
 {
-
     private const val LOG_TAG = "ZDK"
 
     private const val VERBOSE = android.util.Log.VERBOSE
@@ -15,7 +14,7 @@ object Log
     private const val WARN = android.util.Log.WARN
     private const val ERROR = android.util.Log.ERROR
 
-    private var logLevel = android.util.Log.ERROR
+    private var logLevel = android.util.Log.VERBOSE
 	
 	fun setLogLevel(context: Context)
 	{
@@ -208,6 +207,9 @@ object Log
 	private fun log(priority: Int, tag: String, msg: String)
 	{
 		if (priority < logLevel) return
-		android.util.Log.println(priority, tag, msg)
+
+		val newTag = if (tag!= "ZDK") "ZDK - $tag" else tag
+
+		android.util.Log.println(priority, newTag, msg)
 	}
 }

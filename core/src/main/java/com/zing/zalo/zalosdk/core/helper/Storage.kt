@@ -3,7 +3,7 @@ package com.zing.zalo.zalosdk.core.helper
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
-import com.zing.zalo.zalosdk.core.MySharedPreference.PREF_OAUTH_CODE
+import com.zing.zalo.zalosdk.core.SharedPreferenceConstant.PREF_OAUTH_CODE
 
 open class Storage(val context: Context)
 {

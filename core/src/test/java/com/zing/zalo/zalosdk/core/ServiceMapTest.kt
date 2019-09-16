@@ -4,14 +4,15 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.zing.zalo.zalosdk.core.http.HttpClient
-import com.zing.zalo.zalosdk.core.http.HttpClientFactory
-import com.zing.zalo.zalosdk.core.http.HttpClientRequest
+import com.zing.zalo.zalosdk.core.http.HttpGetRequest
 import com.zing.zalo.zalosdk.core.http.HttpMethod
+import com.zing.zalo.zalosdk.core.http.HttpResponse
 import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
 import com.zing.zalo.zalosdk.core.servicemap.ServiceMapStorage
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.slot
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
@@ -33,23 +34,19 @@ class ServiceMapTest {
         "https://srv.mp3.zing.vn/zdl/service_map_all.bin"
     )
 
-    @get:Rule
     private lateinit var context: Context
 
     @MockK
-    private lateinit var request1: HttpClientRequest
+    private lateinit var response1: HttpResponse
 
     @MockK
-    private lateinit var request2: HttpClientRequest
+    private lateinit var response2: HttpResponse
 
     @MockK
     private lateinit var storage: ServiceMapStorage
 
     @MockK
     private lateinit var client: HttpClient
-
-    @MockK
-    private lateinit var httpClientFactory: HttpClientFactory
 
 
     @Before
@@ -58,9 +55,8 @@ class ServiceMapTest {
 
         context = ApplicationProvider.getApplicationContext()
 
-        ServiceMapManager.setHttpClient(client)
-        ServiceMapManager.setHttpClientFactory(httpClientFactory)
-        ServiceMapManager.setServiceMapStorage(storage)
+        ServiceMapManager.httpClient = client
+        ServiceMapManager.storage = storage
 
         every { storage.getKeyUrlCentralized() } returns "centralized"
         every { storage.getKeyUrlOauth() } returns "oauth"
@@ -82,13 +78,13 @@ class ServiceMapTest {
 
     @Test
     fun downloadServiceMapTestInDevMode() {
+        //1. mock
+        val requests = mutableListOf<HttpGetRequest>()
 
-        //1. mock http req
-        every { httpClientFactory.newRequest(HttpMethod.GET, SERVICE_MAP_URLS[0]) } returns request1
-        every { httpClientFactory.newRequest(HttpMethod.GET, SERVICE_MAP_URLS[1]) } returns request2
+        every { client.send(capture(requests)) } returns response1 andThen response2
 
-        every { client.send(request1).getText() } returns "ABC"
-        every { client.send(request2).getText() } returns RESULT
+        every { response1.getText() } returns "ABC"
+        every { response2.getText() } returns RESULT
         every { storage.getExpireTime() } returns 0L
 
         //2. run
@@ -120,6 +116,10 @@ class ServiceMapTest {
         assertThat(urlOauth).isEqualTo(testUrlOauth)
         assertThat(urlGraph).isEqualTo(testUrlGraph)
         assertThat(urlCentralized).isEqualTo(testUrlCentralized)
+
+        assertThat(requests.size).isEqualTo(2)
+        assertThat(requests[0].getUrl("")).isEqualTo(SERVICE_MAP_URLS[0])
+        assertThat(requests[1].getUrl("")).isEqualTo(SERVICE_MAP_URLS[1])
     }
 
 

@@ -7,12 +7,12 @@ object Constant {
     const val DEV_MODE = false
     const val ZALO_PACKAGE_NAME = "com.zing.zalo"
 
-    val sharedPreference = MySharedPreference
+    val sharedPreference = SharedPreferenceConstant
     val nameSharedPreference = NameSharedPreference
     val api = Api
 }
 
-object MySharedPreference {
+object SharedPreferenceConstant {
     const val PREF_OAUTH_CODE = "PREFERECE_ZALO_SDK_OAUTH_CODE"
     const val PREF_ZALO_ID = "PREFERECE_ZALO_SDK_ZALO_ID"
     const val PREF_ZALO_DISPLAY_NAME = "PREFERECE_ZALO_SDK_ZALO_DISPLAY_NAME"

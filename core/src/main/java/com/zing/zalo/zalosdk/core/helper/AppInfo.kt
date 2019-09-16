@@ -6,7 +6,7 @@ import android.content.pm.Signature
 import android.os.Build
 import android.os.Bundle
 import android.util.Base64
-import android.util.Log
+import com.zing.zalo.zalosdk.core.log.Log
 import java.net.URLEncoder
 import java.security.MessageDigest
 
@@ -14,12 +14,11 @@ object AppInfo
 {
     private val lock = Any()
     var extracted: Boolean = false
-    private var appId: String? = null
+    var appId: String? = null
     var versionName: String? = null
     var versionCode: Long = 0
-    var packageName: String? = null
     var appName: String? = null
-    private var applicationHashKey: String? = null
+    var applicationHashKey: String? = null
     var firstInstallDate: String? = null
     var installDate: String? = null
     var lastUpdateDate: String? = null
@@ -54,19 +53,10 @@ object AppInfo
         return try {
             java.lang.Long.parseLong(str)
         } catch (ex: Exception) {
-            Log.w("getAppIdLong", ex.toString())
+            Log.w("getAppIdLong",ex)
             return 0L
         }
 
-    }
-
-    fun getPackageName(ctx: Context): String {
-        synchronized(lock) {
-            if (extracted) return packageName!!
-        }
-
-        extractBasicAppInfo(ctx)
-        return packageName!!
     }
 
     fun getApplicationHashKey(ctx: Context): String? {
@@ -95,7 +85,7 @@ object AppInfo
             }
 
         } catch (e: Exception) {
-            com.zing.zalo.zalosdk.core.log.Log.e(e)
+            Log.e("AppInfo: getApplicationHashKey()", e)
         }
 
         return applicationHashKey
@@ -140,7 +130,7 @@ object AppInfo
 
             try {
                 val pm = ctx.packageManager
-                packageName = ctx.packageName
+                val packageName = ctx.packageName
                 val pInfo = pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
                 val appInfo = pm.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
                 versionName = pInfo.versionName

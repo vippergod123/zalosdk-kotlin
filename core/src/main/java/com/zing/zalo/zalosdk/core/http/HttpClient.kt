@@ -1,44 +1,45 @@
 package com.zing.zalo.zalosdk.core.http
 
-class HttpClient : IHttpClient {
-    private lateinit var path: String
-    private lateinit var method: HttpMethod
+import com.zing.zalo.zalosdk.core.log.Log
+import java.net.HttpURLConnection
+import java.net.URL
 
-    override fun send(request: HttpClientRequest): HttpClientResponse {
-        path = request.path
-        method = request.method
+class HttpClient(private val baseUrl: String) : IHttpClient {
 
-        val response = HttpClientResponse()
-        response.inputStream = request.getResponse()
-        response.path = path
-        return response
+    override fun send(request: IHttpRequest): HttpResponse {
+        val response = HttpResponse(request)
+
+        try {
+            val url = URL(request.getUrl(baseUrl))
+            val conn = url.openConnection() as HttpURLConnection
+            val headers = request.getHeaders()
+            for (key in headers.keys) {
+                conn.setRequestProperty(key, headers[key])
+            }
+
+            when (request.getMethod()) {
+                HttpMethod.POST-> {
+                    val postRequest = request as IPostHttpRequest
+                    conn.requestMethod = "POST"
+                    conn.doOutput = true // Triggers POST.
+
+                    val output = conn.outputStream
+                    postRequest.encodeBody(output)
+                    output.flush()
+                    output.close()
+                }
+                HttpMethod.GET -> {
+                    conn.requestMethod = "GET"
+                }
+            }
+
+            response.responseCode = conn.responseCode;
+            response.responseStream = conn.inputStream
+        } catch (ex: Exception) {
+            Log.w("HttpClient: ", ex)
+        }
+
+        return response;
     }
-
-//    fun getStatusCode(): Int {
-//        val connection = URL(path).openConnection() as HttpURLConnection
-//        return connection.responseCode
-//    }
-//
-//    fun getText(): String? {
-//        try {
-//            val inputStream =
-//
-//            val bufferReader = BufferedReader(InputStreamReader(inputStream))
-//
-//            val sb = StringBuilder()
-//            var line: String? = bufferReader.readLine()
-//            while (line != null) {
-//                sb.append(line)
-//                line = bufferReader.readLine()
-//            }
-//            bufferReader.close()
-//
-//            Log.v("connect server RESPONSE getText() : $sb")
-//            return sb.toString()
-//        } catch (ex: Exception) {
-//            Log.w(ex.toString())
-//            return null
-//        }
-//    }
 
 }
