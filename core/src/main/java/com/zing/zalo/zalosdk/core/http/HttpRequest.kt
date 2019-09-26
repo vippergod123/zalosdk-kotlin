@@ -2,7 +2,8 @@ package com.zing.zalo.zalosdk.core.http
 
 import com.zing.zalo.zalosdk.core.Constant
 import com.zing.zalo.zalosdk.core.log.Log
-import java.io.*
+import java.io.DataOutputStream
+import java.io.OutputStream
 import java.net.URLEncoder
 
 abstract class BaseHttpRequest(val path: String) : IHttpRequest {
@@ -30,17 +31,17 @@ abstract class BaseHttpRequest(val path: String) : IHttpRequest {
     override fun getUrl(baseUrl: String): String {
         val sb = StringBuilder(baseUrl)
 
-        if(baseUrl.isNotBlank() && !baseUrl.endsWith("/") && !path.startsWith("/")) {
+        if (baseUrl.isNotBlank() && !baseUrl.endsWith("/") && !path.startsWith("/")) {
             sb.append("/")
         }
 
         sb.append(path)
 
-        if(mQueryParams.isEmpty()) {
+        if (mQueryParams.isEmpty()) {
             return sb.toString()
         }
 
-        if(path.contains("?")) {
+        if (path.contains("?")) {
             sb.append("&")
         } else {
             sb.append("?")
@@ -57,27 +58,26 @@ abstract class BaseHttpRequest(val path: String) : IHttpRequest {
             }
         }
 
-        if(sb.isNotEmpty() && sb.last() == '&') {
-            sb.deleteCharAt(sb.length -1)
+        if (sb.isNotEmpty() && sb.last() == '&') {
+            sb.deleteCharAt(sb.length - 1)
         }
 
-        return sb.toString();
+        return sb.toString()
     }
 
     override fun getHeaders(): Map<String, String> {
-        return mHeader;
+        return mHeader
     }
 }
 
-class HttpGetRequest(url: String) : BaseHttpRequest(url) {
+class HttpGetRequest(path: String) : BaseHttpRequest(path) {
     override fun getMethod(): HttpMethod {
         return HttpMethod.GET
     }
 }
 
-abstract class BasePostHttpRequest(url: String) : BaseHttpRequest(url), IPostHttpRequest {
+abstract class BasePostHttpRequest(path: String) : BaseHttpRequest(path), IPostHttpRequest {
     var params: MutableMap<String, String> = mutableMapOf()
-
 
     override fun getMethod(): HttpMethod {
         return HttpMethod.POST
@@ -93,7 +93,7 @@ abstract class BasePostHttpRequest(url: String) : BaseHttpRequest(url), IPostHtt
 }
 
 
-class HttpUrlEncodedRequest(url: String) : BasePostHttpRequest(url) {
+class HttpUrlEncodedRequest(path: String) : BasePostHttpRequest(path) {
     init {
         this.addHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
     }
@@ -107,12 +107,12 @@ class HttpUrlEncodedRequest(url: String) : BasePostHttpRequest(url) {
                     .append(URLEncoder.encode(params[key], "UTF-8"))
                     .append("&")
             } catch (e: Exception) {
-                Log.w("HttpUrlEncodedRequest - encodeBody()",e)
+                Log.w("HttpUrlEncodedRequest - encodeBody()", e)
             }
         }
 
-        if(sb.isNotEmpty() && sb.last() == '&') {
-            sb.deleteCharAt(sb.length -1)
+        if (sb.isNotEmpty() && sb.last() == '&') {
+            sb.deleteCharAt(sb.length - 1)
         }
 
         stream.write(sb.toString().toByteArray(charset("UTF-8")))
@@ -120,7 +120,7 @@ class HttpUrlEncodedRequest(url: String) : BasePostHttpRequest(url) {
 }
 
 
-class HttpMultipartRequest(mUrl: String) : BasePostHttpRequest(mUrl), IMultipartHttpRequest {
+class HttpMultipartRequest(path: String) : BasePostHttpRequest(path), IMultipartHttpRequest {
     private var fileKey: String? = null
     private var fileName: String? = null
     private var fileData: ByteArray? = null
@@ -150,7 +150,7 @@ class HttpMultipartRequest(mUrl: String) : BasePostHttpRequest(mUrl), IMultipart
             dos.writeBytes(LINE_END)
         }
 
-        if(fileData != null && fileKey != null) {
+        if (fileData != null && fileKey != null) {
             dos.writeBytes(TWO_HYPHENS + BOUNDARY + LINE_END)
             dos.writeBytes("Content-Disposition: form-data; name=$fileKey; filename=$fileName${LINE_END}")
             dos.writeBytes(LINE_END)

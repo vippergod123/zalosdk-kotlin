@@ -21,7 +21,7 @@ object ZaloSDK
     private var mStorage: AuthStorage? = null
 
     private var isInitialized = false
-    private var settingManager: SettingsManager? = null
+
 
     /**
      * Initialize the SDK
@@ -35,13 +35,14 @@ object ZaloSDK
         mStorage = AuthStorage(context)
         mAuthenticator = Authenticator(context, mStorage!!)
 
-        settingManager = SettingsManager(context)
-        DeviceTracking.init(context)
-        DeviceTracking.getDeviceId(object : DeviceTrackingListener {
+//        SettingsManager.init(context)
+        DeviceTracking.init(context, object :DeviceTrackingListener {
             override fun onComplete(result: String?) {
-                settingManager?.init()
+                super.onComplete(result)
+                SettingsManager(context).init()
             }
         })
+
     }
 
     /**

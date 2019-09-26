@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.zing.zalo.devicetrackingsdk.DeviceTracking
 import com.zing.zalo.zalosdk.core.helper.AppInfoHelper
+import com.zing.zalo.zalosdk.core.helper.AppTrackerHelper
 import com.zing.zalo.zalosdk.core.helper.PrivateSharedPreferenceInterface
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpGetRequest
@@ -31,9 +32,6 @@ class SettingsManagerTest {
     private lateinit var client: HttpClient
 
     @MockK
-    private lateinit var deviceTracking: DeviceTracking
-
-    @MockK
     private lateinit var response: HttpResponse
 
     @MockK
@@ -44,7 +42,8 @@ class SettingsManagerTest {
         MockKAnnotations.init(this, relaxUnitFun = true)
         context = ApplicationProvider.getApplicationContext()
         AppInfoHelper.setup()
-        every { deviceTracking.getDeviceId() } returns AppInfoHelper.zdId
+
+        DeviceTracking.init(context,null)
     }
 
     @Test
@@ -75,6 +74,8 @@ class SettingsManagerTest {
     @Test
     fun `load settings success`() {
         val sut = SettingsManager(context)
+        mockkObject(DeviceTracking)
+
 
         //1. mock
         val data = """{
@@ -100,6 +101,7 @@ class SettingsManagerTest {
         every { client.send(capture(request)) } returns response
         every { storage.getLong(KEY_EXPIRE_TIME) } returns now - 1000
         every { storage.setLong(KEY_EXPIRE_TIME, capture(expireTime)) } just Runs
+        every { DeviceTracking.getDeviceId() } returns AppTrackerHelper.deviceId
 
         //2. run
         sut.init()
@@ -115,7 +117,7 @@ class SettingsManagerTest {
 
         assertThat(request.captured.getUrl("")).isEqualTo(
             "/sdk/mobile/setting?pl=android&appId=${AppInfoHelper.appId}&sdkv=${Constant.VERSION}" +
-                    "&pkg=${context.packageName}&zdId=${AppInfoHelper.zdId}"
+                    "&pkg=${context.packageName}&zdId=${AppTrackerHelper.deviceId}"
         )
     }
 }

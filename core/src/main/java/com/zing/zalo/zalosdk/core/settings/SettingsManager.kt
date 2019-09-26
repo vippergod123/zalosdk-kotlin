@@ -3,7 +3,6 @@ package com.zing.zalo.zalosdk.core.settings
 import android.content.Context
 import android.os.AsyncTask
 import com.zing.zalo.devicetrackingsdk.DeviceTracking
-import com.zing.zalo.devicetrackingsdk.model.DeviceId
 import com.zing.zalo.zalosdk.core.Api.API_GET_SETTING
 import com.zing.zalo.zalosdk.core.Constant
 import com.zing.zalo.zalosdk.core.SharedPreferenceConstant
@@ -39,11 +38,11 @@ class SettingsManager(private val context: Context) {
     var wakeUpStorage =
         Storage(context).privateSharedPreferences(SharedPreferenceConstant.PREFS_NAME_WAKEUP)
     var httpClient = HttpClient(ServiceMapManager.urlFor(ServiceMapManager.KEY_URL_CENTRALIZED))
-    var deviceTracking = DeviceTracking
 
     fun init() {
+        val deviceId = DeviceTracking.getDeviceId() ?:""
         if (isExpiredSetting())
-            GetSDKSettingAsyncTask(context, deviceTracking.getDeviceId(), httpClient, wakeUpStorage).execute()
+            GetSDKSettingAsyncTask(context, deviceId, httpClient, wakeUpStorage).execute()
     }
 
     fun getExpiredTime(): Long {

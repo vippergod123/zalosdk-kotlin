@@ -2,9 +2,16 @@ package com.zing.zalo.zalosdk.core.helper
 
 object AppInfoHelper {
     val appId = "123456"
-    val zdId = "z_device_id"
+    val scanId = "3"
+
+
+    val appName = "ABC"
+    val versionName = "2"
+
     fun setup() {
         AppInfo.extracted = true
         AppInfo.appId = appId
+        AppInfo.appName = appName
+        AppInfo.versionName = versionName
     }
 }

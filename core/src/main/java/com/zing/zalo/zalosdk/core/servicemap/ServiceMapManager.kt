@@ -28,7 +28,7 @@ object ServiceMapManager {
     private const val URL_DEV_CENTRALIZED = URL_CENTRALIZED
 
     private const val ONE_DATE_DURATION = (1000 * 60 * 60 * 24).toLong()
-    private var expireTime: Long = -1
+    private var expireTime: Long = -1L
 
     private val SERVICE_MAP_URLS = arrayOf(
         "https://mp3.zing.vn/zdl/service_map_all.bin",
@@ -116,14 +116,14 @@ object ServiceMapManager {
 
     private fun updateMapUrlsFromPreference() {
 
-        val urlOauth = storage?.getKeyUrlOauth()
-        val urlGraph = storage?.getKeyUrlGraph()
-        val urlCentralized = storage!!.getKeyUrlCentralized()
+        val urlOauth = storage?.getKeyUrlOauth() ?: ""
+        val urlGraph = storage?.getKeyUrlGraph() ?: ""
+        val urlCentralized = storage?.getKeyUrlCentralized() ?: ""
 
         if (!TextUtils.isEmpty(urlOauth) && !TextUtils.isEmpty(urlGraph) && !TextUtils.isEmpty(urlCentralized)) {
-            urls[KEY_URL_OAUTH] = urlOauth as String
-            urls[KEY_URL_GRAPH] = urlGraph as String
-            urls[KEY_URL_CENTRALIZED] = urlCentralized as String
+            urls[KEY_URL_OAUTH] = urlOauth
+            urls[KEY_URL_GRAPH] = urlGraph
+            urls[KEY_URL_CENTRALIZED] = urlCentralized
         }
     }
 

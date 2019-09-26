@@ -4,6 +4,7 @@ import androidx.test.uiautomator.UiObject
 import androidx.test.uiautomator.UiObjectNotFoundException
 import androidx.test.uiautomator.UiScrollable
 import androidx.test.uiautomator.UiSelector
+import org.json.JSONObject
 
 object TestHelper {
 
@@ -19,4 +20,7 @@ object TestHelper {
                 .resourceId("com.zing.zalo.zalosdk.demo:id/$viewID")
         )
     }
+
+
+
 }

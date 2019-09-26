@@ -26,9 +26,11 @@ object DeviceTrackingAsyncTask {
         private val weakContext: WeakReference<Context>,
         private var listener: DeviceTrackingListener?
     ) : AsyncTask<Void, Void, JSONObject>() {
+
         var httpClient = HttpClient(ServiceMapManager.urlFor(
             ServiceMapManager.KEY_URL_CENTRALIZED
         ))
+        var request = HttpUrlEncodedRequest(Constant.api.API_SDK_ID)
 
         private var api = weakContext.get()?.let { Api(it) }
 
@@ -38,7 +40,7 @@ object DeviceTrackingAsyncTask {
                 if (context == null) throw Exception("Context is null")
                 if (api == null) throw Exception("Api cannot be initialized")
 
-                val request = HttpUrlEncodedRequest(Constant.api.API_SDK_ID)
+
 
                 val deviceIdData = api?.prepareDeviceIdData().toString()
 
@@ -52,8 +54,8 @@ object DeviceTrackingAsyncTask {
                 request.addParameter("ref", AppInfo.getReferrer(context))
 
 
-                val jsonObject  = httpClient.send(request).getJSON()!!
-                val errorCode = jsonObject.getInt("error")
+                val jsonObject  = httpClient.send(request).getJSON()
+                val errorCode = jsonObject?.getInt("error")
                 if (errorCode == 0) {
                     val data = jsonObject.getJSONObject("data")
                     val sdkId = data.optString("sdkId")
@@ -98,6 +100,8 @@ object DeviceTrackingAsyncTask {
         var httpClient = HttpClient(ServiceMapManager.urlFor(
             ServiceMapManager.KEY_URL_CENTRALIZED
         ))
+
+        var request = HttpUrlEncodedRequest(Constant.api.API_HARDWARE_ID_URL)
         private var api = weakContext.get()?.let { Api(it) }
 
         override fun doInBackground(vararg params: Void?): JSONObject? {
@@ -105,8 +109,6 @@ object DeviceTrackingAsyncTask {
             try {
                 if (context == null) throw Exception("Context is null")
                 if (api == null) throw Exception("Api cannot be initialized")
-
-                val request = HttpUrlEncodedRequest(Constant.api.API_HARDWARE_ID_URL)
 
                 val deviceIdData = api?.prepareDeviceIdData()
                 val trackingData = api?.prepareTrackingData(currentDeviceId, timestamp)
@@ -131,6 +133,7 @@ object DeviceTrackingAsyncTask {
                     values,
                     Constant.key.TRK_SECRET_KEY
                 )
+
                 request.addQueryStringParameter("pl", "android")
                 request.addQueryStringParameter("appId", appId)
                 request.addQueryStringParameter("oauthCode", authCode)
@@ -140,22 +143,22 @@ object DeviceTrackingAsyncTask {
                 request.addQueryStringParameter("sig", sig)
                 request.addQueryStringParameter("sdkId", sdkId)
 
-                val jsonObject = httpClient.send(request).getJSON()!!
+                val jsonObject = httpClient.send(request).getJSON()
 
-                val errorCode = jsonObject.getInt("error")
+                val errorCode = jsonObject?.getInt("error")
                 if (errorCode == 0) {
                     val data = jsonObject.getJSONObject("data")
                     val deviceId = data.optString("deviceId")
 
                     // expiredTime = duration + currentTime
-                    val duration = data.optLong("expireTime")
+                    val duration = data.optLong("expiredTime")
                     val expiredTime = duration + System.currentTimeMillis()
 
                     val dataJson = JSONObject()
                     dataJson.put("deviceId", deviceId)
                     dataJson.put("expireTime", expiredTime)
 
-                    DeviceTracking.saveDeviceIdSetting(deviceId, expiredTime.toString())
+                    DeviceTracking.setDeviceId(deviceId, expiredTime.toString())
 
                     return dataJson
                 }
@@ -175,6 +178,9 @@ object DeviceTrackingAsyncTask {
          */
         override fun onPostExecute(result: JSONObject?) {
             super.onPostExecute(result)
+
+            val deviceId = result?.optString("deviceId")
+            listener?.onDeviceIdSuccess(deviceId)
 
             val data = result?.toString()
             listener?.onComplete(data)

@@ -3,15 +3,23 @@ package com.zing.zalo.zalosdk.core.helper
 import org.json.JSONArray
 
 object UtilsJSON {
-    fun <T> jsonArrayToArrayList(jsonArray: JSONArray): ArrayList<T> {
+    fun<T> listToJSONArray(array:ArrayList<T>):JSONArray {
+        val jsonArray = JSONArray()
 
-        val packageNames = arrayListOf<T>()
-
-        for (i in 0 until jsonArray.length()) {
-            @Suppress("UNCHECKED_CAST")
-            val data = jsonArray.get(i) as T
-            packageNames.add(data)
+        for (str in array) {
+            jsonArray.put(str)
         }
-        return packageNames
+
+        return jsonArray
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun<T> jsonArrayToArrayList(jsonArray: JSONArray):ArrayList<T> {
+        val listData = arrayListOf<T>()
+        for (i in 0 until jsonArray.length()) {
+            val element = jsonArray.get(i) as T
+            listData.add(element)
+        }
+        return listData
     }
 }

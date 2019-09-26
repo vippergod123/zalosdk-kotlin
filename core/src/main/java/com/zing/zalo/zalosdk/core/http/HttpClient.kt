@@ -33,10 +33,10 @@ class HttpClient(private val baseUrl: String) : IHttpClient {
                 }
             }
 
-            response.responseCode = conn.responseCode;
+            response.responseCode = conn.responseCode
             response.responseStream = conn.inputStream
         } catch (ex: Exception) {
-            Log.w("HttpClient: ", ex)
+            Log.e("HttpClient: ", ex.message.toString())
         }
 
         return response;

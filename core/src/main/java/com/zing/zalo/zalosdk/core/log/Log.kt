@@ -1,11 +1,13 @@
 package com.zing.zalo.zalosdk.core.log
 
-import android.content.Context
 import java.util.*
 
 
 object Log {
     private const val LOG_TAG = "ZDK"
+
+//    private const val isUnitTesting = true
+    private const val isUnitTesting = false
 
     private const val VERBOSE = android.util.Log.VERBOSE
     private const val DEBUG = android.util.Log.DEBUG
@@ -15,7 +17,7 @@ object Log {
 
     private var logLevel = android.util.Log.VERBOSE
 
-    fun setLogLevel(context: Context) {
+    fun setLogLevel() {
         logLevel = android.util.Log.VERBOSE
     }
 
@@ -170,11 +172,25 @@ object Log {
         log(priority, tag, msg)
     }
 
+    @Suppress("ConstantConditionIf")
     private fun log(priority: Int, tag: String, msg: String) {
         if (priority < logLevel) return
 
         val newTag = if (tag != "ZDK") "ZDK - $tag" else tag
+        val key = findKeyPriority(priority)
 
-        android.util.Log.println(priority, newTag, msg)
+        if (isUnitTesting) println("$key://$newTag: $msg")
+        else android.util.Log.println(priority, newTag, msg)
+    }
+
+    private fun findKeyPriority(priority: Int): String {
+        return when (priority) {
+            VERBOSE -> "V"
+            DEBUG -> "D"
+            INFO -> "I"
+            WARN -> "W"
+            ERROR -> "E"
+            else -> ""
+        }
     }
 }

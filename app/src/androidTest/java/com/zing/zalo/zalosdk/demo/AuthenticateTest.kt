@@ -42,7 +42,7 @@ class AuthenticateTest : AppBase() {
     @Test
     @Throws(UiObjectNotFoundException::class, IOException::class)
     fun checkAppLoginSuccess() {
-        clickButtonWithText("CHECK APP LOGIN")
+        clickButtonWithText("Check App Login")
         Runtime.getRuntime().exec(arrayOf("am", "force-stop", APP_PACKAGE_NAME))
         startApp()
         verifyCheckIsAppLogin()
@@ -51,7 +51,7 @@ class AuthenticateTest : AppBase() {
     @Test
     @Throws(UiObjectNotFoundException::class, IOException::class)
     fun loginZaloViaAppSuccessAndPersistentOauthCode() {
-        clickButtonWithText("LOGIN MOBILE")
+        clickButtonWithText("Login Mobile")
         clickButtonWithResId("com.zing.zalo:id/authorization_app_action_accept_btn")
 
         Runtime.getRuntime().exec(arrayOf("am", "force-stop", APP_PACKAGE_NAME))
@@ -62,7 +62,7 @@ class AuthenticateTest : AppBase() {
     @Test
     @Throws(UiObjectNotFoundException::class)
     fun loginZaloViaAppCancelBackToApp() {
-        clickButtonWithText("LOGIN MOBILE")
+        clickButtonWithText("Login Mobile")
         clickButtonWithResId("com.zing.zalo:id/authorization_app_action_cancel_btn")
         assertEquals(device.currentPackageName, APP_PACKAGE_NAME)
         clickButtonWithText("VALIDATE OAUTH CODE")
@@ -84,14 +84,14 @@ class AuthenticateTest : AppBase() {
         //#2
 
         val inst = InstrumentationRegistry.getInstrumentation()
-        val monitor = inst.addMonitor("com.zing.zalo.zalosdk.auth.WebLoginActivity", null, false)
+        val monitor = inst.addMonitor("com.zing.zalo.zalosdk.oauth.WebLoginActivity", null, false)
 
-        clickButtonWithText("LOGIN WEB")
+        clickButtonWithText("Login Web")
 
         val uid: Long = 1234
         val oauthCode = "abcd"
 
-        val activity = monitor.waitForActivityWithTimeout(4000) as WebLoginActivity
+        val activity = monitor.waitForActivityWithTimeout(10000) as WebLoginActivity
         val webView = activity.findViewById<WebView>(R.id.zalosdk_login_webview)
         val signal = CountDownLatch(1)
 
@@ -100,7 +100,7 @@ class AuthenticateTest : AppBase() {
                 .instance(0)
                 .className(EditText::class.java)
         )
-        input.waitForExists(5000)
+        input.waitForExists(10000)
 
         activity.runOnUiThread {
             val url = webView.originalUrl
@@ -137,7 +137,7 @@ class AuthenticateTest : AppBase() {
 
         //#2 start intent
         val inst = InstrumentationRegistry.getInstrumentation()
-        clickButtonWithText("LOGIN WEB")
+        clickButtonWithText("Login Web")
 
         //#3 Assert Activity & result
         val appUID = AppInfo.getAppId(context)
@@ -156,14 +156,14 @@ class AuthenticateTest : AppBase() {
     @Throws(UiObjectNotFoundException::class, IOException::class, InterruptedException::class)
     fun registerZaloViaWebSuccess() {
         val inst = InstrumentationRegistry.getInstrumentation()
-        val monitor = inst.addMonitor("com.zing.zalo.zalosdk.auth.WebLoginActivity", null, false)
+        val monitor = inst.addMonitor("com.zing.zalo.zalosdk.oauth.WebLoginActivity", null, false)
 
         clickButtonWithText("REGISTER")
 
         val uid: Long = 1234
         val oauthCode = "abcd"
 
-        val activity = monitor.waitForActivityWithTimeout(4000) as WebLoginActivity
+        val activity = monitor.waitForActivityWithTimeout(10000) as WebLoginActivity
         val webView = activity.findViewById<WebView>(R.id.zalosdk_login_webview)
         val signal = CountDownLatch(1)
 

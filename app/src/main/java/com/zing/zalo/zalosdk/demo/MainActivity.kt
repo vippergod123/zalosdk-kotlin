@@ -9,8 +9,8 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.zing.zalo.devicetrackingsdk.Api
-import com.zing.zalo.devicetrackingsdk.DeviceTracking
+import com.zing.zalo.zalosdk.core.apptracking.AppTracker
+import com.zing.zalo.zalosdk.core.apptracking.AppTrackerListener
 import com.zing.zalo.zalosdk.core.helper.AppInfo
 import com.zing.zalo.zalosdk.core.log.Log
 import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
@@ -40,6 +40,20 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
 
     private lateinit var mStorage: AuthStorage
 
+    private val appTrackerListener:AppTrackerListener = object :AppTrackerListener {
+        override fun onAppTrackerCompleted(
+            didRun: Boolean,
+            scanId: String,
+            packageNames: List<String>,
+            installedApps: List<String>
+        ) {
+            if (!didRun)
+                Log.d("appTrackerListener", "Got into main activity")
+            if (didRun && installedApps.isNotEmpty())
+                Log.d("appTrackerListener", "Submit complete")
+        }
+
+    }
 
     private val listener = object : IAuthenticateCompleteListener {
         @SuppressLint("SetTextI18n")
@@ -62,7 +76,7 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Log.setLogLevel(this)
+        Log.setLogLevel()
         ServiceMapManager.load(this)
         bindUI()
         configureUI()
@@ -166,11 +180,10 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
         }
 
         deviceTrackingButton.setOnClickListener {
-            val api = Api(this)
-            val s = Thread(Runnable {
-                api.prepareTrackingData(DeviceTracking.getDeviceId(), System.currentTimeMillis())
-            })
-            s.start()
+            val appTracker = AppTracker(this)
+            appTracker.setListener(appTrackerListener)
+            appTracker.run()
+
         }
     }
 

@@ -17,12 +17,12 @@ import java.security.MessageDigest
 
 object AppInfo {
     private val lock = Any()
-    internal var extracted: Boolean = false
-    internal var appId: String? = null
+    var extracted: Boolean = false
+    var appId: String? = null
     internal var versionName: String? = null
     internal var versionCode: Long = 0
     internal var appName: String? = null
-    internal var applicationHashKey: String? = null
+    var applicationHashKey: String? = null
     internal var firstInstallDate: String? = null
     internal var installDate: String? = null
     internal var lastUpdateDate: String? = null

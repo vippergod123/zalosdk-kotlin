@@ -1,14 +1,19 @@
 package com.zing.zalo.devicetrackingsdk
 
 interface DeviceTrackingListener {
-    fun onComplete(result: String?)
+    fun onComplete(result: String?){}
+    fun onDeviceIdSuccess(deviceId:String?){}
 }
 
 interface IDeviceTracking {
-    fun getSDKId(): String?
-    fun getPrivateKey(): String?
     fun setSDKId(value: String)
+    fun getSDKId(): String?
+    fun getSDKId(listener: DeviceTrackingListener?)
+
     fun setPrivateKey(value: String)
-    fun getDeviceId(): String
+    fun getPrivateKey(): String?
+
+    fun setDeviceId(deviceId:String, expiredTime:String)
+    fun getDeviceId(): String?
     fun getDeviceId(listener: DeviceTrackingListener?)
 }

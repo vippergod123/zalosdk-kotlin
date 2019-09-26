@@ -43,7 +43,7 @@ class DeviceTrackingTest {
 
         DeviceTracking.getSdkIdAsyncTask = getSdkIdAsyncTask
         DeviceTracking.getDeviceIdAsyncTask = getDeviceIdAsyncTask
-        DeviceTracking.init(context)
+        DeviceTracking.init(context,null)
 
 
         assertThat(DeviceTracking.getDeviceId()).isNotNull()
@@ -51,13 +51,6 @@ class DeviceTrackingTest {
 
         verify(exactly = 0) { getDeviceIdAsyncTask.execute()}
         verify(exactly = 0) { getSdkIdAsyncTask.execute()}
-    }
-
-    @Test
-    fun `GetDeviceId Invalid UnCached`() {
-        mockkObject(DeviceTracking)
-        DeviceTracking.init(context)
-        verify(exactly = 1) { DeviceTracking.saveDeviceIdSetting(any(),any())}
     }
 
 }

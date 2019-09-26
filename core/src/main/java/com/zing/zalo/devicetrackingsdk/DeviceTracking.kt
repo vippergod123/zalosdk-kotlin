@@ -14,11 +14,11 @@ import java.lang.ref.WeakReference
 @SuppressLint("StaticFieldLeak")
 object DeviceTracking : IDeviceTracking {
 
+
     private var lock = Any()
 
     private const val KEY_DEVICE_ID = "deviceId"
     private const val KEY_DEVICE_ID_EXPIRED_TIME = "expiredTime"
-
     private const val DID_FILE_NAME = "ddinfo2"
 
     private lateinit var context: Context
@@ -27,52 +27,50 @@ object DeviceTracking : IDeviceTracking {
     private var deviceIdExpiredTime: Long = 0L
     private var deviceTrackingStorage: Storage? = null
 
+
     lateinit var getDeviceIdAsyncTask: DeviceTrackingAsyncTask.GetDeviceId
     lateinit var getSdkIdAsyncTask: DeviceTrackingAsyncTask.GetSdkId
 
-    fun init(context: Context) {
+    fun init(context: Context, listener: DeviceTrackingListener?) {
         this.context = context.applicationContext
 
         deviceTrackingStorage = Storage(context)
 
-        deviceId = getDeviceId()
-        val currentMillis = System.currentTimeMillis()
+        loadDeviceIdSetting()
+        runGetInfoDeviceTask(listener)
+    }
 
-        if (TextUtils.isEmpty(getSDKId())) {
-            getSdkIdAsyncTask = DeviceTrackingAsyncTask.GetSdkId(
-                WeakReference(context),
-                object : DeviceTrackingListener {
-                    override fun onComplete(result: String?) {
-                        if (isDeviceIdExpired()) {
-                            getDeviceIdAsyncTask = DeviceTrackingAsyncTask.GetDeviceId(
-                                WeakReference(context), deviceId, currentMillis, null
-                            )
-                            getDeviceIdAsyncTask.execute()
-                        }
-                    }
-                })
-            getSdkIdAsyncTask.execute()
-        }
+
+    override fun setSDKId(value: String) {
+        deviceTrackingStorage?.setString(Constant.sharedPreference.PREF_SDK_ID, value)
     }
 
     override fun getSDKId(): String? {
         return deviceTrackingStorage?.getString(Constant.sharedPreference.PREF_SDK_ID)
     }
 
+    override fun getSDKId(listener: DeviceTrackingListener?) {
+        val sdkId = getSDKId()
+
+        if (!TextUtils.isEmpty(sdkId)) {
+            listener?.onComplete(sdkId)
+            return
+        }
+
+        runGetSdkIDAsyncTask(listener)
+    }
+
     override fun getPrivateKey(): String? {
         return deviceTrackingStorage?.getString(Constant.sharedPreference.PREF_PRIVATE_KEY)
     }
 
-    override fun setSDKId(value: String) {
-        deviceTrackingStorage?.setString(Constant.sharedPreference.PREF_SDK_ID, value)
-    }
 
     override fun setPrivateKey(value: String) {
         deviceTrackingStorage?.setString(Constant.sharedPreference.PREF_PRIVATE_KEY, value)
     }
 
 
-    override fun getDeviceId(): String {
+    override fun getDeviceId(): String? {
         if (!TextUtils.isEmpty(deviceId)) return deviceId
 
         synchronized(lock) { loadDeviceIdSetting() }
@@ -81,19 +79,17 @@ object DeviceTracking : IDeviceTracking {
     }
 
     override fun getDeviceId(listener: DeviceTrackingListener?) {
-        val currentMillis = System.currentTimeMillis()
 
-        DeviceTrackingAsyncTask.GetDeviceId(WeakReference(context),
-            deviceId, currentMillis, object : DeviceTrackingListener {
-                override fun onComplete(result: String?) {
-                    Log.d(result.toString())
-                    listener?.onComplete(result)
-                }
-            }).execute()
+        if (!TextUtils.isEmpty(getDeviceId())) {
+            listener?.onComplete(getDeviceId())
+            return
+        }
+
+        runGetInfoDeviceTask(listener)
     }
 
 
-    fun saveDeviceIdSetting(deviceId: String, expiredTime: String) {
+    override fun setDeviceId(deviceId: String, expiredTime: String) {
         checkContextIsInitialized()
 
         val data = JSONObject()
@@ -109,6 +105,7 @@ object DeviceTracking : IDeviceTracking {
         return System.currentTimeMillis() > deviceIdExpiredTime
     }
 
+
     //#region private supportive method
 
     private fun loadDeviceIdSetting() {
@@ -119,7 +116,7 @@ object DeviceTracking : IDeviceTracking {
             try {
                 val data = JSONObject(obj)
                 deviceId = data.optString(KEY_DEVICE_ID)
-                deviceIdExpiredTime = data.optLong(KEY_DEVICE_ID_EXPIRED_TIME)
+                deviceIdExpiredTime = data.optLong(KEY_DEVICE_ID_EXPIRED_TIME, 0L)
             } catch (e: JSONException) {
                 Log.e("loadDeviceIdSetting", e)
             }
@@ -132,6 +129,43 @@ object DeviceTracking : IDeviceTracking {
     @Throws(Exception::class)
     private fun checkContextIsInitialized() {
         if (!::context.isInitialized) throw Exception("Device Tracking must be init first")
+    }
+
+    /** method run async task to get SDK ID & deviceID
+     * if SDK empty -> run SdkId Task -> run DeviceId Task
+     * if SDK not empty -> run DeviceId Task
+     * @return deviceId save in File ddinfo
+     * @return SDKId save in SharePref
+     * */
+    private fun runGetInfoDeviceTask(listener: DeviceTrackingListener?) {
+
+        if (TextUtils.isEmpty(getSDKId())) {
+            val sdkIdListener = object : DeviceTrackingListener {
+                override fun onComplete(result: String?) {
+                    super.onComplete(result)
+                    if (isDeviceIdExpired())
+                        listener?.let { runGetDeviceIdAsyncTask(it) }
+                }
+            }
+            runGetSdkIDAsyncTask(sdkIdListener)
+            return
+        }
+        listener?.let { runGetDeviceIdAsyncTask(it) }
+    }
+
+    private fun runGetDeviceIdAsyncTask(listener: DeviceTrackingListener) {
+        val currentMillis = System.currentTimeMillis()
+        getDeviceIdAsyncTask = DeviceTrackingAsyncTask.GetDeviceId(
+            WeakReference(context), deviceId, currentMillis, listener
+        )
+        getDeviceIdAsyncTask.execute()
+    }
+
+    private fun runGetSdkIDAsyncTask(listener: DeviceTrackingListener?) {
+        getSdkIdAsyncTask = DeviceTrackingAsyncTask.GetSdkId(
+            WeakReference(context), listener
+        )
+        getSdkIdAsyncTask.execute()
     }
 
     //#endregion

@@ -42,6 +42,7 @@ object Api {
     const val API_SDK_ID = "/sdk/mobile/android"
     const val API_GET_SETTING = "/sdk/mobile/setting"
     const val API_TRACKING_URL = "/apps/mobile/android"
+    const val API_APP_TRACKING_ID_URL = "/apps/mobile/explore/android"
 
 }
 
