@@ -9,17 +9,21 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.zing.zalo.zalosdk.oauth.*
-import com.zing.zalo.zalosdk.oauth.callback.GetZaloLoginStatus
-import com.zing.zalo.zalosdk.oauth.callback.ValidateOAuthCodeCallback
+import com.zing.zalo.devicetrackingsdk.Api
+import com.zing.zalo.devicetrackingsdk.DeviceTracking
 import com.zing.zalo.zalosdk.core.helper.AppInfo
 import com.zing.zalo.zalosdk.core.log.Log
 import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
+import com.zing.zalo.zalosdk.oauth.Constant
+import com.zing.zalo.zalosdk.oauth.IAuthenticateCompleteListener
+import com.zing.zalo.zalosdk.oauth.LoginVia
+import com.zing.zalo.zalosdk.oauth.ZaloSDK
+import com.zing.zalo.zalosdk.oauth.callback.GetZaloLoginStatus
+import com.zing.zalo.zalosdk.oauth.callback.ValidateOAuthCodeCallback
 import com.zing.zalo.zalosdk.oauth.helper.AuthStorage
 
 
-class MainActivity : AppCompatActivity(),
-    ValidateOAuthCodeCallback, GetZaloLoginStatus
+class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLoginStatus
 {
     private lateinit var loginWebButton: Button
     private lateinit var loginViaButton: Button
@@ -162,7 +166,11 @@ class MainActivity : AppCompatActivity(),
         }
 
         deviceTrackingButton.setOnClickListener {
-//            DeviceInfo.getConnectionType(this)
+            val api = Api(this)
+            val s = Thread(Runnable {
+                api.prepareTrackingData(DeviceTracking.getDeviceId(), System.currentTimeMillis())
+            })
+            s.start()
         }
     }
 

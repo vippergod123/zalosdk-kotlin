@@ -14,7 +14,7 @@ import com.zing.zalo.zalosdk.oauth.WebLoginActivity
 import com.zing.zalo.zalosdk.core.SharedPreferenceConstant
 import com.zing.zalo.zalosdk.core.helper.AppInfo
 import com.zing.zalo.zalosdk.core.helper.Storage
-import com.zing.zalo.zalosdk.core.settingsmanager.SettingsManager
+import com.zing.zalo.zalosdk.core.settings.SettingsManager
 import io.mockk.MockKAnnotations
 import org.hamcrest.core.IsNull.notNullValue
 import org.junit.Assert.*

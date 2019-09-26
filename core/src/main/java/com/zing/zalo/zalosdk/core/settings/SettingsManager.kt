@@ -1,9 +1,10 @@
-package com.zing.zalo.zalosdk.core.settingsmanager
+package com.zing.zalo.zalosdk.core.settings
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.AsyncTask
-import com.zing.zalo.zalosdk.core.Api
+import com.zing.zalo.devicetrackingsdk.DeviceTracking
+import com.zing.zalo.devicetrackingsdk.model.DeviceId
+import com.zing.zalo.zalosdk.core.Api.API_GET_SETTING
 import com.zing.zalo.zalosdk.core.Constant
 import com.zing.zalo.zalosdk.core.SharedPreferenceConstant
 import com.zing.zalo.zalosdk.core.helper.AppInfo
@@ -14,11 +15,11 @@ import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpGetRequest
 import com.zing.zalo.zalosdk.core.log.Log
 import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
-import com.zing.zalo.zalosdk.core.settingsmanager.SettingsManager.Companion.KEY_EXPIRE_TIME
-import com.zing.zalo.zalosdk.core.settingsmanager.SettingsManager.Companion.KEY_SETTINGS_OUT_APP_LOGIN
-import com.zing.zalo.zalosdk.core.settingsmanager.SettingsManager.Companion.KEY_SETTINGS_WEB_VIEW
-import com.zing.zalo.zalosdk.core.settingsmanager.SettingsManager.Companion.KEY_WAKEUP_ENABLE
-import com.zing.zalo.zalosdk.core.settingsmanager.SettingsManager.Companion.KEY_WAKEUP_INTERVAL
+import com.zing.zalo.zalosdk.core.settings.SettingsManager.Companion.KEY_EXPIRE_TIME
+import com.zing.zalo.zalosdk.core.settings.SettingsManager.Companion.KEY_SETTINGS_OUT_APP_LOGIN
+import com.zing.zalo.zalosdk.core.settings.SettingsManager.Companion.KEY_SETTINGS_WEB_VIEW
+import com.zing.zalo.zalosdk.core.settings.SettingsManager.Companion.KEY_WAKEUP_ENABLE
+import com.zing.zalo.zalosdk.core.settings.SettingsManager.Companion.KEY_WAKEUP_INTERVAL
 import java.lang.ref.WeakReference
 
 class SettingsManager(private val context: Context) {
@@ -38,11 +39,11 @@ class SettingsManager(private val context: Context) {
     var wakeUpStorage =
         Storage(context).privateSharedPreferences(SharedPreferenceConstant.PREFS_NAME_WAKEUP)
     var httpClient = HttpClient(ServiceMapManager.urlFor(ServiceMapManager.KEY_URL_CENTRALIZED))
+    var deviceTracking = DeviceTracking
 
     fun init() {
-//        Todo: [important] remove comnent
         if (isExpiredSetting())
-            GetSDKSettingAsyncTask(context, "3000.4258336839922934833", httpClient, wakeUpStorage).execute()
+            GetSDKSettingAsyncTask(context, deviceTracking.getDeviceId(), httpClient, wakeUpStorage).execute()
     }
 
     fun getExpiredTime(): Long {
@@ -89,7 +90,7 @@ class GetSDKSettingAsyncTask(context: Context, private val zdId: String,
     override fun doInBackground(vararg p0: Void?): String? {
         val context = weakRefContext.get() ?: return null
 
-        val request = HttpGetRequest(Api.API_GET_SETTING_URL)
+        val request = HttpGetRequest(API_GET_SETTING)
         request.addQueryStringParameter("pl", "android")
         request.addQueryStringParameter("appId", AppInfo.getAppId(context))
         request.addQueryStringParameter("sdkv", Constant.VERSION)

@@ -22,6 +22,7 @@ internal object ZaloSignatureValidator
     }
 
     @SuppressLint("WrongConstant")
+    @Suppress("DEPRECATION")
     fun validateSignature(context: Context, packageName: String): Boolean {
         val brand = Build.BRAND
         val applicationFlags = context.applicationInfo.flags

@@ -6,7 +6,7 @@ import java.security.NoSuchAlgorithmException
 
 internal object Utility
 {
-    private val HASH_ALGORITHM_SHA1 = "SHA-1"
+    private const val HASH_ALGORITHM_SHA1 = "SHA-1"
 
     fun sha1hash(bytes: ByteArray): String? {
         return hashWithAlgorithm(HASH_ALGORITHM_SHA1, bytes)

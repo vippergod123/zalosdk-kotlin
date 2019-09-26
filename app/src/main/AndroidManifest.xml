@@ -15,6 +15,10 @@
                 android:name="com.zing.zalo.zalosdk.appID"
                 android:value="@string/zalosdk_app_id" />
 
+        <meta-data
+                android:name="com.zalo.sdk.preloadChannel"
+                android:value="@string/preloadChannel" />
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

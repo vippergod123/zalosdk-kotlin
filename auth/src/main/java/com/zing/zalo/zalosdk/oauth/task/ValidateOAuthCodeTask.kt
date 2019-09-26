@@ -41,7 +41,7 @@ internal class ValidateOAuthCodeTask(
 
                 if (errorCode == 0) {
                     val data = json.getJSONObject("data")
-                    uid = data.getLong("uid") ?: 0
+                    uid = data.getLong("uid")
 
                     return true
                 }
@@ -55,7 +55,7 @@ internal class ValidateOAuthCodeTask(
             }
 
         } catch (ex: Exception) {
-            Log.w(ex.toString())
+            Log.w("ValidateOAuthCodeTask", ex)
             errorCode = ZaloOAuthResultCode.RESULTCODE_UNEXPECTED_ERROR
         }
 

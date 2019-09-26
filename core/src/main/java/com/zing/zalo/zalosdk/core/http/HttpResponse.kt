@@ -30,7 +30,7 @@ class HttpResponse(var request: IHttpRequest) : IHttpResponse {
             }
             bufferReader.close()
 
-            Log.d("HttpResponse: ",sb.toString())
+            Log.d("HttpResponse: ","$sb")
             return sb.toString()
         } catch (ex: Exception) {
             Log.e("HttpResponse: ",ex)
@@ -43,7 +43,7 @@ class HttpResponse(var request: IHttpRequest) : IHttpResponse {
         try {
             return JSONObject(text)
         } catch (ex: JSONException) {
-            Log.w(ex.toString())
+            Log.w("getJSON", ex)
         }
 
          return null;

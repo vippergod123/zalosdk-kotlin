@@ -33,6 +33,7 @@ class LoginEventDispatcher(var that: WeakReference<ZaloWebLoginBaseFragment>, va
 
     }
 
+    @Suppress("DEPRECATION")
     override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
         if (processCallbackUrl(url!!)) return true
         return super.shouldOverrideUrlLoading(view, url)

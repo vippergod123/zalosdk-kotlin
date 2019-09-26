@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import com.zing.zalo.devicetrackingsdk.DeviceTracking
+import com.zing.zalo.devicetrackingsdk.DeviceTrackingListener
 import com.zing.zalo.zalosdk.oauth.callback.GetZaloLoginStatus
 import com.zing.zalo.zalosdk.core.helper.AppInfo
 import com.zing.zalo.zalosdk.core.helper.Utils
 import com.zing.zalo.zalosdk.core.log.Log
-import com.zing.zalo.zalosdk.core.settingsmanager.SettingsManager
+import com.zing.zalo.zalosdk.core.settings.SettingsManager
 import com.zing.zalo.zalosdk.oauth.callback.ValidateOAuthCodeCallback
 import com.zing.zalo.zalosdk.oauth.helper.AuthStorage
 
@@ -19,7 +21,7 @@ object ZaloSDK
     private var mStorage: AuthStorage? = null
 
     private var isInitialized = false
-
+    private var settingManager: SettingsManager? = null
 
     /**
      * Initialize the SDK
@@ -33,8 +35,13 @@ object ZaloSDK
         mStorage = AuthStorage(context)
         mAuthenticator = Authenticator(context, mStorage!!)
 
-//        SettingsManager.init(context)
-        SettingsManager(context).init()
+        settingManager = SettingsManager(context)
+        DeviceTracking.init(context)
+        DeviceTracking.getDeviceId(object : DeviceTrackingListener {
+            override fun onComplete(result: String?) {
+                settingManager?.init()
+            }
+        })
     }
 
     /**
@@ -103,14 +110,6 @@ object ZaloSDK
         return false
     }
 
-
-    //================================================================================
-    // Utility methods //TODO: nen remove
-    //================================================================================
-    fun setAuthStorage(storage: AuthStorage, context: Context) {
-        this.mStorage = storage
-        mAuthenticator = Authenticator(context, mStorage!!)
-    }
 
     private fun checkInitialize(): Boolean {
         if (isInitialized && mAuthenticator != null)

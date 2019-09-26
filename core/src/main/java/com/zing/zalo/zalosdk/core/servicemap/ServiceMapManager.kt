@@ -13,6 +13,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
 
+@SuppressLint("StaticFieldLeak")
 object ServiceMapManager {
     const val KEY_URL_OAUTH = "oauth_http_s"
     const val KEY_URL_GRAPH = "graph_http_s"
@@ -87,7 +88,6 @@ object ServiceMapManager {
         return urls[key] ?: key
     }
 
-
     fun urlFor(key: String, path: String): String {
         val url = urls[key]
         if (TextUtils.isEmpty(url)) {
@@ -141,14 +141,14 @@ object ServiceMapManager {
 
     fun getStorage(context: Context): ServiceMapStorage {
         if (storage == null) {
-            storage = ServiceMapStorage(context.applicationContext)
+            storage = ServiceMapStorage(context)
         }
         return storage!!
     }
 
     class DownloadServiceMapFilesAsyncTask(
         private val httpClient: HttpClient,
-        private val listener: ServiceMapListener
+        private val listener: ServiceMapListener?
     ) :
         AsyncTask<String?, Void, JSONObject>() {
 
@@ -156,6 +156,7 @@ object ServiceMapManager {
         override fun doInBackground(vararg p0: String?): JSONObject? {
             for (serviceMapUrl in SERVICE_MAP_URLS) {
                 try {
+
                     val request = HttpGetRequest(serviceMapUrl)
                     val response = httpClient.send(request)
                     val str = response.getText() ?: ""
@@ -170,7 +171,7 @@ object ServiceMapManager {
 
         override fun onPostExecute(result: JSONObject?) {
             super.onPostExecute(result)
-            listener.receiveJSONObject(result)
+            listener?.receiveJSONObject(result)
         }
     }
 }

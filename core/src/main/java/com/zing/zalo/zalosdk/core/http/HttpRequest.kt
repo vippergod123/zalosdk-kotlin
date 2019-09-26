@@ -53,7 +53,7 @@ abstract class BaseHttpRequest(val path: String) : IHttpRequest {
                     .append(URLEncoder.encode(mQueryParams[key], "UTF-8"))
                     .append("&")
             } catch (e: Exception) {
-                Log.w(e)
+                Log.w("getUrl", e)
             }
         }
 
@@ -99,7 +99,7 @@ class HttpUrlEncodedRequest(url: String) : BasePostHttpRequest(url) {
     }
 
     override fun encodeBody(stream: OutputStream) {
-        val sb = StringBuilder();
+        val sb = StringBuilder()
         for (key in params.keys) {
             try {
                 sb.append(URLEncoder.encode(key, "UTF-8"))
@@ -107,7 +107,7 @@ class HttpUrlEncodedRequest(url: String) : BasePostHttpRequest(url) {
                     .append(URLEncoder.encode(params[key], "UTF-8"))
                     .append("&")
             } catch (e: Exception) {
-                Log.w(e)
+                Log.w("HttpUrlEncodedRequest - encodeBody()",e)
             }
         }
 

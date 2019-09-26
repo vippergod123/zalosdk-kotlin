@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "133212705786",
+    "firebase_url": "https://zalo-sdk-kotlin.firebaseio.com",
+    "project_id": "zalo-sdk-kotlin",
+    "storage_bucket": "zalo-sdk-kotlin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:133212705786:android:2c65fac2193689129b0a43",
+        "android_client_info": {
+          "package_name": "com.zing.zalo.zalosdk.demo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "133212705786-t35vobp79qd9kc4t00urrfmnc8ofj6eu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZ684001PpkOHqpnkvghnMg8_iS26cf5A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "133212705786-t35vobp79qd9kc4t00urrfmnc8ofj6eu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

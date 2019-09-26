@@ -27,20 +27,24 @@
             android:text="Login Web"
             android:id="@+id/login_web_button" style="@style/Widget.AppCompat.Button.Colored"
             android:backgroundTint="#05A3E5"/>
+
     <Button
+            android:id="@+id/register_button"
+            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:backgroundTint="#05A3E5"
             android:gravity="center"
-            android:text="Register"
-            android:id="@+id/register_button" style="@style/Widget.AppCompat.Button.Colored"
-            android:backgroundTint="#05A3E5"/>
+            android:text="REGISTER" />
+
     <Button
+            android:id="@+id/validate_oauth_code_button"
+            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:backgroundTint="#05A3E5"
             android:gravity="center"
-            android:text="Validate oauth code"
-            android:id="@+id/validate_oauth_code_button" style="@style/Widget.AppCompat.Button.Colored"
-            android:backgroundTint="#05A3E5"/>
+            android:text="VALIDATE OAUTH CODE" />
     <Button
             android:layout_width="match_parent"
             android:layout_height="50dp"

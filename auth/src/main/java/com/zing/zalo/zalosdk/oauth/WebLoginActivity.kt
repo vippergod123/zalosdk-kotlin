@@ -101,7 +101,7 @@ class WebLoginActivity : FragmentActivity(), ZaloWebLoginBaseFragment.ZaloWebLog
 		}
 		catch (ex: JSONException)
 		{
-			Log.w(ex)
+			Log.w("onLoginCompleted", ex)
 		}
 		
 		

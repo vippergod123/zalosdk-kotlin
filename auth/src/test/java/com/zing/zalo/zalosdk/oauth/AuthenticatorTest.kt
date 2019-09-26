@@ -16,7 +16,7 @@ import androidx.test.core.content.pm.PackageInfoBuilder
 import com.google.common.truth.Truth.assertThat
 import com.zing.zalo.zalosdk.core.Constant.ZALO_PACKAGE_NAME
 import com.zing.zalo.zalosdk.core.helper.AppInfo
-import com.zing.zalo.zalosdk.core.settingsmanager.SettingsManager
+import com.zing.zalo.zalosdk.core.settings.SettingsManager
 import com.zing.zalo.zalosdk.oauth.Constant.AUTHORIZATION_LOGIN_SUCCESSFUL_ACTION
 import com.zing.zalo.zalosdk.oauth.Constant.EXTRA_AUTHORIZATION_LOGIN_SUCCESSFUL
 import com.zing.zalo.zalosdk.oauth.Constant.RESULT_CODE_SUCCESSFUL
@@ -262,7 +262,7 @@ class AuthenticatorTest {
         resolveInfo.activityInfo = activityInfo
         val browserIntent = Intent()
         browserIntent.setPackage(context.packageName)
-        browserIntent.data = Uri.parse("zalo-${AppInfo.appId}://")
+        browserIntent.data = Uri.parse("zalo-${AppInfo.getAppId(context)}://")
         packageMgr.addResolveInfoForIntent(browserIntent, resolveInfo)
     }
 

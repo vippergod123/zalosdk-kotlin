@@ -73,6 +73,7 @@ abstract class ZaloWebLoginBaseFragment : Fragment()
         if (listener != null) listener!!.onLoginCompleted(error, uid, oauth, zProtect, name, isRegister)
     }
 
+    @Suppress("DEPRECATION")
     private fun setupWebView(parentView: View) {
         webView = parentView.findViewById(R.id.zalosdk_login_webview)
 
@@ -96,7 +97,7 @@ abstract class ZaloWebLoginBaseFragment : Fragment()
             }
             webView.settings.userAgentString = currentUserAgent
         } catch (ex: Exception) {
-            Log.w(ex.toString())
+            Log.w("setupWebView", ex)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -128,7 +129,7 @@ abstract class ZaloWebLoginBaseFragment : Fragment()
             url.append("&lang=")
             url.append(Utils.getLanguage())
         } catch (e: UnsupportedEncodingException) {
-            Log.v(e.toString())
+            Log.w("generateLoginUrl", e)
         }
 
         return url.toString()

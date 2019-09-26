@@ -10,7 +10,7 @@ import com.zing.zalo.zalosdk.core.helper.ZTaskExecutor
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.log.Log
 import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
-import com.zing.zalo.zalosdk.core.settingsmanager.SettingsManager
+import com.zing.zalo.zalosdk.core.settings.SettingsManager
 import com.zing.zalo.zalosdk.oauth.callback.GetZaloLoginStatus
 import com.zing.zalo.zalosdk.oauth.callback.ValidateOAuthCodeCallback
 import com.zing.zalo.zalosdk.oauth.helper.AuthStorage
@@ -169,7 +169,7 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
                 .append(activity.resources.configuration.orientation)
                 .append("&ts=").append(System.currentTimeMillis())
                 .append("&lang=")
-                .append("en") // Todo: remove "en" constant, replace with a method Utils.getLanguage
+                .append(Utils.getLanguage())
         } catch (e: UnsupportedEncodingException) {
             wListener.get()?.onAuthenticateError(
                 ZaloOAuthResultCode.RESULTCODE_UNEXPECTED_ERROR,
@@ -295,7 +295,7 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
                         if (msg.isNotEmpty()) errorMsg = msg
                     }
                 } catch (ex: Exception) {
-                    Log.w("zalo return empty message")
+                    Log.w("receiveAuthData","zalo return empty message")
                 }
 
                 wListener.get()?.onAuthenticateError(e, errorMsg)

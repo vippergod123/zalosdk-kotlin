@@ -13,7 +13,6 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion as Integer
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -50,9 +49,7 @@ dependencies {
     testImplementation 'org.powermock:powermock-api-mockito2:1.7.0RC2'
     testImplementation 'org.json:json:20140107'
 
-    testImplementation 'io.mockk:mockk:1.9'
-
-
+    testImplementation 'io.mockk:mockk:1.9.3'
 }
 repositories {
     mavenCentral()

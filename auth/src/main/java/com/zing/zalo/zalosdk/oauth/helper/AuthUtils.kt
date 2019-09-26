@@ -7,7 +7,7 @@ import android.net.Uri
 import android.text.TextUtils
 import com.zing.zalo.zalosdk.core.helper.AppInfo
 import com.zing.zalo.zalosdk.core.log.Log
-import com.zing.zalo.zalosdk.core.settingsmanager.SettingsManager
+import com.zing.zalo.zalosdk.core.settings.SettingsManager
 import com.zing.zalo.zalosdk.oauth.BrowserLoginActivity
 
 object AuthUtils {

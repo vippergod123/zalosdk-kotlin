@@ -3,27 +3,24 @@ package com.zing.zalo.zalosdk.core
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
+import com.zing.zalo.devicetrackingsdk.DeviceTracking
 import com.zing.zalo.zalosdk.core.helper.AppInfoHelper
 import com.zing.zalo.zalosdk.core.helper.PrivateSharedPreferenceInterface
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpGetRequest
 import com.zing.zalo.zalosdk.core.http.HttpResponse
-import com.zing.zalo.zalosdk.core.settingsmanager.GetSDKSettingAsyncTask
-import com.zing.zalo.zalosdk.core.settingsmanager.SettingsManager
-import com.zing.zalo.zalosdk.core.settingsmanager.SettingsManager.Companion.KEY_EXPIRE_TIME
-import com.zing.zalo.zalosdk.core.settingsmanager.SettingsManager.Companion.KEY_SETTINGS_OUT_APP_LOGIN
-import com.zing.zalo.zalosdk.core.settingsmanager.SettingsManager.Companion.KEY_SETTINGS_WEB_VIEW
-import com.zing.zalo.zalosdk.core.settingsmanager.SettingsManager.Companion.KEY_WAKEUP_ENABLE
-import com.zing.zalo.zalosdk.core.settingsmanager.SettingsManager.Companion.KEY_WAKEUP_INTERVAL
+import com.zing.zalo.zalosdk.core.settings.SettingsManager
+import com.zing.zalo.zalosdk.core.settings.SettingsManager.Companion.KEY_EXPIRE_TIME
+import com.zing.zalo.zalosdk.core.settings.SettingsManager.Companion.KEY_SETTINGS_OUT_APP_LOGIN
+import com.zing.zalo.zalosdk.core.settings.SettingsManager.Companion.KEY_SETTINGS_WEB_VIEW
+import com.zing.zalo.zalosdk.core.settings.SettingsManager.Companion.KEY_WAKEUP_ENABLE
+import com.zing.zalo.zalosdk.core.settings.SettingsManager.Companion.KEY_WAKEUP_INTERVAL
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.anyBoolean
-import org.mockito.ArgumentMatchers.anyLong
-import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
@@ -32,6 +29,9 @@ class SettingsManagerTest {
 
     @MockK
     private lateinit var client: HttpClient
+
+    @MockK
+    private lateinit var deviceTracking: DeviceTracking
 
     @MockK
     private lateinit var response: HttpResponse
@@ -44,6 +44,7 @@ class SettingsManagerTest {
         MockKAnnotations.init(this, relaxUnitFun = true)
         context = ApplicationProvider.getApplicationContext()
         AppInfoHelper.setup()
+        every { deviceTracking.getDeviceId() } returns AppInfoHelper.zdId
     }
 
     @Test
