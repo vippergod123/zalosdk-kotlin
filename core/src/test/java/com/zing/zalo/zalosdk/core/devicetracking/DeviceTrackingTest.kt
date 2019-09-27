@@ -45,7 +45,8 @@ class DeviceTrackingTest {
         DeviceTracking.getDeviceIdAsyncTask = getDeviceIdAsyncTask
         DeviceTracking.init(context,null)
 
-
+        //TODO:
+        // - Cái này là assert trên mock object, ko có ý nghĩa, phải dùng object thật cần test
         assertThat(DeviceTracking.getDeviceId()).isNotNull()
         assertThat(DeviceTracking.getSDKId()).isNotNull()
 
@@ -53,4 +54,9 @@ class DeviceTrackingTest {
         verify(exactly = 0) { getSdkIdAsyncTask.execute()}
     }
 
+    //TODO: cần test thêm các case:
+    // - Chưa có cache: mock httpClient và trả về kết quả mong muống, sau đó assert DeviceTracking.getDeviceId()
+    // trả về device id đã mock trong http response
+    // - Device id đã expire: trả về cái cũ & đi request tiếp ở background
+    // - Tách test của sdk ra riêng
 }

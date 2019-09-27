@@ -12,6 +12,9 @@ import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 @SuppressLint("StaticFieldLeak")
+//TODO:
+// - Tách phần SDKID & Priate key ra module riêng, module này chỉ để gen device id
+// - getSDKID ko nên dùng chung callback với device id, nếu cần callback thì dùng interface khác
 object DeviceTracking : IDeviceTracking {
 
 
@@ -73,6 +76,7 @@ object DeviceTracking : IDeviceTracking {
     override fun getDeviceId(): String? {
         if (!TextUtils.isEmpty(deviceId)) return deviceId
 
+        //TODO: cái lock này có vẻ ko có tác dụng gì
         synchronized(lock) { loadDeviceIdSetting() }
 
         return deviceId
@@ -99,6 +103,11 @@ object DeviceTracking : IDeviceTracking {
 
     }
 
+    //TODO:
+    // - Một method chỉ nên làm 1 việc, method này làm 2 nhiệm vụ là:
+    //   + check device id expired
+    //   + load device id settings
+    // tham khảo: https://en.wikipedia.org/wiki/Single_responsibility_principle
     fun isDeviceIdExpired(): Boolean {
         if (deviceIdExpiredTime == 0L)
             loadDeviceIdSetting()
@@ -107,7 +116,6 @@ object DeviceTracking : IDeviceTracking {
 
 
     //#region private supportive method
-
     private fun loadDeviceIdSetting() {
         checkContextIsInitialized()
 
@@ -126,6 +134,7 @@ object DeviceTracking : IDeviceTracking {
     }
 
 
+    //TODO: ko nên throw exception, gây crash app, chỉ lên log error
     @Throws(Exception::class)
     private fun checkContextIsInitialized() {
         if (!::context.isInitialized) throw Exception("Device Tracking must be init first")
@@ -137,6 +146,9 @@ object DeviceTracking : IDeviceTracking {
      * @return deviceId save in File ddinfo
      * @return SDKId save in SharePref
      * */
+    //TODO:
+    // - Không nhất thiết phải có sdk id mới gọi lấy device idải
+    // - khi TextUtils.isEmpty(getSDKId()) trả về false thì luôn lấy device id mà ko check đã expire?
     private fun runGetInfoDeviceTask(listener: DeviceTrackingListener?) {
 
         if (TextUtils.isEmpty(getSDKId())) {
@@ -161,6 +173,10 @@ object DeviceTracking : IDeviceTracking {
         getDeviceIdAsyncTask.execute()
     }
 
+    //TODO: method này có thể bị gọi nhiều lần 1 lúc:
+    // - từ runGetInfoDeviceTask
+    // - từ getDeviceId
+    // cần tìm cơ chế lock
     private fun runGetSdkIDAsyncTask(listener: DeviceTrackingListener?) {
         getSdkIdAsyncTask = DeviceTrackingAsyncTask.GetSdkId(
             WeakReference(context), listener

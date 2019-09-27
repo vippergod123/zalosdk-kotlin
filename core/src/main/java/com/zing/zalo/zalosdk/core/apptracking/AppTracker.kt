@@ -65,10 +65,6 @@ class AppTracker(private val context: Context) : IAppTracker {
         try {
             val request = HttpGetRequest(Constant.api.API_TRACKING_URL)
             request.addQueryStringParameter("pl", "android")
-
-
-//            Todo: [important] remove comment
-//            request.addQueryStringParameter("appId", "1577725557845407485")
             request.addQueryStringParameter("appId", AppInfo.getAppId(context))
             request.addQueryStringParameter(
                 "zdId",
@@ -104,12 +100,6 @@ class AppTracker(private val context: Context) : IAppTracker {
 
     fun scanInstalledApps(): Boolean {
         try {
-            //Todo: [important] check logic below code
-//            if (packageNames.size == 0) {
-//                Log.d("scanInstalledApps", "Downloaded packages is empty")
-//                return false
-//            }
-
             for (each in packageNames) {
                 if (Utils.isPackageExisted(context, each)) installedPackagedNames.add(each)
             }

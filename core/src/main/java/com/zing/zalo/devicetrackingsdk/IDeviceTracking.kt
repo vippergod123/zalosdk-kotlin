@@ -1,5 +1,6 @@
 package com.zing.zalo.devicetrackingsdk
 
+//TODO: Callback này chỉ nên có 1 method onComplete
 interface DeviceTrackingListener {
     fun onComplete(result: String?){}
     fun onDeviceIdSuccess(deviceId:String?){}

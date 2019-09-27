@@ -9,6 +9,8 @@ import com.zing.zalo.zalosdk.core.helper.DeviceInfo
 import com.zing.zalo.zalosdk.core.log.Log
 import org.json.JSONObject
 
+//TODO:
+// - Đổi tên class này hay merge vào 1 class khác, tên class này ko hợp lý
 class Api(private val context: Context) {
 
     private var data = JSONObject()

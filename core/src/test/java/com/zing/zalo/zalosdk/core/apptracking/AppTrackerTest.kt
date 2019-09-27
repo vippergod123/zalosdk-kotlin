@@ -91,7 +91,11 @@ class AppTrackerTest {
 
         appTracker.setListener(appTrackerListener)
         TestUtils.waitTaskRunInBackgroundAndForeground()
-
+        //TODO:
+        // - device id là info quan trọng, cần assert lấy đúng device id trong module DeviceTracking.
+        // nên mock DeviceTracking rồi test
+        // - Tìm cách mock phần check 1 package có được install hay ko, để dễ assert result json có
+        // nhữngg package này
         val jsonData = prepareDataForSubmitInstalledApp(appTracker, authCode)
         verify(exactly = 1) { appTracker.needToScanInstalledApp()}
         verify(exactly = 1) { Utils.encrypt(privateKey, jsonData.toString()) }

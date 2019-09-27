@@ -179,6 +179,8 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
             ZaloSDK.getZaloLoginStatus(this)
         }
 
+        //TODO:
+        // deviceTrackingButton sao lại đi gọi app tracker?
         deviceTrackingButton.setOnClickListener {
             val appTracker = AppTracker(this)
             appTracker.setListener(appTrackerListener)
