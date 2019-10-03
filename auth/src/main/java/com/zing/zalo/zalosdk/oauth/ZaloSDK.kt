@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.Intent
 import com.zing.zalo.devicetrackingsdk.DeviceTracking
 import com.zing.zalo.devicetrackingsdk.DeviceTrackingListener
+import com.zing.zalo.devicetrackingsdk.IDeviceTracking
+import com.zing.zalo.devicetrackingsdk.SdkTracking
 import com.zing.zalo.zalosdk.oauth.callback.GetZaloLoginStatus
 import com.zing.zalo.zalosdk.core.helper.AppInfo
 import com.zing.zalo.zalosdk.core.helper.Utils
@@ -21,6 +23,8 @@ object ZaloSDK
     private var mStorage: AuthStorage? = null
 
     private var isInitialized = false
+    private var sdkTracking: SdkTracking? = null
+    private var deviceTracking: IDeviceTracking? = null
 
 
     /**
@@ -31,18 +35,19 @@ object ZaloSDK
         if (isInitialized)
             return
 
+        val ctx = context.applicationContext
         isInitialized = true
-        mStorage = AuthStorage(context)
-        mAuthenticator = Authenticator(context, mStorage!!)
+        mStorage = AuthStorage(ctx)
+        mAuthenticator = Authenticator(ctx, mStorage!!)
+        sdkTracking = SdkTracking(ctx)
 
-//        SettingsManager.init(context)
-        DeviceTracking.init(context, object :DeviceTrackingListener {
+        DeviceTracking.sdkTracking = sdkTracking
+        DeviceTracking.init(ctx, object :DeviceTrackingListener {
             override fun onComplete(result: String?) {
-                super.onComplete(result)
-                SettingsManager(context).init()
+                SettingsManager(ctx).init()
             }
         })
-
+        deviceTracking = DeviceTracking
     }
 
     /**

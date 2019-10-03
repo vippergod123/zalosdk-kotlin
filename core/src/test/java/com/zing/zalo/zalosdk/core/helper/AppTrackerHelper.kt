@@ -7,9 +7,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 object AppTrackerHelper {
-    const val deviceId = "2002.1ecf16c74adba385faca.1568970832304.b92c8f7c"
-    const val sdkId = "nRHRPtwUxNE8smukCyQjIBdU0rvbeza6wArCKcUZwaAxrJTBMv_KSudR0d9qaj8wzROn0Ypvot2p_M9nNfFj8TQ1IquUng07iF4kAocXobMZi6LOPlkDBUVvJsvoxAT5gBLzIoF0anMnu6fvGihxBlcgAZaD-lPIqqpZM4XgTKyzHFj2isfg5IaRl5NsBaDlNLICOS0XC3yK7i87ot04SpLqm46TMa8FARmzBq-GoZ0"
-    const val privateKey = "TTie3CTwKY0UxInP"
+    const val deviceId = "device_id_test"
+    const val sdkId = "sdk_id_test"
+    const val privateKey = "private_key_test"
 
     fun prepareDataForSubmitInstalledApp(appTracker: AppTracker, authCode: String):JSONObject {
         val appData = UtilsJSON.listToJSONArray(AppTracker.installedPackagedNames)

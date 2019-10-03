@@ -1,5 +1,6 @@
-package com.zing.zalo.zalosdk.core
+package com.zing.zalo.zalosdk.core.helper
 
+import com.zing.zalo.zalosdk.core.helper.AppTrackerHelper
 import org.robolectric.Robolectric
 
 object TestUtils {
@@ -11,9 +12,9 @@ object TestUtils {
 
 }
 
-object TestData{
+object DataHelper{
 
-    const val INSTALL_APP= "{\n" +
+    const val PACKAGES_NAME= "{\n" +
             "  \"error\": 0,\n" +
             "  \"data\": {\n" +
             "    \"scanId\": \"3\",\n" +
@@ -73,4 +74,6 @@ object TestData{
 
     val INSTALLED_APP_LIST = arrayListOf("com.zing.mp3", "com.zing.zalo", "com.facebook.orca", "com.facebook.katana")
 
+    const val responseGetDeviceIdAsyncTask = "{\"data\":{\"deviceId\":\"${AppTrackerHelper.deviceId}\",\"expiredTime\":43200000},\"error\":0,\"errorMsg\":\"\"}"
+    const val responseGetSdkIdAsyncTask = "{\"data\":{\"privateKey\":\"${AppTrackerHelper.privateKey}\",\"sdkId\":\"${AppTrackerHelper.sdkId}\"},\"error\":0,\"errorMsg\":\"\"}"
 }

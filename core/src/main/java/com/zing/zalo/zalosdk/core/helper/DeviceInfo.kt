@@ -223,4 +223,20 @@ object DeviceInfo {
         return "unknown"
     }
 
+
+    fun trackingData(context: Context): JSONObject {
+        val data = JSONObject()
+
+        try {
+            data.put("dId", getAdvertiseID(context))
+            data.put("aId", getAndroidId(context))
+            data.put("mod", getModel())
+            data.put("ser", getSerial())
+        } catch (e: Exception) {
+            Log.e("prepareDeviceIdData", e)
+        }
+
+        return data
+    }
+
 }

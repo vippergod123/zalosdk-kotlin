@@ -58,7 +58,7 @@
             android:layout_height="50dp"
             android:gravity="center"
             android:text="Device Tracking"
-            android:id="@+id/device_tracking_button"
+            android:id="@+id/app_tracking_button"
             style="@style/Widget.AppCompat.Button.Colored"
             android:backgroundTint="#05A3E5" />
     <TextView

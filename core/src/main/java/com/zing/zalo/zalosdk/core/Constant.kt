@@ -30,6 +30,8 @@ object SharedPreferenceConstant {
     const val PREFS_NAME_WAKEUP = "com.zing.zalo.sdk.preload.wakeup"
     const val PREFS_NAME_PRELOAD = "com.zing.zalo.sdk.preload"
     const val PREFS_ADVERTISE_ID = "adsid"
+
+    //Prefs DeviceTrackingSdk
     const val PREF_SDK_ID = "PREFERECE_SDK_ID"
     const val PREF_PRIVATE_KEY = "PREFERECE_PRIVATE_KEY"
 

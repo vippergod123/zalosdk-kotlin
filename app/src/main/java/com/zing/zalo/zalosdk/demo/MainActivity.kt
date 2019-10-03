@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
     private lateinit var registerButton: Button
     private lateinit var validateButton: Button
     private lateinit var checkAppLoginButton: Button
-    private lateinit var deviceTrackingButton: Button
+    private lateinit var appTrackingButton: Button
 
     private lateinit var appIDTextView: TextView
     private lateinit var loginStatusTextView: TextView
@@ -131,7 +131,7 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
         registerButton = findViewById(R.id.register_button)
         validateButton = findViewById(R.id.validate_oauth_code_button)
         checkAppLoginButton = findViewById(R.id.check_app_login_button)
-        deviceTrackingButton = findViewById(R.id.device_tracking_button)
+        appTrackingButton = findViewById(R.id.app_tracking_button)
 
         appIDTextView = findViewById(R.id.app_id_text_view)
         userIDTextView = findViewById(R.id.user_id_text_view)
@@ -179,13 +179,10 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
             ZaloSDK.getZaloLoginStatus(this)
         }
 
-        //TODO:
-        // deviceTrackingButton sao lại đi gọi app tracker?
-        deviceTrackingButton.setOnClickListener {
+        appTrackingButton.setOnClickListener {
             val appTracker = AppTracker(this)
             appTracker.setListener(appTrackerListener)
             appTracker.run()
-
         }
     }
 

@@ -4,15 +4,12 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.zing.zalo.devicetrackingsdk.DeviceTracking
-import com.zing.zalo.zalosdk.core.TestData
-import com.zing.zalo.zalosdk.core.TestUtils
-import com.zing.zalo.zalosdk.core.helper.AppInfoHelper
-import com.zing.zalo.zalosdk.core.helper.AppTrackerHelper
+import com.zing.zalo.devicetrackingsdk.SdkTracking
+import com.zing.zalo.zalosdk.core.helper.*
 import com.zing.zalo.zalosdk.core.helper.AppTrackerHelper.prepareDataForSubmitInstalledApp
-import com.zing.zalo.zalosdk.core.helper.Storage
-import com.zing.zalo.zalosdk.core.helper.Utils
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpResponse
+import com.zing.zalo.zalosdk.core.log.Log
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.json.JSONObject
@@ -23,23 +20,22 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class AppTrackerTest {
-    private lateinit var context: Context
+
 
     @MockK
     private lateinit var httpClient: HttpClient
-
     @MockK
     private lateinit var response: HttpResponse
-
     @MockK
     private lateinit var appTrackerStorage: AppTrackerStorage
-
     @MockK
     private lateinit var storage: Storage
+    @MockK
+    private lateinit var sdkTracking: SdkTracking
 
+    private lateinit var context: Context
     private lateinit var appTracker: AppTracker
 
-    private var privateKey: String = AppTrackerHelper.privateKey
 
 
     @Before
@@ -58,7 +54,7 @@ class AppTrackerTest {
         mockDataSubmitInstalledApp()
         spyk(appTracker)
 
-        val resultJson = JSONObject(TestData.INSTALL_APP)
+        val resultJson = JSONObject(DataHelper.PACKAGES_NAME)
         val authCode = "nRHRPtwUxNE8smukCyQjIBdU0rvbeza6wArCKcUZwaAxrJTBMv_KSudR0d9qaj8wzROn0Ypu6fvGihxBlcg"
 
         appTracker.httpClient = httpClient
@@ -83,22 +79,18 @@ class AppTrackerTest {
                 packageNames: List<String>,
                 installedApps: List<String>
             ) {
-                assertThat(installedApps).isNotEmpty()
+                assertThat(installedApps).isEqualTo(DataHelper.INSTALLED_APP_LIST)
                 assertThat(scanId).isEqualTo(AppInfoHelper.scanId)
+                assertThat(packageNames).isEqualTo(getPackagesNameArrayFromJSON())
             }
 
         }
 
         appTracker.setListener(appTrackerListener)
         TestUtils.waitTaskRunInBackgroundAndForeground()
-        //TODO:
-        // - device id là info quan trọng, cần assert lấy đúng device id trong module DeviceTracking.
-        // nên mock DeviceTracking rồi test
-        // - Tìm cách mock phần check 1 package có được install hay ko, để dễ assert result json có
-        // nhữngg package này
         val jsonData = prepareDataForSubmitInstalledApp(appTracker, authCode)
         verify(exactly = 1) { appTracker.needToScanInstalledApp()}
-        verify(exactly = 1) { Utils.encrypt(privateKey, jsonData.toString()) }
+        verify(exactly = 1) { Utils.encrypt(AppTrackerHelper.privateKey, jsonData.toString()) }
         verify(exactly = 1) { appTrackerStorage.setInstallExpireTime(any()) }
         verify(exactly = 1) { appTrackerStorage.getInstallExpireTime() }
     }
@@ -110,7 +102,7 @@ class AppTrackerTest {
         mockDataSubmitInstalledApp()
         spyk(appTracker)
 
-        val resultJson = JSONObject(TestData.INSTALL_APP)
+        val resultJson = JSONObject(DataHelper.PACKAGES_NAME)
         val authCode = "nRHRPtwUxNE8smukCyQjIBdU0rvbeza6wArCKcUZwaAxrJTBMv_KSudR0d9qaj8wzROn0Ypu6fvGihxBlcg"
 
         appTracker.httpClient = httpClient
@@ -139,14 +131,30 @@ class AppTrackerTest {
 //        verify(atLeast = 1) { appTracker.submitInstalledApps() }
     }
 
+
+    //#region private supportive method
     private fun mockDataSubmitInstalledApp() {
         AppInfoHelper.setup()
         mockkObject(DeviceTracking)
         every { DeviceTracking.getDeviceId() } returns AppTrackerHelper.deviceId
-        every { DeviceTracking.getSDKId() } returns AppTrackerHelper.sdkId
-        every { DeviceTracking.getPrivateKey() } returns AppTrackerHelper.privateKey
+        every { sdkTracking.getSDKId() } returns AppTrackerHelper.sdkId
+        every { sdkTracking.getPrivateKey() } returns AppTrackerHelper.privateKey
 
         appTracker.scanId = AppInfoHelper.scanId
-        AppTracker.installedPackagedNames = TestData.INSTALLED_APP_LIST
+        appTracker.sdkTracking = sdkTracking
+        AppTracker.installedPackagedNames = DataHelper.INSTALLED_APP_LIST
     }
+
+    private fun getPackagesNameArrayFromJSON():ArrayList<String> {
+        val jsonObject = JSONObject(DataHelper.PACKAGES_NAME)
+        val error = jsonObject.getInt("error")
+        if (error != 0) throw Exception("Error when call api Download Packages")
+
+        val data = jsonObject.getJSONObject("data")
+        val apps = data.optJSONArray("apps")
+
+        Log.d("downloadPackages", data.toString())
+        return UtilsJSON.jsonArrayToArrayList(apps)
+    }
+    //#endregion
 }

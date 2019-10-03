@@ -7,6 +7,7 @@ import com.zing.zalo.devicetrackingsdk.DeviceTracking
 import com.zing.zalo.zalosdk.core.helper.AppInfoHelper
 import com.zing.zalo.zalosdk.core.helper.AppTrackerHelper
 import com.zing.zalo.zalosdk.core.helper.PrivateSharedPreferenceInterface
+import com.zing.zalo.zalosdk.core.helper.TestUtils
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpGetRequest
 import com.zing.zalo.zalosdk.core.http.HttpResponse
