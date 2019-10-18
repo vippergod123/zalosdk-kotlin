@@ -61,6 +61,16 @@
             android:id="@+id/app_tracking_button"
             style="@style/Widget.AppCompat.Button.Colored"
             android:backgroundTint="#05A3E5" />
+
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Event Tracking"
+            android:id="@+id/event_tracking_button"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:backgroundTint="#05A3E5" />
+
     <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content" android:id="@+id/app_id_text_view"/>

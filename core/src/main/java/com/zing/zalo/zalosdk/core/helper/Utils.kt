@@ -2,11 +2,13 @@ package com.zing.zalo.zalosdk.core.helper
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Environment
+import android.os.Process
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpMultipartRequest
 import com.zing.zalo.zalosdk.core.log.Log
@@ -244,7 +246,7 @@ object Utils {
             )
             return readFileData(file)
         } catch (ex: FileNotFoundException) {
-            Log.v("readFromFile()", "file $filename not found in internal storage")
+            Log.w("readFromFile()", "file $filename not found in internal storage")
         } catch (e: Exception) {
             Log.e("readFromFile(): ", e)
         }
@@ -253,32 +255,32 @@ object Utils {
         return null
     }
 
-    @SuppressLint("TrulyRandom")
-    @Throws(
-        NoSuchAlgorithmException::class,
-        NoSuchPaddingException::class,
-        InvalidKeyException::class,
-        InvalidAlgorithmParameterException::class,
-        IllegalBlockSizeException::class,
-        BadPaddingException::class,
-        UnsupportedEncodingException::class,
-        NoSuchProviderException::class
-    )
-    fun encrypt(keyInStr: String, dataToEncrypt: String): ByteArray {
-
-        val keyInBinary = keyInStr.toByteArray()
-        val vectorBytes = ByteArray(16)
-        for (i in 0..15) {
-            vectorBytes[i] = 0
-        }
-        val secretKeySpec = SecretKeySpec(keyInBinary, "AES")
-        val ivSpec = IvParameterSpec(vectorBytes)
-
-        val c = Cipher.getInstance("AES/CBC/PKCS5Padding")
-        c.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivSpec)
-
-        return c.doFinal(dataToEncrypt.toByteArray(charset("UTF-8")))
-    }
+//    @SuppressLint("TrulyRandom")
+//    @Throws(
+//        NoSuchAlgorithmException::class,
+//        NoSuchPaddingException::class,
+//        InvalidKeyException::class,
+//        InvalidAlgorithmParameterException::class,
+//        IllegalBlockSizeException::class,
+//        BadPaddingException::class,
+//        UnsupportedEncodingException::class,
+//        NoSuchProviderException::class
+//    )
+//    fun encrypt(keyInStr: String, dataToEncrypt: String): ByteArray {
+//
+//        val keyInBinary = keyInStr.toByteArray()
+//        val vectorBytes = ByteArray(16)
+//        for (i in 0..15) {
+//            vectorBytes[i] = 0
+//        }
+//        val secretKeySpec = SecretKeySpec(keyInBinary, "AES")
+//        val ivSpec = IvParameterSpec(vectorBytes)
+//
+//        val c = Cipher.getInstance("AES/CBC/PKCS5Padding")
+//        c.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivSpec)
+//
+//        return c.doFinal(dataToEncrypt.toByteArray(charset("UTF-8")))
+//    }
 
 
 
@@ -346,21 +348,19 @@ object Utils {
         return null
     }
 
-    @Throws(Exception::class)
-    fun postFile(
-        httpClient: HttpClient,
-        multipartRequest: HttpMultipartRequest,
-        fileName: String,
-        fileKey: String,
-        data: ByteArray,
-        otherParams: Map<String, String>?
-    ): JSONObject? {
+    fun getCurrentProcessName(context: Context): String {
+        try {
+            val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val myPid = Process.myPid()
+            for (processInfo in manager.runningAppProcesses) {
+                if (processInfo.pid == myPid) {
+                    return processInfo.processName
+                }
+            }
 
-        multipartRequest.setFileParameter(fileKey,fileName,data)
-
-        val response = httpClient.send(multipartRequest)
-
-        return response.getJSON()
+            return context.packageName
+        } catch (ex: Exception) {
+            return "default"
+        }
     }
-
 }

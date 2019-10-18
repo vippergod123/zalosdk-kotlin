@@ -19,13 +19,14 @@ import java.lang.ref.WeakReference
 
 @SuppressLint("StaticFieldLeak")
 object DeviceTracking : IDeviceTracking {
+    const val DID_FILE_NAME = "ddinfo2"
+
     private const val KEY_DEVICE_ID = "deviceId"
     private const val KEY_DEVICE_ID_EXPIRED_TIME = "expiredTime"
-    private const val DID_FILE_NAME = "ddinfo2"
 
     private lateinit var context: Context
-
     private var deviceId: String = ""
+
     var sdkTracking: ISdkTracking? = null
     var deviceIdExpiredTime: Long = 0L
 
@@ -41,6 +42,9 @@ object DeviceTracking : IDeviceTracking {
         context = ctx.applicationContext
 
         loadDeviceIdSetting()
+
+        if (isDeviceIdValid()) return
+
         runGetDeviceIdAsyncTask(listener)
     }
 
@@ -62,12 +66,13 @@ object DeviceTracking : IDeviceTracking {
     }
 
     fun setDeviceId(deviceId: String, expiredTime: String) {
-        if (isContextInitialized()) return
+        if (!isContextInitialized()) return
 
         val data = JSONObject()
         data.put(KEY_DEVICE_ID, deviceId)
         data.put(KEY_DEVICE_ID_EXPIRED_TIME, expiredTime)
         Utils.writeToFile(context, data.toString(), DID_FILE_NAME)
+        Log.d("setDeviceId", "Write file complete")
     }
 
     private fun isDeviceIdValid(): Boolean {
@@ -76,7 +81,7 @@ object DeviceTracking : IDeviceTracking {
 
     //#region private supportive method
     private fun loadDeviceIdSetting() {
-        if (isContextInitialized()) return
+        if (!isContextInitialized()) return
 
         val obj = Utils.readFromFile(context, DID_FILE_NAME)
         if (!TextUtils.isEmpty(obj)) {
@@ -124,8 +129,8 @@ object DeviceTracking : IDeviceTracking {
                 if (context == null) throw Exception("Context is null")
                 val storage = Storage(context)
 
-                val deviceIdData = DeviceInfo.trackingData(context)
-                val trackingData = AppInfo.trackingData(context, currentDeviceId, timestamp)
+                val deviceIdData = DeviceInfo.prepareDeviceIdData(context)
+                val trackingData = DeviceInfo.prepareTrackingData(context, currentDeviceId, timestamp)
 
                 val sdkId = sdkTracking?.getSDKId() ?: ""
                 val appId = AppInfo.getAppId(context)

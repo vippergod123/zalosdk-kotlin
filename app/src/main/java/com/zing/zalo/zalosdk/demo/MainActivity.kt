@@ -9,6 +9,9 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.zing.zalo.zalosdk.analytics.EventTracker
+import com.zing.zalo.zalosdk.analytics.EventTrackerListener
+import com.zing.zalo.zalosdk.analytics.model.Event
 import com.zing.zalo.zalosdk.core.apptracking.AppTracker
 import com.zing.zalo.zalosdk.core.apptracking.AppTrackerListener
 import com.zing.zalo.zalosdk.core.helper.AppInfo
@@ -23,8 +26,7 @@ import com.zing.zalo.zalosdk.oauth.callback.ValidateOAuthCodeCallback
 import com.zing.zalo.zalosdk.oauth.helper.AuthStorage
 
 
-class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLoginStatus
-{
+class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLoginStatus {
     private lateinit var loginWebButton: Button
     private lateinit var loginViaButton: Button
     private lateinit var loginMobileButton: Button
@@ -32,6 +34,7 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
     private lateinit var validateButton: Button
     private lateinit var checkAppLoginButton: Button
     private lateinit var appTrackingButton: Button
+    private lateinit var eventTrackingButton: Button
 
     private lateinit var appIDTextView: TextView
     private lateinit var loginStatusTextView: TextView
@@ -40,7 +43,7 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
 
     private lateinit var mStorage: AuthStorage
 
-    private val appTrackerListener:AppTrackerListener = object :AppTrackerListener {
+    private val appTrackerListener: AppTrackerListener = object : AppTrackerListener {
         override fun onAppTrackerCompleted(
             didRun: Boolean,
             scanId: String,
@@ -72,6 +75,13 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
         }
     }
 
+    private val eventTrackerListener = object : EventTrackerListener {
+        override fun dispatchComplete() {
+            super.dispatchComplete()
+            Log.d("got Main Activity ")
+        }
+    }
+
     //#region override activity method
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,6 +91,8 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
         bindUI()
         configureUI()
         bindViewsListener()
+
+
     }
 
 
@@ -92,7 +104,12 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
 
     //#region override interface method
     @SuppressLint("SetTextI18n")
-    override fun onValidateComplete(validated: Boolean, errorCode: Int, userId: Long, authCode: String?) {
+    override fun onValidateComplete(
+        validated: Boolean,
+        errorCode: Int,
+        userId: Long,
+        authCode: String?
+    ) {
         showToast("validated: $validated - errorCode: $errorCode")
 
         authCodeTextView.text = authCode
@@ -132,6 +149,7 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
         validateButton = findViewById(R.id.validate_oauth_code_button)
         checkAppLoginButton = findViewById(R.id.check_app_login_button)
         appTrackingButton = findViewById(R.id.app_tracking_button)
+        eventTrackingButton = findViewById(R.id.event_tracking_button)
 
         appIDTextView = findViewById(R.id.app_id_text_view)
         userIDTextView = findViewById(R.id.user_id_text_view)
@@ -184,6 +202,14 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
             appTracker.setListener(appTrackerListener)
             appTracker.run()
         }
+
+        eventTrackingButton.setOnClickListener {
+
+            val eventTracker = EventTracker(this)
+            eventTracker.addEvent(mockEvent())
+            eventTracker.setListener(eventTrackerListener)
+            eventTracker.runDispatchEventLoop()
+        }
     }
 
     private fun showToast(msg: String) {
@@ -193,6 +219,17 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
     private fun showAlertDialog(message: String) {
         AlertDialog.Builder(this).setTitle(R.string.app_name).setMessage(message)
             .setPositiveButton(android.R.string.yes, null).show()
+    }
+
+    private fun mockEvent(): Event {
+        val timeStamp = System.currentTimeMillis()
+        val action = "action-$timeStamp"
+        val params = mutableMapOf<String,String>()
+
+
+        params["name"] = "datahelper-$timeStamp"
+        params["age"] = timeStamp.toString()
+        return Event(action,params,timeStamp)
     }
 
 }

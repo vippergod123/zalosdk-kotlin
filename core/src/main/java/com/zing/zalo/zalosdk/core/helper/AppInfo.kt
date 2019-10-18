@@ -9,10 +9,8 @@ import android.os.Bundle
 import android.os.Environment
 import android.text.TextUtils
 import android.util.Base64
-import com.zing.zalo.zalosdk.core.Constant
 import com.zing.zalo.zalosdk.core.helper.Utils.isExternalStorageReadable
 import com.zing.zalo.zalosdk.core.log.Log
-import org.json.JSONObject
 import java.io.File
 import java.net.URLEncoder
 import java.security.MessageDigest
@@ -149,7 +147,7 @@ object AppInfo {
         return getPropertyAsT(context, "preloadChannel") ?: ""
     }
 
-    fun isPreInstalled(context:Context): Boolean {
+    fun isPreInstalled(context: Context): Boolean {
         try {
             if (isExternalStorageReadable(context)) {
                 val file = prepareFileInExternalStore(context.packageName, false)
@@ -280,74 +278,17 @@ object AppInfo {
                 }
 
                 isAutoTrackingOpenApp =
-                    getBoolean(bundle, "com.zing.zalosdk.configAutoTrackingActivity", true)
+                    getBoolean(bundle, "com.zing.zalosdk.configAutoTrackingActivity", false)
 
-                preloadChannel = getString(bundle, "com.zalo.sdk.preloadChannel", "")
+                preloadChannel = getString(bundle, "com.zing.zalo.sdk.preloadChannel", "")
 
             } catch (ex: Exception) {
-                Log.e("extractBasicAppInfo", ex.toString())
+                Log.e("extractBasicAppInfo", ex)
             }
 
             extracted = true
         }
     }
-
-    fun trackingData(context: Context, currentDeviceId: String, ts: Long): JSONObject {
-        val data = JSONObject()
-        try {
-            data.put("pkg", getPackageName(context))
-            data.put("pl", "android")
-            data.put("osv", DeviceInfo.getOSVersion())
-
-            data.put("sdkv", Constant.VERSION)
-            data.put("sdkv", DeviceInfo.getSDKVersion())
-            data.put("an", getAppName(context)) //imp
-            data.put("av", getVersionName(context))
-
-            data.put("mod", DeviceInfo.getModel())
-            data.put("ss", DeviceInfo.getScreenSize(context))
-
-            data.put("mno", DeviceInfo.getMobileNetworkCode(context))
-            if (!TextUtils.isEmpty(currentDeviceId)) {
-                data.put("sId", currentDeviceId)
-            }
-
-            data.put("dId", DeviceInfo.getAdvertiseID(context))
-            data.put("adId", DeviceInfo.getAdvertiseID(context))
-
-            data.put("ins_pkg", getInstallerPackageName(context))
-            if (!TextUtils.isEmpty(getReferrer(context))) {
-                data.put("ref", getReferrer(context))
-            }
-            data.put("ins_dte", getInstallDate(context))
-            data.put("fst_ins_dte", getFirstInstallDate(context))
-            data.put("lst_ins_dte", getLastUpdate(context))
-            data.put("fst_run_dte", getFirstRunDate(context))
-            data.put("ts", ts.toString())
-            data.put("brd", DeviceInfo.getBrand())
-            data.put("dev", Build.DEVICE)
-            data.put("prd", DeviceInfo.getProduct())
-            data.put("adk_ver", Build.VERSION.SDK_INT)
-            data.put("mnft", DeviceInfo.getManufacturer())
-            data.put("dev_type", Build.TYPE)
-            data.put("avc", getVersionCode(context))
-            data.put("was_ins", isPreInstalled(context).toString())
-            data.put("dpi", context.resources.displayMetrics.density.toDouble())
-
-            val preloadInfo = DeviceInfo.getPreloadInfo(context)
-            data.put("preload", preloadInfo.preload)
-
-            data.put("preloadDefault", getPreloadChannel(context))
-            if (!preloadInfo.isPreloaded()) {
-                data.put("preloadFailed", preloadInfo.error)
-            }
-        } catch (e: Exception) {
-            Log.e("tracking", e)
-        }
-
-        return data
-    }
-
     //#endregion
 }
 	

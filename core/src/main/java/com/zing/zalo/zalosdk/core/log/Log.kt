@@ -177,13 +177,13 @@ object Log {
         if (priority < logLevel) return
 
         val newTag = if (tag != "ZDK") "ZDK - $tag" else tag
-        val key = findKeyPriority(priority)
+        val key = findPriorityKey(priority)
 
         if (isUnitTesting) println("$key://$newTag: $msg")
         else android.util.Log.println(priority, newTag, msg)
     }
 
-    private fun findKeyPriority(priority: Int): String {
+    private fun findPriorityKey(priority: Int): String {
         return when (priority) {
             VERBOSE -> "V"
             DEBUG -> "D"

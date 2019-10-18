@@ -71,7 +71,7 @@ class SdkTracking(var context: Context) : ISdkTracking {
             try {
                 if (context == null) throw Exception("Context is null")
 
-                val deviceIdData = DeviceInfo.trackingData(context).toString()
+                val deviceIdData = DeviceInfo.prepareDeviceIdData(context).toString()
                 request.addParameter("appId", AppInfo.getAppId(context))
                 request.addParameter("sdkv", DeviceInfo.getSDKVersion())
                 request.addParameter("pl", "android")

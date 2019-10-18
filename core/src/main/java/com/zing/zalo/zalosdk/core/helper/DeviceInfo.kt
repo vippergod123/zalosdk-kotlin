@@ -149,7 +149,7 @@ object DeviceInfo {
             val preloadStorage =
                 Storage(context).privateSharedPreferences(Constant.sharedPreference.PREFS_NAME_PRELOAD)
 
-            //load from cache
+            //load from cacheDeviceInfo
             val preload = preloadStorage.getString(KEY_PRELOAD) ?: ""
             val error = preloadStorage.getString(KEY_EXCEPTION_FILE_PRELOAD) ?: ""
             if (!TextUtils.isEmpty(preload) || !TextUtils.isEmpty(error)/*error != null*/) {
@@ -215,16 +215,16 @@ object DeviceInfo {
         return preloadInfo
     }
 
-    fun getAndroidId(context:Context):String {
+    fun getAndroidId(context: Context): String {
         return "unknown"
     }
 
-    fun getSerial():String {
+    fun getSerial(): String {
         return "unknown"
     }
 
 
-    fun trackingData(context: Context): JSONObject {
+    fun prepareDeviceIdData(context: Context): JSONObject {
         val data = JSONObject()
 
         try {
@@ -234,6 +234,62 @@ object DeviceInfo {
             data.put("ser", getSerial())
         } catch (e: Exception) {
             Log.e("prepareDeviceIdData", e)
+        }
+
+        return data
+    }
+
+    fun prepareTrackingData(context: Context, currentDeviceId: String, ts: Long): JSONObject {
+        val data = JSONObject()
+        try {
+            data.put("pkg", AppInfo.getPackageName(context))
+            data.put("pl", "android")
+            data.put("osv", getOSVersion())
+
+            data.put("sdkv", Constant.VERSION)
+            data.put("sdkv", getSDKVersion())
+            data.put("an", AppInfo.getAppName(context)) //imp
+            data.put("av", AppInfo.getVersionName(context))
+
+            data.put("mod", getModel())
+            data.put("ss", getScreenSize(context))
+
+            data.put("mno", getMobileNetworkCode(context))
+            if (!TextUtils.isEmpty(currentDeviceId)) {
+                data.put("sId", currentDeviceId)
+            }
+
+            data.put("dId", getAdvertiseID(context))
+            data.put("adId", getAdvertiseID(context))
+
+            data.put("ins_pkg", AppInfo.getInstallerPackageName(context))
+            if (!TextUtils.isEmpty(AppInfo.getReferrer(context))) {
+                data.put("ref", AppInfo.getReferrer(context))
+            }
+            data.put("ins_dte", AppInfo.getInstallDate(context))
+            data.put("fst_ins_dte", AppInfo.getFirstInstallDate(context))
+            data.put("lst_ins_dte", AppInfo.getLastUpdate(context))
+            data.put("fst_run_dte", AppInfo.getFirstRunDate(context))
+            data.put("ts", ts.toString())
+            data.put("brd", getBrand())
+            data.put("dev", Build.DEVICE)
+            data.put("prd", getProduct())
+            data.put("adk_ver", Build.VERSION.SDK_INT)
+            data.put("mnft", with(DeviceInfo) { getManufacturer() })
+            data.put("dev_type", Build.TYPE)
+            data.put("avc", AppInfo.getVersionCode(context))
+            data.put("was_ins", AppInfo.isPreInstalled(context).toString())
+            data.put("dpi", context.resources.displayMetrics.density.toDouble())
+
+            val preloadInfo = getPreloadInfo(context)
+            data.put("preload", preloadInfo.preload)
+
+            data.put("preloadDefault", AppInfo.getPreloadChannel(context))
+            if (!preloadInfo.isPreloaded()) {
+                data.put("preloadFailed", preloadInfo.error)
+            }
+        } catch (e: Exception) {
+            Log.e("tracking", e)
         }
 
         return data
