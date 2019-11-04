@@ -3,8 +3,7 @@ package com.zing.zalo.zalosdk.core.apptracking
 import android.content.Context
 
 interface IAppTracker {
-    fun run()
-    fun setListener(listener: AppTrackerListener)
+    var listener: AppTrackerListener?
 }
 
 interface AppTrackerListener {

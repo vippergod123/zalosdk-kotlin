@@ -7,11 +7,13 @@ object AppInfoHelper {
 
     val appName = "ABC"
     val versionName = "2"
+    val advertiserId = "abcdef"
 
     fun setup() {
         AppInfo.extracted = true
         AppInfo.appId = appId
         AppInfo.appName = appName
         AppInfo.versionName = versionName
+        DeviceInfo.advertiserId = advertiserId
     }
 }

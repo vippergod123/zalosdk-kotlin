@@ -20,7 +20,7 @@ import java.io.FileNotFoundException
 object DeviceInfo {
 
     private var lock = Any()
-    private var advertiserId: String? = null
+    internal var advertiserId: String? = null
     private var screenSize: String = "unknown"
     private var MNO: String = "unknown"
     var preloadInfo: PreloadInfo = PreloadInfo()
@@ -215,7 +215,7 @@ object DeviceInfo {
         return preloadInfo
     }
 
-    fun getAndroidId(context: Context): String {
+    fun getAndroidId(): String {
         return "unknown"
     }
 
@@ -229,7 +229,7 @@ object DeviceInfo {
 
         try {
             data.put("dId", getAdvertiseID(context))
-            data.put("aId", getAndroidId(context))
+            data.put("aId", getAndroidId())
             data.put("mod", getModel())
             data.put("ser", getSerial())
         } catch (e: Exception) {
@@ -239,7 +239,7 @@ object DeviceInfo {
         return data
     }
 
-    fun prepareTrackingData(context: Context, currentDeviceId: String, ts: Long): JSONObject {
+    fun prepareTrackingData(context: Context, currentDeviceId: String?, ts: Long): JSONObject {
         val data = JSONObject()
         try {
             data.put("pkg", AppInfo.getPackageName(context))

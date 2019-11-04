@@ -62,7 +62,7 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
         }
 
         val appID = AppInfo.getAppId(mContext)
-        val appVersion = ZaloSDK.getVersion()
+        val appVersion = ZaloSDK.getInstance().getVersion()
         val isOnline = Utils.isOnline(mContext)
 
         val task = ValidateOAuthCodeTask(httpClient, code, appID, appVersion, isOnline, callback)
@@ -72,7 +72,7 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
 
     private fun sendOAuthRequest(activity: Activity, loginVia: LoginVia) {
         val isZaloInstalled = AppInfo.isPackageExists(mContext, Constant.core.ZALO_PACKAGE_NAME)
-        val settingsManager = SettingsManager(mContext)
+        val settingsManager = SettingsManager.getInstance()
 
         when (loginVia) {
             LoginVia.APP -> {
@@ -160,7 +160,7 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
             )
         )
         try {
-            url.append(ZaloSDK.getAppID(activity))
+            url.append(ZaloSDK.getInstance().getAppID(activity))
                 .append("&sign_key=")
                 .append(URLEncoder.encode(AppInfo.getApplicationHashKey(activity), "UTF-8"))
                 .append("&pkg_name=")

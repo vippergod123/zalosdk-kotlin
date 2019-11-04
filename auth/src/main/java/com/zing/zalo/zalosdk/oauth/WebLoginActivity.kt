@@ -43,7 +43,7 @@ class WebLoginActivity : FragmentActivity(), ZaloWebLoginBaseFragment.ZaloWebLog
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
 	{
 		super.onActivityResult(requestCode, resultCode, data)
-		ZaloSDK.onActivityResult(this, requestCode, resultCode, data)
+		ZaloSDK.getInstance().onActivityResult(this, requestCode, resultCode, data)
 	}
 	
 	override fun onCreate(savedInstanceState: Bundle?)

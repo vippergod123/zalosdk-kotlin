@@ -1,5 +1,6 @@
 package com.zing.zalo.devicetrackingsdk
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.AsyncTask
 import android.text.TextUtils
@@ -10,112 +11,127 @@ import com.zing.zalo.zalosdk.core.helper.Storage
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpUrlEncodedRequest
 import com.zing.zalo.zalosdk.core.log.Log
+import com.zing.zalo.zalosdk.core.module.BaseModule
 import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
 import org.json.JSONException
 import org.json.JSONObject
-import java.lang.ref.WeakReference
+import java.util.concurrent.atomic.AtomicBoolean
 
-class SdkTracking(var context: Context) : ISdkTracking {
-    internal var sdkStorage = Storage(context)
+@SuppressLint("StaticFieldLeak")
+class SdkTracking private constructor(): BaseModule(), ISdkTracking {
+    internal var storage: Storage? = null
+    private val loading = AtomicBoolean(false)
+    private var sdkId: String? = null
+    private var privateKey: String? = null
 
-    internal lateinit var getSdkIdAsyncTask: GetSdkIdAsyncTask
+    var httpClient = HttpClient(
+        ServiceMapManager.urlFor(
+            ServiceMapManager.KEY_URL_CENTRALIZED
+        )
+    )
 
-    fun setSDKId(value: String) {
-        sdkStorage.setString(Constant.sharedPreference.PREF_SDK_ID, value)
+    companion object {
+        private val instance = SdkTracking()
+        fun getInstance() : SdkTracking { return instance }
     }
 
-    override fun getSDKId(): String? {
-        return sdkStorage.getString(Constant.sharedPreference.PREF_SDK_ID)
-    }
+    override fun onStart(context: Context) {
+        super.onStart(context)
 
-    fun getSDKId(listener: SdkTrackingListener?) {
-        val sdkId = getSDKId()
-        if (!TextUtils.isEmpty(sdkId)) {
-            listener?.onComplete(sdkId)
-            return
+        if(storage == null) {
+            storage = Storage(context)
         }
 
-        runGetSdkIDAsyncTask(listener)
+        sdkId = storage?.getString(Constant.sharedPreference.PREF_SDK_ID)
+        privateKey = storage?.getString(Constant.sharedPreference.PREF_PRIVATE_KEY)
+        if(TextUtils.isEmpty(sdkId) ||
+            TextUtils.isEmpty(privateKey)) {
+            runGetSdkIDAsyncTask()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        storage = null
+        sdkId = null
+        privateKey = null
+    }
+
+
+    override fun getSDKId(): String? {
+        if(TextUtils.isEmpty(sdkId)) {
+            runGetSdkIDAsyncTask()
+        }
+        return sdkId
     }
 
     override fun getPrivateKey(): String? {
-        return sdkStorage.getString(Constant.sharedPreference.PREF_PRIVATE_KEY)
+        if(TextUtils.isEmpty(privateKey)) {
+            runGetSdkIDAsyncTask()
+        }
+        return privateKey
     }
 
-    fun setPrivateKey(value: String) {
-        sdkStorage.setString(Constant.sharedPreference.PREF_PRIVATE_KEY, value)
-    }
+    private fun runGetSdkIDAsyncTask() {
+        if(loading.get() || !hasContext) {
+            return
+        }
 
-    fun runGetSdkIDAsyncTask(listener: SdkTrackingListener?) {
-        if (!::getSdkIdAsyncTask.isInitialized)
-            getSdkIdAsyncTask = GetSdkIdAsyncTask(
-                WeakReference(context), listener
-            )
-        getSdkIdAsyncTask.execute()
-    }
+        loading.set(true)
+        val task = GetSdkIdAsyncTask(context!!, httpClient) {
+            sdkId, privateKey ->
 
-    class GetSdkIdAsyncTask(
-        private val weakContext: WeakReference<Context>,
-        private var listener: SdkTrackingListener?
-    ) : AsyncTask<Void, Void, JSONObject>() {
-
-        var httpClient = HttpClient(
-            ServiceMapManager.urlFor(
-                ServiceMapManager.KEY_URL_CENTRALIZED
-            )
-        )
-        var request = HttpUrlEncodedRequest(Constant.api.API_SDK_ID)
-
-        override fun doInBackground(vararg params: Void?): JSONObject? {
-            val context = weakContext.get()
-            try {
-                if (context == null) throw Exception("Context is null")
-
-                val deviceIdData = DeviceInfo.prepareDeviceIdData(context).toString()
-                request.addParameter("appId", AppInfo.getAppId(context))
-                request.addParameter("sdkv", DeviceInfo.getSDKVersion())
-                request.addParameter("pl", "android")
-                request.addParameter("osv", DeviceInfo.getOSVersion())
-                request.addParameter("model", DeviceInfo.getModel())
-                request.addParameter("screenSize", DeviceInfo.getScreenSize(context))
-                request.addParameter("device", deviceIdData)
-                request.addParameter("ref", AppInfo.getReferrer(context))
-
-                val jsonObject = httpClient.send(request).getJSON()
-                val errorCode = jsonObject?.getInt("error")
-                if (errorCode == 0) {
-                    val data = jsonObject.getJSONObject("data")
-                    val sdkId = data.optString("sdkId")
-                    val privateKey = data.optString("privateKey")
-
-                    val dataJson = JSONObject()
-                    dataJson.put("sdkId", sdkId)
-                    dataJson.put("privateKey", privateKey)
-
-                    val sdkTracking = SdkTracking(context)
-                    sdkTracking.setSDKId(sdkId)
-                    sdkTracking.setPrivateKey(privateKey)
-
-                    return dataJson
-                }
-            } catch (ex: JSONException) {
-                Log.e("GetSdkId", ex)
-            } catch (ex: Exception) {
-                Log.e("GetSdkId", ex)
+            if(sdkId != null && privateKey != null) {
+                this.sdkId = sdkId
+                this.privateKey = privateKey
+                storage?.setString(Constant.sharedPreference.PREF_PRIVATE_KEY, privateKey)
+                storage?.setString(Constant.sharedPreference.PREF_SDK_ID, sdkId)
             }
-            return null
-        }
 
-        /*
-    * Listener must be called in onPostExecute to avoid when doInBackground() return null
-    */
-        override fun onPostExecute(result: JSONObject?) {
-            super.onPostExecute(result)
-
-            val data = result?.toString()
-            listener?.onComplete(data)
-            listener = null
+            loading.set(false)
         }
+        task.execute()
+    }
+}
+
+private typealias GetSdkIdAsyncTaskCallback = (String?, String?) -> Unit
+@SuppressLint("StaticFieldLeak")
+class GetSdkIdAsyncTask(
+    private val context: Context,
+    private val httpClient: HttpClient,
+    private var callback: GetSdkIdAsyncTaskCallback
+) : AsyncTask<Void, Void, JSONObject>() {
+
+    override fun doInBackground(vararg params: Void?): JSONObject? {
+        try {
+            val deviceIdData = DeviceInfo.prepareDeviceIdData(context).toString()
+            val request = HttpUrlEncodedRequest(Constant.api.API_SDK_ID)
+            request.addParameter("appId", AppInfo.getAppId(context))
+            request.addParameter("sdkv", DeviceInfo.getSDKVersion())
+            request.addParameter("pl", "android")
+            request.addParameter("osv", DeviceInfo.getOSVersion())
+            request.addParameter("model", DeviceInfo.getModel())
+            request.addParameter("screenSize", DeviceInfo.getScreenSize(context))
+            request.addParameter("device", deviceIdData)
+            request.addParameter("ref", AppInfo.getReferrer(context))
+
+            val jsonObject = httpClient.send(request).getJSON()
+            val errorCode = jsonObject?.getInt("error")
+            if (errorCode == 0) {
+                return jsonObject.getJSONObject("data")
+            }
+        } catch (ex: JSONException) {
+            Log.e("GetSdkId", ex)
+        } catch (ex: Exception) {
+            Log.e("GetSdkId", ex)
+        }
+        return null
     }
 
+    override fun onPostExecute(result: JSONObject?) {
+        super.onPostExecute(result)
+
+        callback(result?.optString("sdkId"),
+            result?.optString("privateKey"))
+    }
 }

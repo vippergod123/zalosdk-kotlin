@@ -17,7 +17,7 @@ object AuthUtils {
     fun canUseBrowserLogin(context: Context): Boolean {
 
         if (!AuthUtils::settingsManager.isInitialized)
-            settingsManager = SettingsManager(context.applicationContext)
+            settingsManager = SettingsManager.getInstance()
 
         if (!settingsManager.isLoginViaBrowser()) return false
 
