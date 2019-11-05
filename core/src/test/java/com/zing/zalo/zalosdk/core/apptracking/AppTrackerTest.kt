@@ -22,19 +22,14 @@ import org.robolectric.RobolectricTestRunner
 class AppTrackerTest {
 
 
-    @MockK
-    private lateinit var httpClient: HttpClient
-    @MockK
-    private lateinit var response: HttpResponse
-    @MockK
-    private lateinit var appTrackerStorage: AppTrackerStorage
-    @MockK
-    private lateinit var storage: Storage
-    @MockK
-    private lateinit var sdkTracking: SdkTracking
+    @MockK private lateinit var httpClient: HttpClient
+    @MockK private lateinit var response: HttpResponse
+    @MockK private lateinit var appTrackerStorage: AppTrackerStorage
+    @MockK private lateinit var storage: Storage
+    @MockK private lateinit var sdkTracking: SdkTracking
 
     private lateinit var context: Context
-    private lateinit var appTracker: AppTracker
+    private lateinit var sut: AppTracker
 
 
 
@@ -43,23 +38,22 @@ class AppTrackerTest {
         MockKAnnotations.init(this, relaxUnitFun = true)
         context = ApplicationProvider.getApplicationContext()
 
-        DeviceTracking.init(context,null)
-
-        appTracker = AppTracker(context)
+        sut = AppTracker()
+        sut.deviceId = AppTrackerHelper.deviceId
     }
 
     @Test
     fun testAppTracking() {
         mockkObject(Utils)
         mockDataSubmitInstalledApp()
-        spyk(appTracker)
+        spyk(sut)
 
         val resultJson = JSONObject(DataHelper.PACKAGES_NAME)
         val authCode = "nRHRPtwUxNE8smukCyQjIBdU0rvbeza6wArCKcUZwaAxrJTBMv_KSudR0d9qaj8wzROn0Ypu6fvGihxBlcg"
 
-        appTracker.httpClient = httpClient
-        appTracker.appTrackerStorage = appTrackerStorage
-        appTracker.storage = storage
+        sut.httpClient = httpClient
+        sut.appTrackerStorage = appTrackerStorage
+        sut.storage = storage
 
         every { storage.getOAuthCode() } returns authCode
         every { appTrackerStorage.getInstallExpireTime() } returns 0L
@@ -67,10 +61,7 @@ class AppTrackerTest {
         every { httpClient.send(any()) } returns response
         every { response.getJSON() } returns resultJson
 
-        appTracker.needToScanInstalledApp()
-        appTracker.downloadPackages()
-        appTracker.scanInstalledApps()
-        appTracker.submitInstalledApps()
+        sut.start(context)
 
         val appTrackerListener = object:AppTrackerListener {
             override fun onAppTrackerCompleted(
@@ -86,10 +77,10 @@ class AppTrackerTest {
 
         }
 
-        appTracker.setListener(appTrackerListener)
+        sut.listener = appTrackerListener
         TestUtils.waitTaskRunInBackgroundAndForeground()
-        val jsonData = prepareDataForSubmitInstalledApp(appTracker, authCode)
-        verify(exactly = 1) { appTracker.needToScanInstalledApp()}
+        val jsonData = prepareDataForSubmitInstalledApp(sut, authCode)
+        verify(exactly = 1) { sut.needToScanInstalledApp()}
 //        verify(exactly = 1) { Utils.encrypt(AppTrackerHelper.privateKey, jsonData.toString()) }
         verify(exactly = 1) { appTrackerStorage.setInstallExpireTime(any()) }
         verify(exactly = 1) { appTrackerStorage.getInstallExpireTime() }
@@ -100,14 +91,14 @@ class AppTrackerTest {
     fun `testAppTracking sometimes fail to get SdkID`() {
         mockkObject(Utils)
         mockDataSubmitInstalledApp()
-        spyk(appTracker)
+        spyk(sut)
 
         val resultJson = JSONObject(DataHelper.PACKAGES_NAME)
         val authCode = "nRHRPtwUxNE8smukCyQjIBdU0rvbeza6wArCKcUZwaAxrJTBMv_KSudR0d9qaj8wzROn0Ypu6fvGihxBlcg"
 
-        appTracker.httpClient = httpClient
-        appTracker.appTrackerStorage = appTrackerStorage
-        appTracker.storage = storage
+        sut.httpClient = httpClient
+        sut.appTrackerStorage = appTrackerStorage
+        sut.storage = storage
 
         every { storage.getOAuthCode() } returns authCode
         every { appTrackerStorage.getInstallExpireTime() } returns 0L
@@ -115,33 +106,27 @@ class AppTrackerTest {
         every { httpClient.send(any()) } returns response
         every { response.getJSON() } returns resultJson
 
-
-
-        appTracker.needToScanInstalledApp()
-        appTracker.downloadPackages()
-        appTracker.scanInstalledApps()
-
-        every { DeviceTracking.getDeviceId() } returns  "" andThen  AppTrackerHelper.deviceId
-        appTracker.submitInstalledApps()
-
-
+        sut.start(context)
+        sut.needToScanInstalledApp()
+        sut.downloadPackages()
+        sut.scanInstalledApps()
+        sut.submitInstalledApps()
 
         TestUtils.waitTaskRunInBackgroundAndForeground()
 
-//        verify(atLeast = 1) { appTracker.submitInstalledApps() }
+//        verify(atLeast = 1) { sut.submitInstalledApps() }
     }
 
 
     //#region private supportive method
     private fun mockDataSubmitInstalledApp() {
         AppInfoHelper.setup()
-        mockkObject(DeviceTracking)
-        every { DeviceTracking.getDeviceId() } returns AppTrackerHelper.deviceId
+//        every { DeviceTracking.getInstance().getDeviceId() } returns AppTrackerHelper.deviceId
         every { sdkTracking.getSDKId() } returns AppTrackerHelper.sdkId
         every { sdkTracking.getPrivateKey() } returns AppTrackerHelper.privateKey
 
-        appTracker.scanId = AppInfoHelper.scanId
-        appTracker.sdkTracking = sdkTracking
+        sut.scanId = AppInfoHelper.scanId
+        sut.sdkTracking = sdkTracking
         AppTracker.installedPackagedNames = DataHelper.INSTALLED_APP_LIST
     }
 

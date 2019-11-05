@@ -9,12 +9,16 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.zing.zalo.devicetrackingsdk.DeviceTracking
+import com.zing.zalo.devicetrackingsdk.SdkTracking
 import com.zing.zalo.zalosdk.analytics.EventTracker
 import com.zing.zalo.zalosdk.analytics.EventTrackerListener
 import com.zing.zalo.zalosdk.analytics.model.Event
 import com.zing.zalo.zalosdk.core.apptracking.AppTracker
 import com.zing.zalo.zalosdk.core.apptracking.AppTrackerListener
+import com.zing.zalo.zalosdk.core.apptracking.AppTrackerStorage
 import com.zing.zalo.zalosdk.core.helper.AppInfo
+import com.zing.zalo.zalosdk.core.helper.Storage
 import com.zing.zalo.zalosdk.core.log.Log
 import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
 import com.zing.zalo.zalosdk.oauth.Constant
@@ -58,7 +62,7 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
 
     }
 
-    private val listener = object : IAuthenticateCompleteListener {
+    private val authenticateListener = object : IAuthenticateCompleteListener {
         @SuppressLint("SetTextI18n")
         override fun onAuthenticateSuccess(uid: Long, code: String, data: Map<String, Any>) {
             val displayName = data[Constant.user.DISPLAY_NAME]
@@ -87,18 +91,15 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Log.setLogLevel()
-        ServiceMapManager.load(this)
         bindUI()
         configureUI()
         bindViewsListener()
-
-
     }
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        ZaloSDK.onActivityResult(this, requestCode, resultCode, data)
+        ZaloSDK.getInstance().onActivityResult(this, requestCode, resultCode, data)
     }
     //#endregion
 
@@ -156,7 +157,7 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
         authCodeTextView = findViewById(R.id.auth_code_text_view)
         loginStatusTextView = findViewById(R.id.login_status_text_view)
 
-        ZaloSDK.initialize(this)
+//        ZaloSDK.initialize(this)
     }
 
     @SuppressLint("SetTextI18n")
@@ -171,44 +172,49 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
 
     private fun bindViewsListener() {
         loginMobileButton.setOnClickListener {
-            ZaloSDK.unAuthenticate()
-            ZaloSDK.authenticate(this, LoginVia.APP, listener)
+            ZaloSDK.getInstance().unAuthenticate()
+            ZaloSDK.getInstance().authenticate(this, LoginVia.APP, authenticateListener)
         }
 
         loginWebButton.setOnClickListener {
-            ZaloSDK.unAuthenticate()
-            ZaloSDK.authenticate(this, LoginVia.WEB, listener)
+            ZaloSDK.getInstance().unAuthenticate()
+            ZaloSDK.getInstance().authenticate(this, LoginVia.WEB, authenticateListener)
         }
         loginViaButton.setOnClickListener {
-            ZaloSDK.unAuthenticate()
-            ZaloSDK.authenticate(this, LoginVia.APP_OR_WEB, listener)
+            ZaloSDK.getInstance().unAuthenticate()
+            ZaloSDK.getInstance().authenticate(this, LoginVia.APP_OR_WEB, authenticateListener)
         }
 
         registerButton.setOnClickListener {
             //			ZaloSDK.unAuthenticate()
-            ZaloSDK.registerZalo(this, listener)
+            ZaloSDK.getInstance().registerZalo(this, authenticateListener)
         }
 
         validateButton.setOnClickListener {
-            ZaloSDK.isAuthenticate(this)
+            ZaloSDK.getInstance().isAuthenticate(this)
         }
 
         checkAppLoginButton.setOnClickListener {
-            ZaloSDK.getZaloLoginStatus(this)
+            ZaloSDK.getInstance().getZaloLoginStatus(this)
         }
 
         appTrackingButton.setOnClickListener {
-            val appTracker = AppTracker(this)
-            appTracker.setListener(appTrackerListener)
-            appTracker.run()
+            val appTracker = AppTracker()
+            appTracker.sdkTracking = SdkTracking.getInstance()
+            appTracker.deviceId = DeviceTracking.getInstance().getDeviceId() ?: ""
+            appTracker.storage = Storage(applicationContext)
+            appTracker.appTrackerStorage = AppTrackerStorage(applicationContext)
+            appTracker.listener = appTrackerListener
+            appTracker.start(applicationContext)
         }
 
         eventTrackingButton.setOnClickListener {
 
             val eventTracker = EventTracker(this)
+
             eventTracker.addEvent(mockEvent())
             eventTracker.setListener(eventTrackerListener)
-            eventTracker.runDispatchEventLoop()
+            eventTracker.dispatchEventImmediate(mockEvent())
         }
     }
 

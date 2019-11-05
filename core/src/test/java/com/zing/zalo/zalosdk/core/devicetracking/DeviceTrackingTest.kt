@@ -4,110 +4,148 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.zing.zalo.devicetrackingsdk.DeviceTracking
-import com.zing.zalo.devicetrackingsdk.DeviceTrackingListener
-import com.zing.zalo.zalosdk.core.helper.AppTrackerHelper
+import com.zing.zalo.devicetrackingsdk.SdkTracking
+import com.zing.zalo.zalosdk.core.Constant
+import com.zing.zalo.zalosdk.core.helper.AppInfoHelper
 import com.zing.zalo.zalosdk.core.helper.DataHelper
-import com.zing.zalo.zalosdk.core.helper.TestUtils
+import com.zing.zalo.zalosdk.core.helper.Storage
+import com.zing.zalo.zalosdk.core.helper.Utils
 import com.zing.zalo.zalosdk.core.http.HttpClient
+import com.zing.zalo.zalosdk.core.http.HttpResponse
 import com.zing.zalo.zalosdk.core.http.HttpUrlEncodedRequest
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.slot
+import io.mockk.verify
 import org.json.JSONObject
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.net.URLEncoder
 
 @RunWith(RobolectricTestRunner::class)
 class DeviceTrackingTest {
     private lateinit var context: Context
-
+    @MockK private lateinit var client: HttpClient
+    @MockK private lateinit var resp: HttpResponse
+    @MockK private lateinit var sdkTracking: SdkTracking
+    lateinit var sut: DeviceTracking
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxUnitFun = true)
         context = ApplicationProvider.getApplicationContext()
+        sut = DeviceTracking.getInstance()
+        sut.httpClient = client
+        sut.sdkTracking = sdkTracking
+
+        every { sdkTracking.getSDKId() } returns "sdk-id"
+        AppInfoHelper.setup()
+
+        Storage(context).setAuthCode(DataHelper.authCode)
+    }
+
+    @After
+    fun teardown() {
+        val f = File(DeviceTracking.DID_FILE_NAME)
+        f.delete()
+        sut.stop()
     }
 
     @Test
     fun `GetDeviceId CachedValid ReturnCached`() {
         //#1. Setup mock data
-        val getDeviceIdAsyncTask = mockk<DeviceTracking.GetDeviceIdAsyncTask>(relaxUnitFun = true)
-        DeviceTracking.deviceIdExpiredTime = System.currentTimeMillis() + 10000L // make not expired
-        DeviceTracking.getDeviceIdAsyncTask = getDeviceIdAsyncTask
+        val data = JSONObject()
+        data.put(DeviceTracking.KEY_DEVICE_ID, "1234")
+        data.put(DeviceTracking.KEY_DEVICE_ID_EXPIRED_TIME, System.currentTimeMillis() + 5000)
+        Utils.writeToFile(context, data.toString(), DeviceTracking.DID_FILE_NAME)
 
         //#2. Run
-        DeviceTracking.init(context, null)
+        sut.start(context)
+        Robolectric.flushBackgroundThreadScheduler()
 
         //#3. Verify & assert
-        assertThat(DeviceTracking.getDeviceId()).isNotNull()
-        verify(exactly = 0) { getDeviceIdAsyncTask.execute() }
+        assertThat(sut.getDeviceId()).isEqualTo("1234")
+        verify(exactly = 0) { client.send(any()) }
     }
 
     @Test
     fun `GetDeviceId Not Cached`() {
         //#1. Setup mock data
-        val request = mockk<HttpUrlEncodedRequest>(relaxUnitFun = true)
-        val httpClient = mockk<HttpClient>(relaxUnitFun = true)
-
-        every {
-            httpClient.send(request).getJSON()
-        } returns JSONObject(DataHelper.responseGetDeviceIdAsyncTask)
-
-        DeviceTracking.deviceIdExpiredTime = System.currentTimeMillis() - 10000L  // make expired
-        DeviceTracking.request = request
-        DeviceTracking.httpClient = httpClient
+        val json = JSONObject("{ error: 0, data: { deviceId:'1234', expiredTime:${System.currentTimeMillis() + 1000} } }")
+        val slot = slot<HttpUrlEncodedRequest>()
+        every { client.send(capture(slot)) } returns resp
+        every { resp.getJSON() } returns json
 
         //#2. Run
-        DeviceTracking.init(context, null)
+        sut.start(context)
+        Robolectric.flushBackgroundThreadScheduler()
 
-        //#3. Verify & assert
-        assertThat(DeviceTracking.getDeviceId()).isEqualTo(AppTrackerHelper.deviceId)
-        verifyRequestOnceForDeviceId(request)
+        //#3. Verify
+        assertThat(slot.isCaptured).isTrue()
+        val req = slot.captured
+        assertThat(sut.getDeviceId()).isEqualTo("1234")
+
+        val url = req.getUrl("")
+        assertThat(url).isEqualTo(Constant.api.API_HARDWARE_ID_URL)
+
+        val outputStream = ByteArrayOutputStream()
+        req.encodeBody(outputStream)
+        val byteArray = outputStream.toByteArray()
+        val body = String(byteArray)
+
+        assertThat(body.contains("pl=android")).isTrue()
+        assertThat(body.contains("appId=${AppInfoHelper.appId}")).isTrue()
+        assertThat(body.contains("oauthCode=${DataHelper.authCode}")).isTrue()
+        val dIdResult = "{\"dId\":\"${AppInfoHelper.advertiserId}\",\"aId\":\"unknown\",\"mod\":\"robolectric\",\"ser\":\"unknown\"}"
+        assertThat(body.contains(URLEncoder.encode(dIdResult,"UTF-8"))).isTrue()
+        val appNameResult = "\"an\":\"${AppInfoHelper.appName}\""
+        assertThat(body.contains(URLEncoder.encode(appNameResult,"UTF-8"))).isTrue()
+
     }
-
-    private fun verifyRequestOnceForDeviceId(request: HttpUrlEncodedRequest) {
-        verify(exactly = 1) { request.addQueryStringParameter("pl", any()) }
-        verify(exactly = 1) { request.addQueryStringParameter("appId", any()) }
-        verify(exactly = 1) { request.addQueryStringParameter("oauthCode", any()) }
-        verify(exactly = 1) { request.addQueryStringParameter("device", any()) }
-        verify(exactly = 1) { request.addQueryStringParameter("data", any()) }
-        verify(exactly = 1) { request.addQueryStringParameter("ts", any()) }
-        verify(exactly = 1) { request.addQueryStringParameter("sig", any()) }
-        verify(exactly = 1) { request.addQueryStringParameter("sdkId", any()) }
-    }
-
 
     @Test
     fun `GetDeviceId When Expired`() {
+        //#1. Setup mock data
+        val data = JSONObject()
+        data.put(DeviceTracking.KEY_DEVICE_ID, "1234")
+        data.put(DeviceTracking.KEY_DEVICE_ID_EXPIRED_TIME, System.currentTimeMillis() - 5000)
+        Utils.writeToFile(context, data.toString(), DeviceTracking.DID_FILE_NAME)
 
-        var times = 1
-        val request = mockk<HttpUrlEncodedRequest>(relaxUnitFun = true)
-        val httpClient = mockk<HttpClient>(relaxUnitFun = true)
+        val json = JSONObject("{ error: 0, data: { deviceId:'45678', expiredTime:${System.currentTimeMillis() + 1000} } }")
+        val slot = slot<HttpUrlEncodedRequest>()
+        every { client.send(capture(slot)) } returns resp
+        every { resp.getJSON() } returns json
 
-        val deviceIdAfter = "deviceId_second"
-        val responseAfter = "{\"data\":{\"deviceId\":\"$deviceIdAfter\",\"expiredTime\":43200000},\"error\":0,\"errorMsg\":\"\"}"
-        DeviceTracking.deviceIdExpiredTime = System.currentTimeMillis() - 10000L  // make expired
-        DeviceTracking.request = request
-        DeviceTracking.httpClient = httpClient
+        //#2. Run
+        sut.start(context)
+        Robolectric.flushBackgroundThreadScheduler()
 
-        every {
-            httpClient.send(request).getJSON()
-        } returns JSONObject(DataHelper.responseGetDeviceIdAsyncTask)
+        //#3. Verify
+        assertThat(slot.isCaptured).isTrue()
+        assertThat(sut.getDeviceId()).isEqualTo("45678")
+    }
 
-        DeviceTracking.init(context, null)
-        DeviceTracking.deviceIdExpiredTime = 0L
+    @Test
+    fun `GetDeviceId Multiple times`() {
+        val json = JSONObject("{ error: 0, data: { deviceId:'1234', expiredTime:${System.currentTimeMillis() + 1000} } }")
+        every { client.send(any()) } returns resp
+        every { resp.getJSON() } returns json
 
-        every {
-            httpClient.send(request).getJSON()
-        } returns JSONObject(responseAfter)
+        //#2. Run
+        sut.getDeviceId()
+        sut.start(context)
+        sut.getDeviceId()
+        sut.getDeviceId()
+        sut.getDeviceId()
+        Robolectric.flushBackgroundThreadScheduler()
 
-        DeviceTracking.getDeviceId(object: DeviceTrackingListener{
-            override fun onComplete(result: String?) {
-                when (times) {
-                    1 -> assertThat(result).isEqualTo(AppTrackerHelper.deviceId)
-                    2 -> assertThat(result).isEqualTo(deviceIdAfter)
-                }
-                times++
-            }
-        })
+        //#3. Verify
+        verify(exactly = 1) { client.send(any()) }
     }
 }

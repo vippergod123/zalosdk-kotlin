@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.zing.zalo.zalosdk.demo">
+        xmlns:tools="http://schemas.android.com/tools"
+        package="com.zing.zalo.zalosdk.demo">
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <application
             android:allowBackup="true"
@@ -8,7 +9,8 @@
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            tools:ignore="GoogleAppIndexingWarning">
 
 
         <meta-data
@@ -27,16 +29,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.zing.zalo.zalosdk.oauth.BrowserLoginActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="zalo-1829577289837795818" />
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>

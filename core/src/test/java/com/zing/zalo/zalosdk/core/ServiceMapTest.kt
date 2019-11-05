@@ -13,6 +13,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,31 +35,29 @@ class ServiceMapTest {
 
     private lateinit var context: Context
 
-    @MockK
-    private lateinit var response1: HttpResponse
-
-    @MockK
-    private lateinit var response2: HttpResponse
-
-    @MockK
-    private lateinit var storage: ServiceMapStorage
-
-    @MockK
-    private lateinit var client: HttpClient
-
+    @MockK private lateinit var response1: HttpResponse
+    @MockK private lateinit var response2: HttpResponse
+    @MockK private lateinit var storage: ServiceMapStorage
+    @MockK private lateinit var client: HttpClient
+    private lateinit var sut: ServiceMapManager
 
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
         context = ApplicationProvider.getApplicationContext()
-
-        ServiceMapManager.httpClient = client
-        ServiceMapManager.storage = storage
+        sut = ServiceMapManager.getInstance()
+        sut.httpClient = client
+        sut.storage = storage
 
         every { storage.getKeyUrlCentralized() } returns "centralized"
         every { storage.getKeyUrlOauth() } returns "oauth"
         every { storage.getKeyUrlGraph() } returns "graph"
+    }
+
+    @After
+    fun teardown() {
+        sut.stop()
     }
 
     @Test
@@ -67,7 +66,7 @@ class ServiceMapTest {
         every { storage.getExpireTime() } returns System.currentTimeMillis() + 1000 * 60 * 59 * 24
 
         //2. run
-        ServiceMapManager.load(context)
+        sut.start(context)
         TestUtils.waitTaskRunInBackgroundAndForeground()
 
         //3. verify
@@ -86,7 +85,7 @@ class ServiceMapTest {
         every { storage.getExpireTime() } returns 0L
 
         //2. run
-        ServiceMapManager.load(context)
+        sut.start(context)
 
         //3. verify
         //3.a load from cache

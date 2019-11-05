@@ -20,6 +20,7 @@ import com.zing.zalo.zalosdk.core.settings.SettingsManager.Companion.KEY_WAKEUP_
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.json.JSONObject
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,32 +30,33 @@ import org.robolectric.RobolectricTestRunner
 class SettingsManagerTest {
     private lateinit var context: Context
 
-    @MockK
-    private lateinit var client: HttpClient
-
-    @MockK
-    private lateinit var response: HttpResponse
-
-    @MockK
-    private lateinit var storage: PrivateSharedPreferenceInterface
+    @MockK private lateinit var client: HttpClient
+    @MockK private lateinit var response: HttpResponse
+    @MockK private lateinit var storage: PrivateSharedPreferenceInterface
+    @MockK private lateinit var deviceTracking: DeviceTracking
+    private lateinit var sut: SettingsManager
 
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxUnitFun = true)
         context = ApplicationProvider.getApplicationContext()
-        AppInfoHelper.setup()
+        sut = SettingsManager.getInstance()
+        sut.deviceTracking = deviceTracking
+        sut.httpClient = client
+        sut.wakeUpStorage = storage
 
-        DeviceTracking.init(context,null)
+        every { deviceTracking.getDeviceId() } returns AppTrackerHelper.deviceId
+        AppInfoHelper.setup()
+    }
+
+    @After
+    fun teardown() {
+        sut.stop()
     }
 
     @Test
     fun `cached settings`() {
-        val sut = SettingsManager(context)
-
         //1. mock
-        sut.wakeUpStorage = storage
-        sut.httpClient = client
-
         every { storage.getLong(KEY_EXPIRE_TIME) } returns System.currentTimeMillis() + 1000
         every { storage.getBoolean(KEY_SETTINGS_OUT_APP_LOGIN) } returns true
         every { storage.getBoolean(KEY_SETTINGS_WEB_VIEW) } returns true
@@ -62,7 +64,7 @@ class SettingsManagerTest {
         every { storage.getLong(KEY_WAKEUP_INTERVAL) } returns 3600
 
         //2. run
-        sut.init()
+        sut.start(context)
 
         //3. verify
         verify(exactly = 0) { client.send(any()) }
@@ -74,10 +76,6 @@ class SettingsManagerTest {
 
     @Test
     fun `load settings success`() {
-        val sut = SettingsManager(context)
-        mockkObject(DeviceTracking)
-
-
         //1. mock
         val data = """{
             "data":{
@@ -92,8 +90,6 @@ class SettingsManagerTest {
             },
             "error":0,"errorMsg":"Success."
         }"""
-        sut.wakeUpStorage = storage
-        sut.httpClient = client
 
         val request = slot<HttpGetRequest>()
         val expireTime = slot<Long>()
@@ -102,11 +98,9 @@ class SettingsManagerTest {
         every { client.send(capture(request)) } returns response
         every { storage.getLong(KEY_EXPIRE_TIME) } returns now - 1000
         every { storage.setLong(KEY_EXPIRE_TIME, capture(expireTime)) } just Runs
-        every { DeviceTracking.getDeviceId() } returns AppTrackerHelper.deviceId
 
         //2. run
-        sut.init()
-        TestUtils.waitTaskRunInBackgroundAndForeground()
+        sut.start(context)
 
         //3. verify
         verify(exactly = 1) { client.send(any()) }

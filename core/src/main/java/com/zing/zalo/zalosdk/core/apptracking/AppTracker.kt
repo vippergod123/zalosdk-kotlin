@@ -3,38 +3,37 @@ package com.zing.zalo.zalosdk.core.apptracking
 import android.content.Context
 import android.os.Build
 import android.text.TextUtils
-import com.zing.zalo.devicetrackingsdk.DeviceTracking
-import com.zing.zalo.devicetrackingsdk.DeviceTrackingListener
 import com.zing.zalo.devicetrackingsdk.SdkTracking
-import com.zing.zalo.devicetrackingsdk.SdkTrackingListener
 import com.zing.zalo.zalosdk.core.Constant
 import com.zing.zalo.zalosdk.core.helper.*
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpGetRequest
 import com.zing.zalo.zalosdk.core.http.HttpMultipartRequest
 import com.zing.zalo.zalosdk.core.log.Log
+import com.zing.zalo.zalosdk.core.module.BaseModule
 import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
 import org.json.JSONObject
 
-class AppTracker(private val context: Context) : IAppTracker {
+class AppTracker : BaseModule(), IAppTracker {
     companion object {
         var packageNames = arrayListOf<String>()
         var installedPackagedNames = arrayListOf<String>()
     }
 
     var httpClient = HttpClient(ServiceMapManager.urlFor(ServiceMapManager.KEY_URL_CENTRALIZED))
-
     var expiredTime = 0L
     var scanId = ""
 
-    internal var appTrackerStorage = AppTrackerStorage(context)
-    internal var storage = Storage(context)
-    internal var sdkTracking = SdkTracking(context)
-
+    lateinit var appTrackerStorage: AppTrackerStorage
+    lateinit var storage: Storage
+    lateinit var sdkTracking: SdkTracking
+    lateinit var deviceId: String
     private var submitRetry = 0
-    private var listener: AppTrackerListener? = null
+    override var listener: AppTrackerListener? = null
 
-    override fun run() {
+    override fun onStart(context: Context) {
+        super.onStart(context)
+
         if (!needToScanInstalledApp()) {
             Log.v("App Tracker run():", "not expired yet! ")
             cleanUp()
@@ -53,10 +52,6 @@ class AppTracker(private val context: Context) : IAppTracker {
         })
     }
 
-    override fun setListener(listener: AppTrackerListener) {
-        this.listener = listener
-    }
-
     internal fun needToScanInstalledApp(): Boolean {
         val expiredTime = appTrackerStorage.getInstallExpireTime()
         return System.currentTimeMillis() >= expiredTime
@@ -66,11 +61,8 @@ class AppTracker(private val context: Context) : IAppTracker {
         try {
             val request = HttpGetRequest(Constant.api.API_TRACKING_URL)
             request.addQueryStringParameter("pl", "android")
-            request.addQueryStringParameter("appId", AppInfo.getAppId(context))
-            request.addQueryStringParameter(
-                "zdId",
-                DeviceTracking.getDeviceId() ?: ""
-            )
+            request.addQueryStringParameter("appId", AppInfo.getAppId(context!!))
+            request.addQueryStringParameter("zdId", deviceId)
             request.addQueryStringParameter(
                 "sdkId",
                 sdkTracking.getSDKId() ?: ""
@@ -102,7 +94,7 @@ class AppTracker(private val context: Context) : IAppTracker {
     fun scanInstalledApps(): Boolean {
         try {
             for (each in packageNames) {
-                if (Utils.isPackageExisted(context, each)) installedPackagedNames.add(each)
+                if (Utils.isPackageExisted(context!!, each)) installedPackagedNames.add(each)
             }
 
         } catch (ex: Exception) {
@@ -125,7 +117,6 @@ class AppTracker(private val context: Context) : IAppTracker {
                 return
             }
 
-            val deviceId = DeviceTracking.getDeviceId() ?: ""
             val sdkId = sdkTracking.getSDKId() ?: ""
             val privateKey = sdkTracking.getPrivateKey() ?: ""
 
@@ -135,30 +126,14 @@ class AppTracker(private val context: Context) : IAppTracker {
                     "submitInstalledApps",
                     "sdkId & privateKey empty -> waiting sdkId to submit"
                 )
-                sdkTracking.getSDKId(object : SdkTrackingListener {
-                    override fun onComplete(result: String?) {
-                        submitInstalledApps()
-                    }
-                })
-            } else if (TextUtils.isEmpty(deviceId)) {
-                submitRetry += 1
-                Log.d("submitInstalledApps", "deviceID empty -> waiting deviceId to submit")
-                DeviceTracking.getDeviceId(object : DeviceTrackingListener {
-                    override fun onComplete(result: String?) {
-                        Log.d(
-                            "submitInstalledApps",
-                            "deviceID not empty -> submit install app: $result"
-                        )
-                        submitInstalledApps()
-                    }
-                })
+                submitInstalledApps()
             } else {
                 Log.d(
                     "submitInstalledApps",
                     "ready to submit file to server"
                 )
                 ZTaskExecutor.queueRunnable(Runnable {
-                    postRequestSubmitInstalledApps(sdkId, deviceId, privateKey)
+                    postRequestSubmitInstalledApps(sdkId, deviceId)
                     Log.v("App Tracker run():", "completed")
                     cleanUp()
                 })
@@ -171,8 +146,7 @@ class AppTracker(private val context: Context) : IAppTracker {
     //#region private supportive method
     private fun postRequestSubmitInstalledApps(
         sdkId: String,
-        deviceId: String,
-        privateKey: String
+        deviceId: String
     ) {
         val appData = UtilsJSON.listToJSONArray(installedPackagedNames)
 
@@ -183,9 +157,9 @@ class AppTracker(private val context: Context) : IAppTracker {
 
         val jsonData = JSONObject()
         jsonData.put("pl", "android")
-        jsonData.put("appId", AppInfo.getAppId(context))
-        jsonData.put("an", AppInfo.getAppName(context))
-        jsonData.put("av", AppInfo.getVersionName(context))
+        jsonData.put("appId", AppInfo.getAppId(context!!))
+        jsonData.put("an", AppInfo.getAppName(context!!))
+        jsonData.put("av", AppInfo.getVersionName(context!!))
         jsonData.put("oauthCode", storage.getOAuthCode())
         jsonData.put("osv", Build.VERSION.RELEASE)
         jsonData.put("sdkv", Constant.VERSION)

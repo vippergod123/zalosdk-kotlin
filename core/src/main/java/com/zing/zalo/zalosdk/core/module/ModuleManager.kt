@@ -1,0 +1,89 @@
+package com.zing.zalo.zalosdk.core.module
+
+import android.annotation.SuppressLint
+import android.content.Context
+import androidx.annotation.NonNull
+import com.zing.zalo.devicetrackingsdk.DeviceTracking
+import com.zing.zalo.devicetrackingsdk.DeviceTrackingListener
+import com.zing.zalo.devicetrackingsdk.SdkTracking
+import com.zing.zalo.zalosdk.core.apptracking.AppTracker
+import com.zing.zalo.zalosdk.core.apptracking.AppTrackerListener
+import com.zing.zalo.zalosdk.core.apptracking.AppTrackerStorage
+import com.zing.zalo.zalosdk.core.helper.Storage
+import com.zing.zalo.zalosdk.core.log.Log
+import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
+import com.zing.zalo.zalosdk.core.settings.SettingsManager
+import java.util.concurrent.atomic.AtomicBoolean
+
+@SuppressLint("StaticFieldLeak")
+object ModuleManager {
+
+    private var isInitialized = AtomicBoolean(false)
+    private val modules = mutableSetOf<IModule>()
+    private var context: Context? = null
+
+    init {
+        val dt = DeviceTracking.getInstance()
+        val st = SdkTracking.getInstance()
+        val sm = SettingsManager.getInstance()
+        val smm = ServiceMapManager.getInstance()
+
+        dt.sdkTracking = st
+        modules.add(dt)
+        modules.add(st)
+        modules.add(sm)
+        modules.add(smm)
+    }
+
+    fun addModule(module: IModule) {
+        if(isInitialized.get() && context != null) {
+            module.start(context!!)
+        }
+        modules.add(module)
+    }
+
+    fun removeModule(module: IModule) {
+        modules.remove(module)
+    }
+
+    fun initializeApp(context: Context) {
+        if (isInitialized.get()) return
+
+        this.context = context
+        val iter = modules.iterator()
+        while(iter.hasNext()) {
+            iter.next().start(context)
+        }
+
+        isInitialized.set(true)
+        DeviceTracking.getInstance().getDeviceId(object : DeviceTrackingListener {
+            override fun onComplete(result: String) {
+                onHasDeviceId(context, result)
+            }
+        })
+
+        Class.forName("com.zing.zalo.zalosdk.oauth.ZaloSDK")
+    }
+
+    private fun onHasDeviceId(context: Context, deviceId: String) {
+        val at = AppTracker()
+        at.sdkTracking = SdkTracking.getInstance()
+        at.deviceId = deviceId
+        at.storage = Storage(context)
+        at.appTrackerStorage = AppTrackerStorage(context)
+        at.listener = object : AppTrackerListener {
+            override fun onAppTrackerCompleted(
+                didRun: Boolean,
+                scanId: String,
+                packageNames: List<String>,
+                installedApps: List<String>
+            ) {
+                at.listener = null
+                at.stop()
+                removeModule(at)
+            }
+
+        }
+        addModule(at)
+    }
+}

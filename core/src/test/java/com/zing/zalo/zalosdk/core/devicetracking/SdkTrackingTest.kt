@@ -4,94 +4,124 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.zing.zalo.devicetrackingsdk.SdkTracking
-import com.zing.zalo.devicetrackingsdk.SdkTrackingListener
 import com.zing.zalo.zalosdk.core.Constant
-import com.zing.zalo.zalosdk.core.helper.AppTrackerHelper
-import com.zing.zalo.zalosdk.core.helper.DataHelper
+import com.zing.zalo.zalosdk.core.SharedPreferenceConstant.PREF_PRIVATE_KEY
+import com.zing.zalo.zalosdk.core.SharedPreferenceConstant.PREF_SDK_ID
+import com.zing.zalo.zalosdk.core.helper.AppInfoHelper
 import com.zing.zalo.zalosdk.core.helper.Storage
 import com.zing.zalo.zalosdk.core.http.HttpClient
+import com.zing.zalo.zalosdk.core.http.HttpResponse
 import com.zing.zalo.zalosdk.core.http.HttpUrlEncodedRequest
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.slot
+import io.mockk.verify
 import org.json.JSONObject
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import java.lang.ref.WeakReference
+import java.io.ByteArrayOutputStream
+import java.net.URLEncoder
 
 @RunWith(RobolectricTestRunner::class)
 class SdkTrackingTest {
     private lateinit var context: Context
 
+    @MockK private lateinit var client: HttpClient
+    @MockK private lateinit var resp: HttpResponse
+    @MockK private lateinit var sdkStorage: Storage
 
-    @MockK
-    private lateinit var sdkStorage: Storage
-
+    lateinit var sut: SdkTracking
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxUnitFun = true)
         context = ApplicationProvider.getApplicationContext()
+        sut = SdkTracking.getInstance()
+        sut.storage = sdkStorage
+        sut.httpClient = client
+
+        AppInfoHelper.setup()
+    }
+
+    @After
+    fun teardown() {
+        sut.stop()
     }
 
     @Test
     fun `GetSdkId CachedValid ReturnCached`() {
         //#1. setup mock
-        val sdkTracking = spyk(SdkTracking(context))
-        val returnResult = "ABCSAD"
-        every { sdkStorage.getString(Constant.sharedPreference.PREF_SDK_ID) } returns returnResult
-        sdkTracking.sdkStorage = sdkStorage
+        val sdkId = "ABCSAD"
+        val privateKey = "123456"
+        every { sdkStorage.getString(PREF_SDK_ID) } returns sdkId
+        every { sdkStorage.getString(PREF_PRIVATE_KEY) } returns privateKey
+        every { client.send(any()) } returns resp
 
         //#2. Run
-        sdkTracking.getSDKId(object : SdkTrackingListener {
-            override fun onComplete(result: String?) {
-                assertThat(result).isEqualTo(returnResult)
-            }
-        })
-        //#3. Verify
+        sut.start(context)
 
-        verify(exactly = 0) { sdkTracking.runGetSdkIDAsyncTask(any()) }
+        //#3. Verify
+        assertThat(sut.getSDKId()).isEqualTo(sdkId)
+        assertThat(sut.getPrivateKey()).isEqualTo(privateKey)
+        verify(exactly = 0) { client.send(any()) }
 
     }
 
     @Test
     fun `GetSdkId Not Cached`() {
         //#1. setup mock
-        val sdkTracking = spyk(SdkTracking(context))
-        val request = mockk<HttpUrlEncodedRequest>(relaxUnitFun = true)
-        val httpClient = mockk<HttpClient>(relaxUnitFun = true)
+        val json = JSONObject("{ error: 0, data: { sdkId:'1234', privateKey:'abcdef' } }")
+        val slot = slot<HttpUrlEncodedRequest>()
+        every { client.send(capture(slot)) } returns resp
+        every { resp.getJSON() } returns json
+        every { sdkStorage.getString(PREF_SDK_ID) } returns null
+        every { sdkStorage.getString(PREF_PRIVATE_KEY) } returns "abc"
 
-        every { sdkStorage.getString(Constant.sharedPreference.PREF_SDK_ID) } returns null
-        sdkTracking.sdkStorage = sdkStorage
-        val getSdkIdAsyncTask = SdkTracking.GetSdkIdAsyncTask(WeakReference(context), null)
-
-        sdkTracking.getSdkIdAsyncTask = getSdkIdAsyncTask
-        getSdkIdAsyncTask.request = request
-        getSdkIdAsyncTask.httpClient = httpClient
-
-        every { httpClient.send(request).getJSON() } returns JSONObject(DataHelper.responseGetSdkIdAsyncTask)
         //#2. Run
-        sdkTracking.getSDKId(object : SdkTrackingListener {
-            override fun onComplete(result: String?) {
-                assertThat(result).isEqualTo(AppTrackerHelper.sdkId)
-            }
-        })
+        sut.start(context)
+
         //#3. Verify
+        verify() { sdkStorage.setString(PREF_SDK_ID, "1234") }
+        verify() { sdkStorage.setString(PREF_PRIVATE_KEY, "abcdef") }
+        assertThat(sut.getSDKId()).isEqualTo("1234")
+        assertThat(sut.getPrivateKey()).isEqualTo("abcdef")
 
-        verify(exactly = 1) { sdkTracking.runGetSdkIDAsyncTask(any()) }
-        verify (exactly = 1){ getSdkIdAsyncTask.request.addParameter("pl", "android") }
-        verifyRequestOnceForSdkId(request)
+        assertThat(slot.isCaptured).isTrue()
+        val req = slot.captured
+        val url = req.getUrl("")
+        assertThat(url).isEqualTo(Constant.api.API_SDK_ID)
+
+        val outputStream = ByteArrayOutputStream()
+        req.encodeBody(outputStream)
+        val byteArray = outputStream.toByteArray()
+        val body = String(byteArray)
+
+        assertThat(body.contains("pl=android")).isTrue()
+        assertThat(body.contains("appId=${AppInfoHelper.appId}")).isTrue()
+
+        val dIdResult = "{\"dId\":\"${AppInfoHelper.advertiserId}\",\"aId\":\"unknown\",\"mod\":\"robolectric\",\"ser\":\"unknown\"}"
+        assertThat(body.contains(URLEncoder.encode(dIdResult,"UTF-8"))).isTrue()
     }
 
-    private fun verifyRequestOnceForSdkId(request: HttpUrlEncodedRequest) {
-        verify(exactly = 1) { request.addParameter("appId", any()) }
-        verify(exactly = 1) { request.addParameter("sdkv", any()) }
-        verify(exactly = 1) { request.addParameter("pl", any()) }
-        verify(exactly = 1) { request.addParameter("osv", any()) }
-        verify(exactly = 1) { request.addParameter("model", any()) }
-        verify(exactly = 1) { request.addParameter("screenSize", any()) }
-        verify(exactly = 1) { request.addParameter("device", any()) }
-        verify(exactly = 1) { request.addParameter("ref", any()) }
-    }
+    @Test
+    fun `GetSdkId call multiple times`() {
+        //#1. setup mock
+        val json = JSONObject("{ error: 0, data: { sdkId:'1234', privateKey:'abcdef' } }")
+        every { client.send(any()) } returns resp
+        every { resp.getJSON() } returns json
+        every { sdkStorage.getString(PREF_SDK_ID) } returns "bbb"
+        every { sdkStorage.getString(PREF_PRIVATE_KEY) } returns null
 
+        //#2. Run
+        sut.getSDKId()
+        sut.start(context)
+        sut.getSDKId()
+        sut.getPrivateKey()
+
+        //#3. Verify
+        verify(exactly = 1) { client.send(any()) }
+    }
 }
