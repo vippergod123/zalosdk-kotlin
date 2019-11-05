@@ -36,7 +36,6 @@ class AuthenticateTest : AppBase() {
 
         MockKAnnotations.init(this, relaxUnitFun = true)
         contextApp = context.applicationContext
-        SettingsManager(context).init()
     }
 
     @Test
@@ -78,7 +77,7 @@ class AuthenticateTest : AppBase() {
         val wakeUp =
             Storage(context).privateSharedPreferences(SharedPreferenceConstant.PREFS_NAME_WAKEUP)
         wakeUp.setBoolean(SettingsManager.KEY_SETTINGS_OUT_APP_LOGIN, false)
-        val setting = SettingsManager(context)
+        val setting = SettingsManager.getInstance()
         setting.wakeUpStorage = wakeUp
         AuthUtils.settingsManager = setting
         //#2
@@ -131,7 +130,7 @@ class AuthenticateTest : AppBase() {
         val wakeUp =
             Storage(context).privateSharedPreferences(SharedPreferenceConstant.PREFS_NAME_WAKEUP)
         wakeUp.setBoolean(SettingsManager.KEY_SETTINGS_OUT_APP_LOGIN, true)
-        val setting = SettingsManager(context)
+        val setting = SettingsManager.getInstance()
         setting.wakeUpStorage = wakeUp
         AuthUtils.settingsManager = setting
 

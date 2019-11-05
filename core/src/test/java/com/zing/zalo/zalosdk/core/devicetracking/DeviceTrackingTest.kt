@@ -7,6 +7,8 @@ import com.zing.zalo.devicetrackingsdk.DeviceTracking
 import com.zing.zalo.devicetrackingsdk.SdkTracking
 import com.zing.zalo.zalosdk.core.Constant
 import com.zing.zalo.zalosdk.core.helper.AppInfoHelper
+import com.zing.zalo.zalosdk.core.helper.DataHelper
+import com.zing.zalo.zalosdk.core.helper.Storage
 import com.zing.zalo.zalosdk.core.helper.Utils
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpResponse
@@ -25,6 +27,7 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.net.URLEncoder
 
 @RunWith(RobolectricTestRunner::class)
 class DeviceTrackingTest {
@@ -43,6 +46,8 @@ class DeviceTrackingTest {
 
         every { sdkTracking.getSDKId() } returns "sdk-id"
         AppInfoHelper.setup()
+
+        Storage(context).setAuthCode(DataHelper.authCode)
     }
 
     @After
@@ -96,7 +101,12 @@ class DeviceTrackingTest {
 
         assertThat(body.contains("pl=android")).isTrue()
         assertThat(body.contains("appId=${AppInfoHelper.appId}")).isTrue()
-        //TODO: verify mấy param còn lại trong body
+        assertThat(body.contains("oauthCode=${DataHelper.authCode}")).isTrue()
+        val dIdResult = "{\"dId\":\"${AppInfoHelper.advertiserId}\",\"aId\":\"unknown\",\"mod\":\"robolectric\",\"ser\":\"unknown\"}"
+        assertThat(body.contains(URLEncoder.encode(dIdResult,"UTF-8"))).isTrue()
+        val appNameResult = "\"an\":\"${AppInfoHelper.appName}\""
+        assertThat(body.contains(URLEncoder.encode(appNameResult,"UTF-8"))).isTrue()
+
     }
 
     @Test

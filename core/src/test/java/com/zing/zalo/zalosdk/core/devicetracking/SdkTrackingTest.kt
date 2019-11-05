@@ -24,6 +24,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.io.ByteArrayOutputStream
+import java.net.URLEncoder
 
 @RunWith(RobolectricTestRunner::class)
 class SdkTrackingTest {
@@ -100,7 +101,9 @@ class SdkTrackingTest {
 
         assertThat(body.contains("pl=android")).isTrue()
         assertThat(body.contains("appId=${AppInfoHelper.appId}")).isTrue()
-        //TODO: verify mấy param còn lại trong body
+
+        val dIdResult = "{\"dId\":\"${AppInfoHelper.advertiserId}\",\"aId\":\"unknown\",\"mod\":\"robolectric\",\"ser\":\"unknown\"}"
+        assertThat(body.contains(URLEncoder.encode(dIdResult,"UTF-8"))).isTrue()
     }
 
     @Test

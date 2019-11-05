@@ -277,7 +277,6 @@ class EventTrackerTest {
     }
 
     private fun verifyPreloadInfo() {
-        //TODO: [done]verify preload info & preload default
         val times = 1
         verify(exactly = times) { AppInfo.getPreloadChannel(context) }
         verify(exactly = times) { DeviceInfo.getPreloadInfo(context) }
