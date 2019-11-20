@@ -19,16 +19,18 @@ object AppInfo {
     private val lock = Any()
     var extracted: Boolean = false
     var appId: String? = null
-    internal var versionName: String? = null
+    var applicationHashKey: String? = null
+    var packageName: String? = null
+    var versionName: String? = null
+
     internal var versionCode: Long = 0
     internal var appName: String? = null
-    var applicationHashKey: String? = null
     internal var firstInstallDate: String? = null
     internal var installDate: String? = null
     internal var lastUpdateDate: String? = null
     internal var installerPackageName: String? = null
     internal var preloadChannel: String? = null
-    internal var packageName: String? = null
+
     private var isAutoTrackingOpenApp: Boolean = false
 
     fun isPackageExists(mContext: Context, targetPackage: String): Boolean {
@@ -235,7 +237,6 @@ object AppInfo {
         }
     }
 
-    @Suppress("DEPRECATION")
     private fun extractBasicAppInfo(ctx: Context) {
         synchronized(lock) {
             if (extracted) return

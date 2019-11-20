@@ -20,7 +20,6 @@ import com.zing.zalo.zalosdk.core.apptracking.AppTrackerStorage
 import com.zing.zalo.zalosdk.core.helper.AppInfo
 import com.zing.zalo.zalosdk.core.helper.Storage
 import com.zing.zalo.zalosdk.core.log.Log
-import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
 import com.zing.zalo.zalosdk.oauth.Constant
 import com.zing.zalo.zalosdk.oauth.IAuthenticateCompleteListener
 import com.zing.zalo.zalosdk.oauth.LoginVia
@@ -39,7 +38,7 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
     private lateinit var checkAppLoginButton: Button
     private lateinit var appTrackingButton: Button
     private lateinit var eventTrackingButton: Button
-
+    private lateinit var openApiButton: Button
     private lateinit var appIDTextView: TextView
     private lateinit var loginStatusTextView: TextView
     private lateinit var authCodeTextView: TextView
@@ -149,8 +148,11 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
         registerButton = findViewById(R.id.register_button)
         validateButton = findViewById(R.id.validate_oauth_code_button)
         checkAppLoginButton = findViewById(R.id.check_app_login_button)
+        openApiButton = findViewById(R.id.open_api_button)
+        eventTrackingButton = findViewById(R.id.event_tracking_button)
         appTrackingButton = findViewById(R.id.app_tracking_button)
         eventTrackingButton = findViewById(R.id.event_tracking_button)
+
 
         appIDTextView = findViewById(R.id.app_id_text_view)
         userIDTextView = findViewById(R.id.user_id_text_view)
@@ -216,6 +218,11 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
             eventTracker.setListener(eventTrackerListener)
             eventTracker.dispatchEventImmediate(mockEvent())
         }
+
+        openApiButton.setOnClickListener {
+            val intent = Intent(this, OpenApiActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun showToast(msg: String) {
@@ -230,12 +237,11 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
     private fun mockEvent(): Event {
         val timeStamp = System.currentTimeMillis()
         val action = "action-$timeStamp"
-        val params = mutableMapOf<String,String>()
-
+        val params = mutableMapOf<String, String>()
 
         params["name"] = "datahelper-$timeStamp"
         params["age"] = timeStamp.toString()
-        return Event(action,params,timeStamp)
+        return Event(action, params, timeStamp)
     }
 
 }

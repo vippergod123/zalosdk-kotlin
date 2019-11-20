@@ -4,6 +4,7 @@ package com.zing.zalo.zalosdk.core
 
 object Constant {
     const val VERSION = "4.0"
+//    const val DEV_MODE = true
     const val DEV_MODE = false
     const val ZALO_PACKAGE_NAME = "com.zing.zalo"
 
@@ -38,7 +39,6 @@ object SharedPreferenceConstant {
 }
 
 
-
 object Api {
     const val API_HARDWARE_ID_URL = "id/mobile/android"
     const val API_SDK_ID = "/sdk/mobile/android"
@@ -46,6 +46,13 @@ object Api {
     const val API_TRACKING_URL = "/apps/mobile/android"
     const val API_APP_TRACKING_ID_URL = "/apps/mobile/explore/android"
 
+    const val AUTH_MOBILE_ACCESS_TOKEN_PATH = "/v3/mobile/access_token"
+    const val GRAPH_ME_FRIENDS_PATH = "/v2.0/me/friends"
+    const val GRAPH_V2_ME_PATH = "/v2.0/me"
+    const val GRAPH_ME_INVITABLE_FRIENDS_PATH = "/v2.0/me/invitable_friends"
+    const val GRAPH_ME_FEED_PATH = "/v2.0/me/feed"
+    const val GRAPH_ME_MESSAGE_PATH = "/v2.0/me/message"
+    const val GRAPH_APP_REQUESTS_PATH = "/v2.0/apprequests"
 }
 
 object SecretKey {

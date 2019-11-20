@@ -54,13 +54,13 @@
             android:backgroundTint="#05A3E5"/>
 
     <Button
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:gravity="center"
-            android:text="Device Tracking"
             android:id="@+id/app_tracking_button"
             style="@style/Widget.AppCompat.Button.Colored"
-            android:backgroundTint="#05A3E5" />
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:backgroundTint="#05A3E5"
+            android:gravity="center"
+            android:text="App Tracking" />
 
     <Button
             android:layout_width="match_parent"
@@ -70,6 +70,16 @@
             android:id="@+id/event_tracking_button"
             style="@style/Widget.AppCompat.Button.Colored"
             android:backgroundTint="#05A3E5" />
+            
+    <Button
+            android:id="@+id/open_api_button"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:backgroundTint="#05A3E5"
+            android:gravity="center"
+            android:text="Open Api" />
+
 
     <TextView
             android:layout_width="match_parent"

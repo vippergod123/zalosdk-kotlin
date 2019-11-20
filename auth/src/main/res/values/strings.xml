@@ -6,4 +6,6 @@
     <string name="zalo_app_not_installed">Zalo is not installed yet</string>
     <string name="zalo_app_out_of_date">Zalo is out of date</string>
     <string name="no_network">Network unstable, please try again later</string>
+    <string name="zalosdk_login_protocol_schema" translatable="false">missing-protocol-schema</string>
+    <string name="zalosdk_app_id" translatable="false">missing-app-id</string>
 </resources>

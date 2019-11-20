@@ -9,9 +9,11 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Environment
 import android.os.Process
+import com.zing.zalo.zalosdk.core.Constant
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpMultipartRequest
 import com.zing.zalo.zalosdk.core.log.Log
+import org.jetbrains.annotations.NotNull
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.*
@@ -21,6 +23,7 @@ import java.lang.reflect.Method
 import java.net.HttpURLConnection
 import java.security.*
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
 import javax.crypto.IllegalBlockSizeException
@@ -165,7 +168,7 @@ object Utils {
                 builder.append(str)
             }
             builder.append(secretKey)
-            Log.v("getSignature","bsig: $builder")
+            Log.v("getSignature", "bsig: $builder")
             return md5(builder.toString())
         } catch (ex: Exception) {
             Log.e("Utils: getSignature()", ex)
@@ -348,6 +351,8 @@ object Utils {
         return null
     }
 
+
+
     fun getCurrentProcessName(context: Context): String {
         try {
             val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -362,5 +367,35 @@ object Utils {
         } catch (ex: Exception) {
             return "default"
         }
+    }
+
+    fun convertTimeToMilliSeconds(@NotNull time: Int, @NotNull unit: TimeUnit): Long {
+        return when (unit) {
+            TimeUnit.SECONDS -> time * 1000L
+            TimeUnit.HOURS -> time * 3600 * 1000L
+            TimeUnit.MINUTES -> time * 60 * 1000L
+            else -> time.toLong()
+        }
+    }
+
+    fun isZaloSupportCallBack(context: Context): Boolean {
+        return getVersionCodeOfPackage(context, Constant.ZALO_PACKAGE_NAME) > 1100123
+    }
+
+    private fun getVersionCodeOfPackage(oContext: Context, packageId: String): Long {
+        try {
+            val pInfo = oContext.packageManager.getPackageInfo(packageId, 0)
+            if (pInfo != null) {
+                return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    pInfo.longVersionCode
+                } else {
+                    pInfo.versionCode.toLong()
+                }
+            }
+        } catch (ex: Exception) {
+            Log.w("getVersionCodeOfPackage",ex)
+        }
+
+        return -1L
     }
 }

@@ -1,19 +1,20 @@
-package com.zing.zalo.zalosdk.core.helper
+package com.zing.zalo.zalosdk.openapi.helper
+
+import com.zing.zalo.zalosdk.core.helper.AppInfo
 
 object AppInfoHelper {
-    const val appId = "appId_123456"
-    const scanId = "scanId_3"
-    const val appName = "appName"
+    const val appId = "123456"
+    const val packageName = "packageName"
+    const val scanId = "3"
+    const val appName = "ABC"
     const val versionName = "2"
     const val applicationHashKey = "applicationHashKey"
-    const val advertiserId = "advertiserId"
 
     fun setup() {
         AppInfo.extracted = true
         AppInfo.appId = appId
-        AppInfo.appName = appName
+        AppInfo.packageName = packageName
         AppInfo.versionName = versionName
-        DeviceInfo.advertiserId = advertiserId
         AppInfo.applicationHashKey = applicationHashKey
     }
 }

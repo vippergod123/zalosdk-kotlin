@@ -53,6 +53,7 @@ dependencies {
     implementation project(':core')
     implementation project(':auth')
     implementation project(':analytics')
+    implementation project(':openapi')
 
     //Unit Test
     def powerMockVersion =  '1.7.0RC2'

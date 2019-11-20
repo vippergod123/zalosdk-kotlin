@@ -27,8 +27,11 @@ import com.zing.zalo.zalosdk.oauth.ZaloOAuthResultCode.RESULTCODE_ZALO_APPLICATI
 import com.zing.zalo.zalosdk.oauth.helper.AppInfoHelper
 import com.zing.zalo.zalosdk.oauth.helper.AuthStorage
 import com.zing.zalo.zalosdk.oauth.helper.AuthUtils
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.slot
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,10 +44,14 @@ import kotlin.reflect.jvm.jvmName
 class AuthenticatorTest {
     private lateinit var context: Context
 
-    @MockK private lateinit var activity: Activity
-    @MockK private lateinit var storage: AuthStorage
-    @MockK private lateinit var settingMgr: SettingsManager
-    @MockK private lateinit var resources: Resources
+    @MockK
+    private lateinit var activity: Activity
+    @MockK
+    private lateinit var storage: AuthStorage
+    @MockK
+    private lateinit var settingMgr: SettingsManager
+    @MockK
+    private lateinit var resources: Resources
 
 
     private lateinit var sut: IAuthenticator
@@ -71,7 +78,10 @@ class AuthenticatorTest {
         successIntent.putExtra("error", RESULT_CODE_SUCCESSFUL)
         successIntent.putExtra(Constant.user.UID, 12345L)
         successIntent.putExtra(Constant.user.AUTH_CODE, "abcdef")
-        successIntent.putExtra("data", "{ \"data\": { \"${Constant.user.DISPLAY_NAME}\": \"abc\"  } }")
+        successIntent.putExtra(
+            "data",
+            "{ \"data\": { \"${Constant.user.DISPLAY_NAME}\": \"abc\"  } }"
+        )
     }
 
     @Test
@@ -87,14 +97,24 @@ class AuthenticatorTest {
         val cuid = slot<Long>()
         val displayName = slot<String>()
 
-        every { activity.registerReceiver( capture(broadcastReceiver), capture(receiverFilter) ) } answers { nothing }
-        every { activity.startActivityForResult(capture(intent), capture(reqCode)) } answers { nothing }
+        every {
+            activity.registerReceiver(
+                capture(broadcastReceiver),
+                capture(receiverFilter)
+            )
+        } answers { nothing }
+        every {
+            activity.startActivityForResult(
+                capture(intent),
+                capture(reqCode)
+            )
+        } answers { nothing }
         every { storage.setAuthCode(capture(oauthCode)) } answers { nothing }
         every { storage.setZaloId(capture(cuid)) } answers { nothing }
         every { storage.setZaloDisplayName(capture(displayName)) } answers { nothing }
 
         //2. run
-        sut.authenticate(activity, LoginVia.APP, object: IAuthenticateCompleteListener {
+        sut.authenticate(activity, LoginVia.APP, object : IAuthenticateCompleteListener {
             override fun onAuthenticateError(errorCode: Int, message: String) {
                 assertThat(true).isFalse() //must not go in here
             }
@@ -117,7 +137,12 @@ class AuthenticatorTest {
         assertThat(broadcastReceiver.isCaptured).isTrue()
         assertThat(receiverFilter.captured.hasAction(AUTHORIZATION_LOGIN_SUCCESSFUL_ACTION)).isTrue()
         assertThat(intent.captured.action).isEqualTo("com.zing.zalo.intent.action.THIRD_PARTY_APP_AUTHORIZATION")
-        assertThat(intent.captured.getLongExtra(Intent.EXTRA_UID, 0)).isEqualTo(AppInfo.getAppIdLong(context))
+        assertThat(
+            intent.captured.getLongExtra(
+                Intent.EXTRA_UID,
+                0
+            )
+        ).isEqualTo(AppInfo.getAppIdLong(context))
 
         sut.onActivityResult(activity, reqCode.captured, Activity.RESULT_OK, successIntent)
     }
@@ -125,7 +150,7 @@ class AuthenticatorTest {
     @Test
     fun `test login via app not installed`() {
         //2. run
-        sut.authenticate(activity, LoginVia.APP, object: IAuthenticateCompleteListener {
+        sut.authenticate(activity, LoginVia.APP, object : IAuthenticateCompleteListener {
             override fun onAuthenticateError(errorCode: Int, message: String) {
                 assertThat(errorCode).isEqualTo(RESULTCODE_ZALO_APPLICATION_NOT_INSTALLED)
             }
@@ -145,11 +170,11 @@ class AuthenticatorTest {
         val cancelIntent = Intent()
         cancelIntent.putExtra("error", RESULT_CODE_ZALO_NOT_LOGIN)
 
-        every { activity.registerReceiver( any(), any() ) } answers { nothing }
+        every { activity.registerReceiver(any(), any()) } answers { nothing }
         every { activity.startActivityForResult(any(), capture(reqCode)) } answers { nothing }
 
         //2. run
-        sut.authenticate(activity, LoginVia.APP, object: IAuthenticateCompleteListener {
+        sut.authenticate(activity, LoginVia.APP, object : IAuthenticateCompleteListener {
             override fun onAuthenticateError(errorCode: Int, message: String) {
                 assertThat(errorCode).isEqualTo(RESULTCODE_USER_BACK)
             }
@@ -172,11 +197,11 @@ class AuthenticatorTest {
         val cancelIntent = Intent()
         cancelIntent.putExtra("error", RESULT_CODE_ZALO_NOT_LOGIN)
 
-        every { activity.registerReceiver( capture(broadcastReceiver), any() ) } answers { nothing }
+        every { activity.registerReceiver(capture(broadcastReceiver), any()) } answers { nothing }
         every { activity.startActivityForResult(any(), capture(reqCode)) } answers { nothing }
 
         //2. run
-        sut.authenticate(activity, LoginVia.APP, object: IAuthenticateCompleteListener {
+        sut.authenticate(activity, LoginVia.APP, object : IAuthenticateCompleteListener {
             override fun onAuthenticateError(errorCode: Int, message: String) {
                 assertThat(true).isFalse() //must not go in here
             }
@@ -200,7 +225,12 @@ class AuthenticatorTest {
         val reqCode = slot<Int>()
 
         every { settingMgr.isLoginViaBrowser() } returns false
-        every { activity.startActivityForResult(capture(intent), capture(reqCode)) } answers { nothing }
+        every {
+            activity.startActivityForResult(
+                capture(intent),
+                capture(reqCode)
+            )
+        } answers { nothing }
 
         //2. run
         sut.authenticate(activity, LoginVia.WEB, object : IAuthenticateCompleteListener {
@@ -245,10 +275,17 @@ class AuthenticatorTest {
             }
         })
 
-        assertThat(intent.captured.data!!.toString()).startsWith("https://oauth.zaloapp.com/v3/auth?" +
-                "app_id=${AppInfoHelper.appId}&sign_key=${AppInfoHelper.applicationHashKey}&" +
-                "pkg_name=${context.packageName}&orientation=${activity.resources.configuration.orientation}")
-        sut.onActivityResult(activity, ZALO_AUTHENTICATE_REQUEST_CODE, Activity.RESULT_OK, successIntent)
+        assertThat(intent.captured.data!!.toString()).startsWith(
+            "https://oauth.zaloapp.com/v3/auth?" +
+                    "app_id=${AppInfoHelper.appId}&sign_key=${AppInfoHelper.applicationHashKey}&" +
+                    "pkg_name=${context.packageName}&orientation=${activity.resources.configuration.orientation}"
+        )
+        sut.onActivityResult(
+            activity,
+            ZALO_AUTHENTICATE_REQUEST_CODE,
+            Activity.RESULT_OK,
+            successIntent
+        )
     }
 
     private fun mockBrowserActivity() {
@@ -267,8 +304,11 @@ class AuthenticatorTest {
     }
 
     private fun mockZaloInstalled() {
-        val appInfo = ApplicationInfoBuilder.newBuilder().setName("Zalo").setPackageName(ZALO_PACKAGE_NAME).build()
-        val packageInfo = PackageInfoBuilder.newBuilder().setApplicationInfo(appInfo).setPackageName(ZALO_PACKAGE_NAME).build()
+        val appInfo =
+            ApplicationInfoBuilder.newBuilder().setName("Zalo").setPackageName(ZALO_PACKAGE_NAME)
+                .build()
+        val packageInfo = PackageInfoBuilder.newBuilder().setApplicationInfo(appInfo)
+            .setPackageName(ZALO_PACKAGE_NAME).build()
         packageMgr.installPackage(packageInfo)
     }
 }

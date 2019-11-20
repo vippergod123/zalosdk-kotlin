@@ -1,1 +1,1 @@
-include ':app', ':core', ':auth', ':analytics'
+include ':app', ':core', ':auth', ':analytics', ':openapi'
