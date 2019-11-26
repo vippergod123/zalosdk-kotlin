@@ -212,7 +212,7 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
 
         eventTrackingButton.setOnClickListener {
 
-            val eventTracker = EventTracker(this)
+            val eventTracker = EventTracker.getInstance()
 
             eventTracker.addEvent(mockEvent())
             eventTracker.setListener(eventTrackerListener)

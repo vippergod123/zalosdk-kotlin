@@ -2,7 +2,7 @@ package com.zing.zalo.zalosdk.core.helper
 
 object AppInfoHelper {
     const val appId = "appId_123456"
-    const scanId = "scanId_3"
+    const val scanId = "scanId_3"
     const val appName = "appName"
     const val versionName = "2"
     const val applicationHashKey = "applicationHashKey"

@@ -25,20 +25,19 @@ object ZTaskExecutor
         if (Build.VERSION.SDK_INT >= 14) {
             mExecutor!!.allowCoreThreadTimeOut(true)
         }
-
     }
 
     fun queueRunnable(runnable: Runnable) {
         mTaskQueue.queueRunnable(runnable)
     }
-
-    fun queueDelayedRunnable(runnable: Runnable, milliseconds: Long) {
-        mTaskQueue.queueDelayedRunnable(runnable, milliseconds)
-    }
-
-    fun setTaskQueue(taskQueue: TaskQueue) {
-        mTaskQueue = taskQueue
-    }
+//
+//    fun queueDelayedRunnable(runnable: Runnable, milliseconds: Long) {
+//        mTaskQueue.queueDelayedRunnable(runnable, milliseconds)
+//    }
+//
+//    fun setTaskQueue(taskQueue: TaskQueue) {
+//        mTaskQueue = taskQueue
+//    }
 
 
     private class DefaultTaskQueue : TaskQueue {

@@ -29,7 +29,7 @@ class ZaloOpenApi : BaseModule(), IZaloOpenApi {
         private var feedCallbackReceiver: BroadcastReceiver? = null
         private var callbackZaloPluginClient: WeakReference<ZaloPluginCallback>? = null
 
-        private var isBroadcastRegistered = false
+        internal var isBroadcastRegistered = false
 
         fun getInstance(): ZaloOpenApi {
             return instance

@@ -34,7 +34,6 @@ dependencies {
 //    Dependencies
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     //Todo: check the under-line
-    implementation "org.jetbrains.kotlin:kotlin-reflect:1.3.50"
 
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'

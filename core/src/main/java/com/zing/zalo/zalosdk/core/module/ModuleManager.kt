@@ -64,6 +64,7 @@ object ModuleManager {
 
         Class.forName("com.zing.zalo.zalosdk.oauth.ZaloSDK")
         Class.forName("com.zing.zalo.zalosdk.openapi.ZaloOpenApi")
+        Class.forName("com.zing.zalo.zalosdk.analytics.EventTracker")
     }
 
     private fun onHasDeviceId(context: Context, deviceId: String) {

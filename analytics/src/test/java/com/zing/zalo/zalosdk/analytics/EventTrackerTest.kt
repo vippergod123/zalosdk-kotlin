@@ -14,6 +14,7 @@ import com.zing.zalo.zalosdk.core.helper.Utils
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpUrlEncodedRequest
 import com.zing.zalo.zalosdk.core.log.Log
+import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -39,9 +40,7 @@ class EventTrackerTest {
     @MockK
     private lateinit var request: HttpUrlEncodedRequest
 
-    private lateinit var eventTracker: EventTracker
-
-    var testThread = HandlerThread("event-tracker-test", HandlerThread.MIN_PRIORITY)
+    private lateinit var sut: EventTracker
 
 
     @Before
@@ -49,20 +48,19 @@ class EventTrackerTest {
         MockKAnnotations.init(this, relaxUnitFun = true)
         context = ApplicationProvider.getApplicationContext()
 
-        EventTracker.thread = testThread
-        EventTracker.thread.start()
-        eventTracker = EventTracker(context)
+        sut = EventTracker.getInstance()
+        startModuleTest()
+
     }
 
     @Test
     fun `dispatch Event To Server`() {
         mockDataWithDeviceIdNotExpired()
-//        DeviceTracking.init(context, null)
         //#1. Setup mock
         val event = DataHelper.mockEvent()
         val okResult = "{\"error\":0,\"errorMsg\":\"Success\"}"
 
-        eventTracker.setListener(object : EventTrackerListener {
+        sut.setListener(object : EventTrackerListener {
             override fun dispatchComplete() {
                 super.dispatchComplete()
                 Log.d("got here")
@@ -71,19 +69,18 @@ class EventTrackerTest {
         })
 
         every { httpClient.send(any()).getJSON() } returns JSONObject(okResult)
-        eventTracker.httpClient = httpClient
-        eventTracker.request = request
+        sut.httpClient = httpClient
+        sut.request = request
         //#2. Execute
-//        eventTracker.loadEvents()
-        eventTracker.addEvent(event.action, event.params, event.timestamp)
-        eventTracker.dispatchEvent()
+
+        sut.addEvent(event.action, event.params, event.timestamp)
+        sut.dispatchEvent()
 
 
         //wait for complete thread's task
-        shadowOf(EventTracker.thread.looper).idle()
+        shadowOf(sut.thread.looper).idle()
         //#3. verify
-        val times = 1
-        verifyRequest(request, times)
+        verifyRequest(request, 1)
         verifyPreloadInfo()
     }
 
@@ -96,7 +93,7 @@ class EventTrackerTest {
         val event = DataHelper.mockEvent()
         val okResult = "{\"error\":0,\"errorMsg\":\"Success\"}"
 
-        eventTracker.setListener(object : EventTrackerListener {
+        sut.setListener(object : EventTrackerListener {
             override fun dispatchComplete() {
                 super.dispatchComplete()
                 Log.d("got here")
@@ -105,12 +102,12 @@ class EventTrackerTest {
         })
 
         every { httpClient.send(any()).getJSON() } returns JSONObject(okResult)
-        eventTracker.httpClient = httpClient
-        eventTracker.request = request
+        sut.httpClient = httpClient
+        sut.request = request
         //#2. Execute
-        eventTracker.dispatchEventImmediate(event)
+        sut.dispatchEventImmediate(event)
         //wait for complete thread's task
-        shadowOf(EventTracker.thread.looper).idle()
+        shadowOf(sut.thread.looper).idle()
 
         //#3. verify
         verifyRequest(request, 1)
@@ -126,7 +123,7 @@ class EventTrackerTest {
         val failResult = "{\"params\":{\"name\":\"Luke\",\"age\":\"0\"},\"action\":\"0\"}"
 
 
-        eventTracker.setListener(object : EventTrackerListener {
+        sut.setListener(object : EventTrackerListener {
             override fun dispatchComplete() {
                 super.dispatchComplete()
                 Log.d("got here")
@@ -135,18 +132,18 @@ class EventTrackerTest {
         })
 
         every { httpClient.send(any()).getJSON() } returns JSONObject(failResult)
-        eventTracker.httpClient = httpClient
-        eventTracker.request = request
+        sut.httpClient = httpClient
+        sut.request = request
         //#2. Execute
 //        eventTracker.loadEvents()
-        eventTracker.addEvent(event.action, event.params, event.timestamp)
-        eventTracker.addEvent(event.action, event.params, event.timestamp)
+        sut.addEvent(event.action, event.params, event.timestamp)
+        sut.addEvent(event.action, event.params, event.timestamp)
 
-        eventTracker.dispatchEvent()
+        sut.dispatchEvent()
 
 
         //wait for complete thread's task
-        shadowOf(EventTracker.thread.looper).idle()
+        shadowOf(sut.thread.looper).idle()
         //#3. verify
         verifyRequest(request, 1)
         verifyPreloadInfo()
@@ -162,7 +159,7 @@ class EventTrackerTest {
         val event = DataHelper.mockEvent()
         val failResult = "{\"params\":{\"name\":\"Luke\",\"age\":\"0\"},\"action\":\"0\"}"
 
-        eventTracker.setListener(object : EventTrackerListener {
+        sut.setListener(object : EventTrackerListener {
             override fun dispatchComplete() {
                 super.dispatchComplete()
                 Log.d("got here")
@@ -172,25 +169,30 @@ class EventTrackerTest {
         })
 
         every { httpClient.send(any()).getJSON() } returns JSONObject(failResult)
-        eventTracker.httpClient = httpClient
-        eventTracker.request = request
+        sut.httpClient = httpClient
+        sut.request = request
         //#2. Execute
 //        eventTracker.loadEvents()
-        eventTracker.addEvent(event.action, event.params, event.timestamp)
-        eventTracker.dispatchEvent()
-        eventTracker.addEvent(event.action, event.params, event.timestamp)
+        sut.addEvent(event.action, event.params, event.timestamp)
+        sut.dispatchEvent()
+        sut.addEvent(event.action, event.params, event.timestamp)
 
 
         Log.d("Test Thread Blocking")
         //wait for complete thread's task
 
 
-        shadowOf(EventTracker.thread.looper).idle()
+        shadowOf(sut.thread.looper).idle()
         //#3. verify
         verifyRequestWithTimeOut(request, 1, 7)
         verifyPreloadInfo()
     }
+
     //#region private supportive method
+    private fun startModuleTest() {
+        sut.start(context)
+        DeviceTracking.getInstance().start(context)
+    }
 
     private fun mockDataWithDeviceIdExpired() {
 
