@@ -2,7 +2,6 @@ package com.zing.zalo.zalosdk.core.module
 
 import android.annotation.SuppressLint
 import android.content.Context
-import androidx.annotation.NonNull
 import com.zing.zalo.devicetrackingsdk.DeviceTracking
 import com.zing.zalo.devicetrackingsdk.DeviceTrackingListener
 import com.zing.zalo.devicetrackingsdk.SdkTracking
@@ -36,7 +35,7 @@ object ModuleManager {
     }
 
     fun addModule(module: IModule) {
-        if(isInitialized.get() && context != null) {
+        if (isInitialized.get() && context != null) {
             module.start(context!!)
         }
         modules.add(module)
@@ -51,7 +50,7 @@ object ModuleManager {
 
         this.context = context
         val iter = modules.iterator()
-        while(iter.hasNext()) {
+        while (iter.hasNext()) {
             iter.next().start(context)
         }
 
@@ -62,9 +61,7 @@ object ModuleManager {
             }
         })
 
-        Class.forName("com.zing.zalo.zalosdk.oauth.ZaloSDK")
-        Class.forName("com.zing.zalo.zalosdk.openapi.ZaloOpenApi")
-        Class.forName("com.zing.zalo.zalosdk.analytics.EventTracker")
+        importModule()
     }
 
     private fun onHasDeviceId(context: Context, deviceId: String) {
@@ -87,5 +84,16 @@ object ModuleManager {
 
         }
         addModule(at)
+    }
+
+    private fun importModule() {
+        try {
+            Class.forName("com.zing.zalo.zalosdk.oauth.ZaloSDK")
+            Class.forName("com.zing.zalo.zalosdk.openapi.ZaloOpenApi")
+            Class.forName("com.zing.zalo.zalosdk.analytics.EventTracker")
+        } catch (ex: Exception) {
+            Log.w(ex)
+        }
+
     }
 }

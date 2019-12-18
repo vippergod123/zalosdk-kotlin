@@ -4,6 +4,10 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'com.jfrog.bintray'
+
+apply plugin: 'maven-publish'
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion as Integer
     buildToolsVersion rootProject.ext.buildToolsVersion as String
@@ -27,6 +31,40 @@ android {
     }
 }
 
+def nameLib = 'core'
+ext {
+    bintrayName =  rootProject.ext.bintrayName + '.' + nameLib
+    bintrayRepo = rootProject.ext.bintrayRepo
+    libVersion = rootProject.ext.zdklibVersion
+
+    publishedGroupId = rootProject.ext.libGroup
+    libraryName = nameLib
+    artifact = nameLib // core in 'com.zing.zalo.zalosdk:core:1.0'
+
+    libraryDescription = 'A widget to load WebView as an Overlay.'
+
+    siteUrl = rootProject.ext.siteUrl
+    gitUrl = rootProject.ext.gitUrl
+
+    libraryVersion = rootProject.ext.zdklibVersion
+
+    developerId = rootProject.ext.developerId
+    developerName = rootProject.ext.developerName
+    developerEmail = rootProject.ext.developerEmail
+
+    licenseName =  rootProject.ext.licenseName
+    licenseUrl =  rootProject.ext.licenseUrl
+    allLicenses =  rootProject.ext.allLicenses
+}
+
+bintray {
+    pkg {
+        userOrg = rootProject.ext.userOrg
+    }
+}
+
+apply from: '../bintray.gradle'
+
 dependencies {
     //noinspection GradleCompatible
     api rootProject.ext.androidSupportV4
@@ -39,7 +77,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     //Unit Test
-    def powerMockVersion =  '1.7.0RC2'
+    def powerMockVersion = '1.7.0RC2'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.robolectric:robolectric:4.1'
 
@@ -53,9 +91,15 @@ dependencies {
     testImplementation "org.json:json:20140107"
 
     testImplementation 'io.mockk:mockk:1.9.3'
-
-
 }
 repositories {
     mavenCentral()
 }
+
+
+//Add these lines to publish library to bintray
+//Place it at the end of the file
+//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
+
+

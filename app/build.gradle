@@ -52,7 +52,7 @@ dependencies {
     //Zalo SDK Dependence
     implementation project(':core')
     implementation project(':auth')
-    implementation project(':analytics')
+//    implementation project(':analytics')
     implementation project(':openapi')
 
     //Unit Test
@@ -80,9 +80,6 @@ dependencies {
     androidTestImplementation "com.google.truth:truth:0.43"
     androidTestImplementation('io.mockk:mockk-android:1.9.3') { exclude module: 'objenesis' }
     androidTestImplementation 'org.objenesis:objenesis:2.6'
-
-
-
 }
 
 apply plugin: 'com.google.gms.google-services'
