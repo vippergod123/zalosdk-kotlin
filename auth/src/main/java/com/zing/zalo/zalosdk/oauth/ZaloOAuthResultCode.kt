@@ -1,7 +1,9 @@
 package com.zing.zalo.zalosdk.oauth
 
 import android.content.res.Resources
+import androidx.annotation.Keep
 
+@Keep
 object ZaloOAuthResultCode {
     const val RESULTCODE_NO_ERROR = 0
     const val RESULTCODE_PERMISSION_DENIED = -201

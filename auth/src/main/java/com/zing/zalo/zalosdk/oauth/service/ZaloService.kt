@@ -3,6 +3,7 @@ package com.zing.zalo.zalosdk.oauth.service
 import android.content.Context
 import android.os.Bundle
 import android.os.Looper
+import com.zing.zalo.zalosdk.core.log.Log
 import org.json.JSONObject
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.ReentrantLock
@@ -35,7 +36,7 @@ open class ZaloService
                             }
                         }
                     } catch (e: Exception) {
-                        e.printStackTrace()
+                        Log.e("getUserLoggedStatus",e)
                     }
 
                 }

@@ -3,59 +3,51 @@ package com.zing.zalo.zalosdk.core.helper
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
-import com.zing.zalo.zalosdk.core.Constant
 import com.zing.zalo.zalosdk.core.SharedPreferenceConstant.PREF_OAUTH_CODE
 
-open class Storage(val context: Context)
-{
-	private var localPref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+open class Storage(val context: Context) {
+    private var localPref: SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(context)
 
-	fun getString(key: String): String?
-	{
-		return localPref.getString(key, "")
-	}
-	
-	fun setString(key: String, value: String)
-	{
-		val edit = localPref.edit()
-		edit.putString(key, value)
-		edit.apply()
-	}
+    fun getString(key: String): String? {
+        return localPref.getString(key, "")
+    }
 
-    fun getInt(key: String): Int
-	{
-		return localPref.getInt(key, 0)
-	}
+    fun setString(key: String, value: String) {
+        val edit = localPref.edit()
+        edit.putString(key, value)
+        edit.apply()
+    }
 
-    fun setInt(key: String, value: Int)
-	{
-		val edit = localPref.edit()
-		edit.putInt(key, value)
-		edit.apply()
-	}
+    fun getInt(key: String): Int {
+        return localPref.getInt(key, 0)
+    }
+
+    fun setInt(key: String, value: Int) {
+        val edit = localPref.edit()
+        edit.putInt(key, value)
+        edit.apply()
+    }
 
     fun getLong(key: String): Long {
         return localPref.getLong(key, 0L)
-	}
-	
-	fun setLong(key: String, value: Long)
-	{
-		val edit = localPref.edit()
-		edit.putLong(key, value)
-		edit.apply()
-	}
-	
-	fun setBoolean(key: String, value: Boolean)
-	{
-		val editor = localPref.edit()
-		editor.putBoolean(key, value)
-		editor.apply()
-	}
-	
-	fun getBoolean(key: String): Boolean
-	{
-		return localPref.getBoolean(key, false)
-	}
+    }
+
+    fun setLong(key: String, value: Long) {
+        val edit = localPref.edit()
+        edit.putLong(key, value)
+        edit.apply()
+    }
+
+    fun setBoolean(key: String, value: Boolean) {
+        val editor = localPref.edit()
+        editor.putBoolean(key, value)
+        editor.apply()
+    }
+
+    fun getBoolean(key: String): Boolean {
+        return localPref.getBoolean(key, false)
+    }
 
     fun getOAuthCode(): String? {
         return getString(PREF_OAUTH_CODE)

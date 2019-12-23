@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.AsyncTask
 import android.text.TextUtils
+import androidx.annotation.Keep
 import com.zing.zalo.zalosdk.core.Constant
 import com.zing.zalo.zalosdk.core.helper.AppInfo
 import com.zing.zalo.zalosdk.core.helper.DeviceInfo
@@ -20,8 +21,10 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 @SuppressLint("StaticFieldLeak")
 class DeviceTracking private constructor(): BaseModule(), IDeviceTracking {
+    @Keep
     companion object {
         private val instance = DeviceTracking()
+
         fun getInstance() : DeviceTracking { return instance }
 
         const val DID_FILE_NAME = "ddinfo2"

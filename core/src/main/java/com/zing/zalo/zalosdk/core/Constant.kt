@@ -2,9 +2,13 @@
 
 package com.zing.zalo.zalosdk.core
 
+import androidx.annotation.Keep
+
+
+@Keep
 object Constant {
     const val VERSION = "4.0"
-//    const val DEV_MODE = true
+    //    const val DEV_MODE = true
     const val DEV_MODE = false
     const val ZALO_PACKAGE_NAME = "com.zing.zalo"
 
@@ -13,6 +17,7 @@ object Constant {
     val key = SecretKey
 }
 
+@Keep
 object SharedPreferenceConstant {
 
     //Prefs Auth
@@ -38,7 +43,7 @@ object SharedPreferenceConstant {
 
 }
 
-
+@Keep
 object Api {
     const val API_HARDWARE_ID_URL = "id/mobile/android"
     const val API_SDK_ID = "/sdk/mobile/android"
@@ -55,6 +60,7 @@ object Api {
     const val GRAPH_APP_REQUESTS_PATH = "/v2.0/apprequests"
 }
 
+@Keep
 object SecretKey {
     const val TRK_SECRET_KEY = "@#centralize#@"
 }

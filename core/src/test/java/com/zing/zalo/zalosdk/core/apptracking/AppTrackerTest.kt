@@ -4,10 +4,8 @@ import android.content.Context
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
-import com.zing.zalo.devicetrackingsdk.DeviceTracking
 import com.zing.zalo.devicetrackingsdk.SdkTracking
 import com.zing.zalo.zalosdk.core.helper.*
-import com.zing.zalo.zalosdk.core.helper.AppTrackerHelper.prepareDataForSubmitInstalledApp
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpResponse
 import com.zing.zalo.zalosdk.core.log.Log
@@ -24,15 +22,19 @@ import org.robolectric.Shadows.shadowOf
 class AppTrackerTest {
 
 
-    @MockK private lateinit var httpClient: HttpClient
-    @MockK private lateinit var response: HttpResponse
-    @MockK private lateinit var appTrackerStorage: AppTrackerStorage
-    @MockK private lateinit var storage: Storage
-    @MockK private lateinit var sdkTracking: SdkTracking
+    @MockK
+    private lateinit var httpClient: HttpClient
+    @MockK
+    private lateinit var response: HttpResponse
+    @MockK
+    private lateinit var appTrackerStorage: AppTrackerStorage
+    @MockK
+    private lateinit var storage: Storage
+    @MockK
+    private lateinit var sdkTracking: SdkTracking
 
     private lateinit var context: Context
     private lateinit var sut: AppTracker
-
 
 
     @Before
@@ -51,7 +53,8 @@ class AppTrackerTest {
         spyk(sut)
 
         val resultJson = JSONObject(DataHelper.PACKAGES_NAME)
-        val authCode = "nRHRPtwUxNE8smukCyQjIBdU0rvbeza6wArCKcUZwaAxrJTBMv_KSudR0d9qaj8wzROn0Ypu6fvGihxBlcg"
+        val authCode =
+            "nRHRPtwUxNE8smukCyQjIBdU0rvbeza6wArCKcUZwaAxrJTBMv_KSudR0d9qaj8wzROn0Ypu6fvGihxBlcg"
 
         sut.httpClient = httpClient
         sut.appTrackerStorage = appTrackerStorage
@@ -65,13 +68,14 @@ class AppTrackerTest {
 
         sut.start(context)
 
-        val appTrackerListener = object:AppTrackerListener {
+        val appTrackerListener = object : AppTrackerListener {
             override fun onAppTrackerCompleted(
                 didRun: Boolean,
                 scanId: String,
                 packageNames: List<String>,
                 installedApps: List<String>
             ) {
+                Log.d(scanId)
                 assertThat(installedApps).isEqualTo(DataHelper.INSTALLED_APP_LIST)
                 assertThat(scanId).isEqualTo(AppInfoHelper.scanId)
                 assertThat(packageNames).isEqualTo(getPackagesNameArrayFromJSON())
@@ -83,7 +87,7 @@ class AppTrackerTest {
         TestUtils.waitTaskRunInBackgroundAndForeground()
 
         shadowOf(Looper.getMainLooper()).idle()
-        verify(exactly = 1) { sut.needToScanInstalledApp()}
+        verify(exactly = 1) { sut.needToScanInstalledApp() }
 //        verify(exactly = 1) { appTrackerStorage.setInstallExpireTime(any()) }
         verify(exactly = 1) { appTrackerStorage.getInstallExpireTime() }
     }
@@ -96,7 +100,8 @@ class AppTrackerTest {
         spyk(sut)
 
         val resultJson = JSONObject(DataHelper.PACKAGES_NAME)
-        val authCode = "nRHRPtwUxNE8smukCyQjIBdU0rvbeza6wArCKcUZwaAxrJTBMv_KSudR0d9qaj8wzROn0Ypu6fvGihxBlcg"
+        val authCode =
+            "nRHRPtwUxNE8smukCyQjIBdU0rvbeza6wArCKcUZwaAxrJTBMv_KSudR0d9qaj8wzROn0Ypu6fvGihxBlcg"
 
         sut.httpClient = httpClient
         sut.appTrackerStorage = appTrackerStorage
@@ -123,7 +128,6 @@ class AppTrackerTest {
     //#region private supportive method
     private fun mockDataSubmitInstalledApp() {
         AppInfoHelper.setup()
-//        every { DeviceTracking.getInstance().getDeviceId() } returns AppTrackerHelper.deviceId
         every { sdkTracking.getSDKId() } returns AppTrackerHelper.sdkId
         every { sdkTracking.getPrivateKey() } returns AppTrackerHelper.privateKey
 
@@ -132,7 +136,7 @@ class AppTrackerTest {
         AppTracker.installedPackagedNames = DataHelper.INSTALLED_APP_LIST
     }
 
-    private fun getPackagesNameArrayFromJSON():ArrayList<String> {
+    private fun getPackagesNameArrayFromJSON(): ArrayList<String> {
         val jsonObject = JSONObject(DataHelper.PACKAGES_NAME)
         val error = jsonObject.getInt("error")
         if (error != 0) throw Exception("Error when call api Download Packages")

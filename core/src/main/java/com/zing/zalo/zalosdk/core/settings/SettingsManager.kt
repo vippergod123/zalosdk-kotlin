@@ -3,6 +3,7 @@ package com.zing.zalo.zalosdk.core.settings
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.AsyncTask
+import androidx.annotation.Keep
 import com.zing.zalo.devicetrackingsdk.DeviceTracking
 import com.zing.zalo.zalosdk.core.Api.API_GET_SETTING
 import com.zing.zalo.zalosdk.core.Constant
@@ -27,6 +28,7 @@ import java.lang.ref.WeakReference
 @SuppressLint("StaticFieldLeak")
 class SettingsManager : BaseModule() {
 
+    @Keep
     companion object {
         private val instance = SettingsManager()
         fun getInstance() : SettingsManager { return instance }

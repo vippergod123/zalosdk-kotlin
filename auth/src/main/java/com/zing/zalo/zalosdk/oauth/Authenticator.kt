@@ -160,7 +160,7 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
             )
         )
         try {
-            url.append(ZaloSDK.getInstance().getAppID(activity))
+            url.append(AppInfo.getAppIdLong(activity))
                 .append("&sign_key=")
                 .append(URLEncoder.encode(AppInfo.getApplicationHashKey(activity), "UTF-8"))
                 .append("&pkg_name=")

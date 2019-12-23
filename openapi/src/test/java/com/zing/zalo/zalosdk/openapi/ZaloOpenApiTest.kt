@@ -11,7 +11,6 @@ import com.zing.zalo.zalosdk.core.helper.DeviceInfo
 import com.zing.zalo.zalosdk.core.helper.Utils
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpUrlEncodedRequest
-import com.zing.zalo.zalosdk.core.module.ModuleManager
 import com.zing.zalo.zalosdk.oauth.helper.AuthStorage
 import com.zing.zalo.zalosdk.openapi.helper.AppInfoHelper
 import com.zing.zalo.zalosdk.openapi.helper.DataHelper
@@ -20,6 +19,7 @@ import com.zing.zalo.zalosdk.openapi.model.FeedData
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.json.JSONObject
+
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -196,7 +196,6 @@ class ZaloOpenApiTest {
         val broadcastReceiver = slot<BroadcastReceiver>()
         val receiverFilter = slot<IntentFilter>()
         val intent = slot<Intent>()
-
         var ctx = mockk<Context>(relaxUnitFun = true)
 
         every {
@@ -222,9 +221,8 @@ class ZaloOpenApiTest {
         //resume
     }
 
-
     //#region private supportive method
-    private fun verifyIntent(receiverFilter: IntentFilter,intent: Intent) {
+    private fun verifyIntent(receiverFilter: IntentFilter, intent: Intent) {
         assertThat(receiverFilter.hasAction("com.zing.zalo.shareFeedResultInfo")).isTrue()
         assertThat(intent.getBooleanExtra("autoBack2S", false)).isTrue()
         assertThat(intent.getBooleanExtra("backToSource", false)).isTrue()
@@ -240,6 +238,7 @@ class ZaloOpenApiTest {
         assertThat(intent.extras?.get(Intent.EXTRA_SUBJECT)).isEqualTo(feedData.msg)
         assertThat(intent.extras?.get(Intent.EXTRA_TEXT)).isEqualTo(feedData.link)
     }
+
     private fun verifyRequest(request: HttpUrlEncodedRequest, times: Int) {
         verify(exactly = times) { request.addQueryStringParameter("code", any()) }
         verify(exactly = times) {

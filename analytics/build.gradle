@@ -12,12 +12,13 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion as Integer
         targetSdkVersion rootProject.ext.targetSdkVersion as Integer
 
+        consumerProguardFiles 'proguard-rules.pro'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -25,20 +26,17 @@ android {
 }
 
 dependencies {
-//    implementation fileTree(dir: 'libs', include: ['*.jar'])
-//    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     //Zalo SDK Dependence
     implementation project(':core')
 
-    //Unit Test
-    def powerMockVersion =  '1.7.0RC2'
     testImplementation 'junit:junit:4.12'
-    testImplementation 'androidx.test:core:1.1.0'
-
+    testImplementation 'androidx.test:core:1.2.0'
     testImplementation 'org.robolectric:robolectric:4.1'
     testImplementation "com.google.truth:truth:0.43"
-
     testImplementation 'org.mockito:mockito-core:2.4.0'
+
+    def powerMockVersion =  '1.7.0RC2'
     testImplementation "org.powermock:powermock-core:$powerMockVersion"
     testImplementation "org.powermock:powermock-module-junit4:$powerMockVersion"
     testImplementation "org.powermock:powermock-api-mockito2:$powerMockVersion"
@@ -47,4 +45,5 @@ dependencies {
 
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
 }

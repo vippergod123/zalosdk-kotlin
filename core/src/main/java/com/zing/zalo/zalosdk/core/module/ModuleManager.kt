@@ -2,7 +2,6 @@ package com.zing.zalo.zalosdk.core.module
 
 import android.annotation.SuppressLint
 import android.content.Context
-import androidx.annotation.NonNull
 import com.zing.zalo.devicetrackingsdk.DeviceTracking
 import com.zing.zalo.devicetrackingsdk.DeviceTrackingListener
 import com.zing.zalo.devicetrackingsdk.SdkTracking
@@ -10,7 +9,6 @@ import com.zing.zalo.zalosdk.core.apptracking.AppTracker
 import com.zing.zalo.zalosdk.core.apptracking.AppTrackerListener
 import com.zing.zalo.zalosdk.core.apptracking.AppTrackerStorage
 import com.zing.zalo.zalosdk.core.helper.Storage
-import com.zing.zalo.zalosdk.core.log.Log
 import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
 import com.zing.zalo.zalosdk.core.settings.SettingsManager
 import java.util.concurrent.atomic.AtomicBoolean
@@ -36,7 +34,7 @@ object ModuleManager {
     }
 
     fun addModule(module: IModule) {
-        if(isInitialized.get() && context != null) {
+        if (isInitialized.get() && context != null) {
             module.start(context!!)
         }
         modules.add(module)
@@ -51,7 +49,7 @@ object ModuleManager {
 
         this.context = context
         val iter = modules.iterator()
-        while(iter.hasNext()) {
+        while (iter.hasNext()) {
             iter.next().start(context)
         }
 

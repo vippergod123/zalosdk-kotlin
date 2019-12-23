@@ -1,13 +1,13 @@
 package com.zing.zalo.zalosdk.core.log
 
-import java.util.*
+import java.util.Locale
 
 
 object Log {
     private const val LOG_TAG = "ZDK"
 
-//    private const val isUnitTesting = true
-    private const val isUnitTesting = false
+    private const val isUnitTesting = true
+//    private const val isUnitTesting = false
 
     private const val VERBOSE = android.util.Log.VERBOSE
     private const val DEBUG = android.util.Log.DEBUG

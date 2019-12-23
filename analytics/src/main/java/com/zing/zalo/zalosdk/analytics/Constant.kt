@@ -1,8 +1,9 @@
 package com.zing.zalo.zalosdk.analytics
 
+import androidx.annotation.Keep
 import com.zing.zalo.zalosdk.core.Constant
 
-
+@Keep
 object Constant {
     val core = Constant
     val eventDatabase = EventDatabase
@@ -11,9 +12,8 @@ object Constant {
 }
 
 
-
+@Keep
 object EventDatabase {
-
     const val NAME = "session.db"
     const val VERSION = 1
     const val TABLE_EVENT = "events"

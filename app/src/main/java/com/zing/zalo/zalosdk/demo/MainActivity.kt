@@ -5,20 +5,17 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.zing.zalo.devicetrackingsdk.DeviceTracking
-import com.zing.zalo.devicetrackingsdk.SdkTracking
 import com.zing.zalo.zalosdk.analytics.EventTracker
 import com.zing.zalo.zalosdk.analytics.EventTrackerListener
 import com.zing.zalo.zalosdk.analytics.model.Event
 import com.zing.zalo.zalosdk.core.apptracking.AppTracker
 import com.zing.zalo.zalosdk.core.apptracking.AppTrackerListener
-import com.zing.zalo.zalosdk.core.apptracking.AppTrackerStorage
 import com.zing.zalo.zalosdk.core.helper.AppInfo
-import com.zing.zalo.zalosdk.core.helper.Storage
 import com.zing.zalo.zalosdk.core.log.Log
 import com.zing.zalo.zalosdk.oauth.Constant
 import com.zing.zalo.zalosdk.oauth.IAuthenticateCompleteListener
@@ -202,12 +199,7 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
 
         appTrackingButton.setOnClickListener {
             val appTracker = AppTracker()
-            appTracker.sdkTracking = SdkTracking.getInstance()
-            appTracker.deviceId = DeviceTracking.getInstance().getDeviceId() ?: ""
-            appTracker.storage = Storage(applicationContext)
-            appTracker.appTrackerStorage = AppTrackerStorage(applicationContext)
             appTracker.listener = appTrackerListener
-            appTracker.start(applicationContext)
         }
 
         eventTrackingButton.setOnClickListener {

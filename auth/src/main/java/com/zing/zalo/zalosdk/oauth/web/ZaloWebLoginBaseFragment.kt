@@ -37,12 +37,12 @@ abstract class ZaloWebLoginBaseFragment : Fragment()
         private val WZUIN = Pattern.compile("(wzuin)([^;][\\D\\w])*")
     }
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         try {
             listener = context as ZaloWebLoginBaseFragmentListener
         } catch (ex: ClassCastException) {
-            Log.e(context?.javaClass?.simpleName + " must implement " + ZaloWebLoginBaseFragmentListener::class.java.simpleName)
+            Log.e(context.javaClass.simpleName + " must implement " + ZaloWebLoginBaseFragmentListener::class.java.simpleName)
         }
     }
 
@@ -116,7 +116,7 @@ abstract class ZaloWebLoginBaseFragment : Fragment()
         val url = StringBuilder()
         url.append(WEB_LOGIN_URL)
         try {
-            url.append(ZaloSDK.getInstance().getAppID(ctx))
+            url.append(AppInfo.getAppIdLong(ctx))
             url.append("&sign_key=")
             url.append(URLEncoder.encode(AppInfo.getApplicationHashKey(ctx), "UTF-8"))
             url.append("&pkg_name=")

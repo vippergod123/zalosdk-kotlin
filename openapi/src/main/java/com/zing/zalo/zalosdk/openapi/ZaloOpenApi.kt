@@ -3,7 +3,6 @@ package com.zing.zalo.zalosdk.openapi
 import android.annotation.SuppressLint
 import android.content.*
 import android.text.TextUtils
-import androidx.annotation.Nullable
 import com.zing.zalo.zalosdk.core.Constant
 import com.zing.zalo.zalosdk.core.helper.Utils
 import com.zing.zalo.zalosdk.core.http.HttpGetRequest
@@ -15,11 +14,13 @@ import com.zing.zalo.zalosdk.core.module.ModuleManager
 import com.zing.zalo.zalosdk.oauth.helper.AuthStorage
 import com.zing.zalo.zalosdk.openapi.exception.OpenApiException
 import com.zing.zalo.zalosdk.openapi.model.FeedData
+import org.jetbrains.annotations.Nullable
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 @SuppressLint("StaticFieldLeak")
 class ZaloOpenApi : BaseModule(), IZaloOpenApi {
+
     companion object {
         private val instance = ZaloOpenApi()
         private lateinit var authStorage: AuthStorage

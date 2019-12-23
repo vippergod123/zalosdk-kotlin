@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.zing.zalo.zalosdk.oauth">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.zing.zalo.zalosdk.oauth">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="com.zing.zalo.permission.ACCESS_THIRD_PARTY_APP_AUTHORIZATION"/>
@@ -11,7 +12,7 @@
                 android:theme="@style/FixThemeForLoginWebview"
                 android:windowSoftInputMode="stateHidden|stateAlwaysHidden"
                 android:configChanges="orientation|screenSize"
-                android:screenOrientation="sensor" />
+                android:screenOrientation="sensor"/>
 
 
         <activity android:name="com.zing.zalo.zalosdk.oauth.BrowserLoginActivity">

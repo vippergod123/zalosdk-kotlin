@@ -14,7 +14,7 @@ object AuthUtils {
     @SuppressLint("StaticFieldLeak")
     lateinit var settingsManager:SettingsManager
 
-    fun canUseBrowserLogin(context: Context): Boolean {
+    internal fun canUseBrowserLogin(context: Context): Boolean {
 
         if (!AuthUtils::settingsManager.isInitialized)
             settingsManager = SettingsManager.getInstance()
