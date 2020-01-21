@@ -32,6 +32,9 @@ android {
 dependencies {
     //noinspection GradleCompatible
     api rootProject.ext.androidSupportV4
+    api rootProject.ext.kotlinCoroutinesCore
+    api rootProject.ext.kotlinCoroutinesAndroid
+
 
 //    Dependencies
     implementation 'androidx.appcompat:appcompat:1.1.0'
@@ -51,7 +54,7 @@ dependencies {
     testImplementation "org.powermock:powermock-module-junit4:$powerMockVersion"
     testImplementation "org.powermock:powermock-api-mockito2:$powerMockVersion"
 
-//    testImplementation "org.json:json:20140107"
-
     testImplementation 'io.mockk:mockk:1.9.3'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.2'
+
 }

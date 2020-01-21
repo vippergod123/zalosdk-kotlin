@@ -7,7 +7,6 @@ import com.zing.zalo.devicetrackingsdk.DeviceTracking
 import com.zing.zalo.zalosdk.core.helper.AppInfoHelper
 import com.zing.zalo.zalosdk.core.helper.AppTrackerHelper
 import com.zing.zalo.zalosdk.core.helper.PrivateSharedPreferenceInterface
-import com.zing.zalo.zalosdk.core.helper.TestUtils
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpGetRequest
 import com.zing.zalo.zalosdk.core.http.HttpResponse
@@ -19,6 +18,8 @@ import com.zing.zalo.zalosdk.core.settings.SettingsManager.Companion.KEY_WAKEUP_
 import com.zing.zalo.zalosdk.core.settings.SettingsManager.Companion.KEY_WAKEUP_INTERVAL
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.json.JSONObject
 import org.junit.After
 import org.junit.Before
@@ -26,15 +27,23 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
+@ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
 class SettingsManagerTest {
+
     private lateinit var context: Context
 
-    @MockK private lateinit var client: HttpClient
-    @MockK private lateinit var response: HttpResponse
-    @MockK private lateinit var storage: PrivateSharedPreferenceInterface
-    @MockK private lateinit var deviceTracking: DeviceTracking
+    @MockK
+    private lateinit var client: HttpClient
+    @MockK
+    private lateinit var response: HttpResponse
+    @MockK
+    private lateinit var storage: PrivateSharedPreferenceInterface
+    @MockK
+    private lateinit var deviceTracking: DeviceTracking
     private lateinit var sut: SettingsManager
+
+    private var testScope = TestCoroutineScope()
 
     @Before
     fun setup() {
@@ -100,6 +109,7 @@ class SettingsManagerTest {
         every { storage.setLong(KEY_EXPIRE_TIME, capture(expireTime)) } just Runs
 
         //2. run
+        sut.scope = testScope
         sut.start(context)
 
         //3. verify

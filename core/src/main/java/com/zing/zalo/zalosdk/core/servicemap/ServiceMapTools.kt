@@ -12,7 +12,7 @@ import javax.crypto.IllegalBlockSizeException
 import javax.crypto.NoSuchPaddingException
 import javax.crypto.spec.SecretKeySpec
 
-object ServiceMapTools
+internal object ServiceMapTools
 {
     private const val USER_NAME = "ZALO"
     private const val AES_KEY = "zalo@123"

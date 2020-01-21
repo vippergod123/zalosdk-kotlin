@@ -21,7 +21,7 @@ class AppTracker : BaseModule(), IAppTracker {
         var installedPackagedNames = arrayListOf<String>()
     }
 
-    var httpClient = HttpClient(ServiceMapManager.urlFor(ServiceMapManager.KEY_URL_CENTRALIZED))
+    var httpClient = HttpClient(ServiceMapManager.getInstance().urlFor(ServiceMapManager.KEY_URL_CENTRALIZED))
     var expiredTime = 0L
     var scanId = ""
 

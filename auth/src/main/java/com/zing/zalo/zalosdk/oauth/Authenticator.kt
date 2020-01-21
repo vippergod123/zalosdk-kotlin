@@ -28,7 +28,7 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
         WeakReference<IAuthenticateCompleteListener>(null)
     private var bIsZaloLoginSuccessful = false
     private var bIsZaloOutOfDate: Boolean = false
-    var httpClient: HttpClient = HttpClient(ServiceMapManager.urlFor(ServiceMapManager.KEY_URL_OAUTH))
+    var httpClient: HttpClient = HttpClient(ServiceMapManager.getInstance().urlFor(ServiceMapManager.KEY_URL_OAUTH))
 
     private fun setOAuthCompleteListener(listener: IAuthenticateCompleteListener) {
         wListener = WeakReference(listener)
@@ -154,7 +154,7 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
 
         val url = StringBuilder()
         url.append(
-            ServiceMapManager.urlFor(
+            ServiceMapManager.getInstance().urlFor(
                 ServiceMapManager.KEY_URL_OAUTH,
                 "/v3/auth?app_id="
             )
@@ -222,7 +222,6 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
 
     override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         if (requestCode == Constant.ZALO_AUTHENTICATE_REQUEST_CODE) {
-            Constant.core.sharedPreference.PREF_ACCESS_TOKEN_NEW_API
             receiveAuthData(activity, data)
             return true
         }

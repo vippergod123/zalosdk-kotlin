@@ -36,11 +36,14 @@ interface IZaloOpenApi {
 
     fun shareMessage(
         feedData: FeedData,
-        callback: ZaloPluginCallback
+        @Nullable callback: ZaloPluginCallback?
     )
 
     fun shareFeed(
         feedData: FeedData,
-        callback: ZaloPluginCallback
+        @Nullable callback: ZaloPluginCallback?
     )
+
+    var accessToken:String
+    var accessTokenExpiredTime: Long
 }

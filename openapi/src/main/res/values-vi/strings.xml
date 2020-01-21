@@ -1,0 +1,6 @@
+<resources>
+    <string name="zalo_app_not_installed">Bạn chưa cài Zalo!</string>
+    <string name="zalo_app_out_of_date">Bản Zalo hiện tại không tương thích!</string>
+    <string name="no_network">Mạng không ổn định, vui lòng thử lại sau</string>
+    <string name="zalo_oauth_code_invalid">Mã xác thực không hợp lệ</string>
+</resources>

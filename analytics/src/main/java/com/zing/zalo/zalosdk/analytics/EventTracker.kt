@@ -57,7 +57,7 @@ class EventTracker : BaseModule(), IEventTracker {
 
     internal lateinit var thread: HandlerThread
     internal var httpClient = HttpClient(
-        ServiceMapManager.urlFor(
+        ServiceMapManager.getInstance().urlFor(
             ServiceMapManager.KEY_URL_CENTRALIZED
         )
     )

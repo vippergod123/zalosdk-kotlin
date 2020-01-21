@@ -75,4 +75,13 @@ object DataHelper{
     const val authCode = "authCode"
     const val responseGetDeviceIdAsyncTask = "{\"data\":{\"deviceId\":\"${AppTrackerHelper.deviceId}\",\"expiredTime\":43200000},\"error\":0,\"errorMsg\":\"\"}"
     const val responseGetSdkIdAsyncTask = "{\"data\":{\"privateKey\":\"${AppTrackerHelper.privateKey}\",\"sdkId\":\"${AppTrackerHelper.sdkId}\"},\"error\":0,\"errorMsg\":\"\"}"
+
+    val serviceMap = ServiceMapData
+}
+
+
+object ServiceMapData {
+    const val URL_OAUTH = "https://oauth.zaloapp.com"
+    const val URL_GRAPH = "https://graph.zaloapp.com"
+    const val URL_CENTRALIZED = "https://centralized.zaloapp.com"
 }

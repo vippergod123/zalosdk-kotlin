@@ -33,21 +33,6 @@ class AuthStorage(ctx: Context) : Storage(ctx) {
         setString(prefZaloDisplayName, displayname)
     }
 
-    fun getAccessTokenNewAPI(): JSONObject? {
-        return try {
-            val accessToken = getString(prefAccessTokenNewApi) ?: ""
-            if (TextUtils.isEmpty(accessToken)) throw Exception("Access token is empty in auth storage")
-            JSONObject(accessToken)
-        } catch (ex: JSONException) {
-            Log.e("getAccessTokenNewAPI",ex)
-            null
-        }
-        catch (ex: Exception) {
-            Log.w("getAccessTokenNewAPI",ex)
-            null
-        }
-    }
-
     fun setAccessTokenNewAPI(token: String) {
         setString(prefAccessTokenNewApi, token)
     }

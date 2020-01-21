@@ -9,7 +9,7 @@ import androidx.annotation.Keep
 object Constant {
     const val VERSION = "4.0"
     //    const val DEV_MODE = true
-    const val DEV_MODE = false
+    var DEV_MODE = false
     const val ZALO_PACKAGE_NAME = "com.zing.zalo"
 
     val sharedPreference = SharedPreferenceConstant

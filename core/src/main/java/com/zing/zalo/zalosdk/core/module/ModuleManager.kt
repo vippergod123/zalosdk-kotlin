@@ -9,6 +9,7 @@ import com.zing.zalo.zalosdk.core.apptracking.AppTracker
 import com.zing.zalo.zalosdk.core.apptracking.AppTrackerListener
 import com.zing.zalo.zalosdk.core.apptracking.AppTrackerStorage
 import com.zing.zalo.zalosdk.core.helper.Storage
+import com.zing.zalo.zalosdk.core.log.Log
 import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
 import com.zing.zalo.zalosdk.core.settings.SettingsManager
 import java.util.concurrent.atomic.AtomicBoolean
@@ -26,11 +27,14 @@ object ModuleManager {
         val sm = SettingsManager.getInstance()
         val smm = ServiceMapManager.getInstance()
 
+        modules.add(smm)
+        modules.add(sm)
+        modules.add(st)
         dt.sdkTracking = st
         modules.add(dt)
-        modules.add(st)
-        modules.add(sm)
-        modules.add(smm)
+
+
+
     }
 
     fun addModule(module: IModule) {

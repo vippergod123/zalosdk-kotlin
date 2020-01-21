@@ -79,17 +79,18 @@ class AppTrackerTest {
                 assertThat(installedApps).isEqualTo(DataHelper.INSTALLED_APP_LIST)
                 assertThat(scanId).isEqualTo(AppInfoHelper.scanId)
                 assertThat(packageNames).isEqualTo(getPackagesNameArrayFromJSON())
-            }
 
+                verify(exactly = 1) { sut.needToScanInstalledApp() }
+                verify(exactly = 1) { appTrackerStorage.setInstallExpireTime(any()) }
+                verify(exactly = 1) { appTrackerStorage.getInstallExpireTime() }
+            }
         }
 
         sut.listener = appTrackerListener
         TestUtils.waitTaskRunInBackgroundAndForeground()
 
         shadowOf(Looper.getMainLooper()).idle()
-        verify(exactly = 1) { sut.needToScanInstalledApp() }
-//        verify(exactly = 1) { appTrackerStorage.setInstallExpireTime(any()) }
-        verify(exactly = 1) { appTrackerStorage.getInstallExpireTime() }
+
     }
 
 

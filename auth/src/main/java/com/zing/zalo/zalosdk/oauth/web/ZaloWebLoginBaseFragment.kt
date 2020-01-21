@@ -33,7 +33,7 @@ abstract class ZaloWebLoginBaseFragment : Fragment()
         //		private var WEB_LOGIN_URL: String = if (Constant.IS_DEV == true) "http://dev-oauth.zaloapp.com/v3/auth?app_id="
 //		else "https://oauth.zaloapp.com/v3/auth?app_id="
         private var WEB_LOGIN_URL: String =
-            ServiceMapManager.urlFor(ServiceMapManager.KEY_URL_OAUTH, "/v3/auth?app_id=")
+            ServiceMapManager.getInstance().urlFor(ServiceMapManager.KEY_URL_OAUTH, "/v3/auth?app_id=")
         private val WZUIN = Pattern.compile("(wzuin)([^;][\\D\\w])*")
     }
 
