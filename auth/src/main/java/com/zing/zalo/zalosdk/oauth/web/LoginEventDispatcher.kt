@@ -9,11 +9,12 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.zing.zalo.zalosdk.core.log.Log
 import com.zing.zalo.zalosdk.oauth.Constant
-import java.lang.Long.parseLong
 import java.lang.ref.WeakReference
 
-class LoginEventDispatcher(var that: WeakReference<ZaloWebLoginBaseFragment>, var callbackUrl: String) : WebViewClient()
-{
+class LoginEventDispatcher(
+    var that: WeakReference<ZaloWebLoginBaseFragment>,
+    var callbackUrl: String
+) : WebViewClient() {
 
     override fun onPageFinished(view: WebView?, url: String?) {
         super.onPageFinished(view, url)
@@ -25,7 +26,11 @@ class LoginEventDispatcher(var that: WeakReference<ZaloWebLoginBaseFragment>, va
         if (that.get() != null) that.get()!!.progressBar.visibility = View.VISIBLE
     }
 
-    override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+    override fun onReceivedError(
+        view: WebView?,
+        request: WebResourceRequest?,
+        error: WebResourceError?
+    ) {
         super.onReceivedError(view, request, error)
 
         if (that.get() != null) {
@@ -66,7 +71,14 @@ class LoginEventDispatcher(var that: WeakReference<ZaloWebLoginBaseFragment>, va
         }
 
 
-        if (that.get() != null) that.get()!!.onLoginCompleted(error, uid, code!!, zProtect, name!!, false)
+        if (that.get() != null) that.get()!!.onLoginCompleted(
+            error,
+            uid,
+            code!!,
+            zProtect,
+            name!!,
+            false
+        )
         return true
     }
 }

@@ -8,7 +8,6 @@ import com.zing.zalo.zalosdk.core.helper.Storage
 import com.zing.zalo.zalosdk.core.log.Log
 import org.json.JSONException
 import org.json.JSONObject
-import java.lang.Exception
 
 @Keep
 class OpenApiStorage(ctx: Context) : Storage(ctx) {
@@ -20,11 +19,10 @@ class OpenApiStorage(ctx: Context) : Storage(ctx) {
             if (TextUtils.isEmpty(accessToken)) throw Exception("Access token is empty in auth storage")
             JSONObject(accessToken)
         } catch (ex: JSONException) {
-            Log.e("getAccessTokenNewAPI",ex)
+            Log.e("getAccessTokenNewAPI", ex)
             null
-        }
-        catch (ex: Exception) {
-            Log.w("getAccessTokenNewAPI",ex)
+        } catch (ex: Exception) {
+            Log.w("getAccessTokenNewAPI", ex)
             null
         }
     }

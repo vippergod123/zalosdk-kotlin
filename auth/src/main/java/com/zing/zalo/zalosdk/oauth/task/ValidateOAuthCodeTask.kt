@@ -1,11 +1,11 @@
 package com.zing.zalo.zalosdk.oauth.task
 
 import android.os.AsyncTask
-import com.zing.zalo.zalosdk.oauth.Constant
-import com.zing.zalo.zalosdk.oauth.ZaloOAuthResultCode
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpUrlEncodedRequest
 import com.zing.zalo.zalosdk.core.log.Log
+import com.zing.zalo.zalosdk.oauth.Constant
+import com.zing.zalo.zalosdk.oauth.ZaloOAuthResultCode
 import com.zing.zalo.zalosdk.oauth.callback.ValidateOAuthCodeCallback
 
 internal class ValidateOAuthCodeTask(
@@ -49,8 +49,7 @@ internal class ValidateOAuthCodeTask(
 
             if (!isOnline) {
                 errorCode = ZaloOAuthResultCode.RESULTCODE_ZALO_SDK_NO_INTERNET_ACCESS
-            }
-            else {
+            } else {
                 errorCode = ZaloOAuthResultCode.RESULTCODE_ZALO_UNKNOWN_ERROR
             }
 

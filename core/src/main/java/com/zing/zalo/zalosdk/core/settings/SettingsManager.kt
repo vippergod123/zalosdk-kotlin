@@ -121,7 +121,7 @@ class SettingsManager : BaseModule() {
 
                 return@launch
             } catch (ex: Exception) {
-                Log.w("GetSDKSettingAsyncTask", ex)
+                Log.w("makeGetSDKSettingRequest", ex)
             }
             return@launch
         }

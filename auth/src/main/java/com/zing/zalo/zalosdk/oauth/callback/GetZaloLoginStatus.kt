@@ -1,6 +1,5 @@
 package com.zing.zalo.zalosdk.oauth.callback
 
-interface GetZaloLoginStatus
-{
+interface GetZaloLoginStatus {
     fun onGetZaloLoginStatusCompleted(status: Int)
 }

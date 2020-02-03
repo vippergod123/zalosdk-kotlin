@@ -10,8 +10,7 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 
-open class ZaloService
-{
+open class ZaloService {
     companion object {
         private val lock = ReentrantLock()
         private val condition = lock.newCondition()
@@ -30,13 +29,14 @@ open class ZaloService
                 if (bundle != null) {
                     try {
                         if (bundle.getInt(NativeProtocol.KEY_RESULT_ERROR_CODE) == 0) {
-                            val data = JSONObject(bundle.getString(NativeProtocol.KEY_RESULT_DATA)!!)
+                            val data =
+                                JSONObject(bundle.getString(NativeProtocol.KEY_RESULT_DATA)!!)
                             if (data.has("isUserLogged")) {
                                 waitingResult.set(if (data.getBoolean("isUserLogged")) 1 else 0)
                             }
                         }
                     } catch (e: Exception) {
-                        Log.e("getUserLoggedStatus",e)
+                        Log.e("getUserLoggedStatus", e)
                     }
 
                 }

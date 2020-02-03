@@ -124,35 +124,30 @@ class ZaloOpenApiTest {
         })
     }
 
-//    @Test
-//    fun `get Profile fail when auth code invalid `() {
-//        val mock = spyk<ZaloOpenApi>(recordPrivateCalls = true)
-//        every { mock["isAccessTokenValid"]() } returns false
-//        every { mock getProperty "enableUnitTest" } returns true
-//        every {
-//            httpClient.send(any()).getJSON()
-//        } returns JSONObject(DataHelper.accessTokenData) andThen JSONObject(DataHelper.profile)
-//
-//        val fields = arrayOf("id", "birthday", "gender", "picture", "name")
-//        val callback = object : ZaloOpenApiCallback {
-//            override fun onResult(data: JSONObject?) {
-//                val invalidAuthCodeResult = "{\"error\":-1019}"
-//                assertThat(data.toString()).isEqualTo(invalidAuthCodeResult)
-//            }
-//        }
-//
-//        val getAccessTokenAsyncTask = GetAccessTokenAsyncTask(WeakReference(context), null)
-//        authStorage.setAuthCode("")
-//        getAccessTokenAsyncTask.request = request
-//        getAccessTokenAsyncTask.httpClient = httpClient
-//        val callApiAsyncTask = CallApiAsyncTask(callback)
-//        callApiAsyncTask.httpClient = httpClient
-//        mock.callApiAsyncTask = callApiAsyncTask
-//        mock.getAccessTokenAsyncTask = getAccessTokenAsyncTask
-//        mock.getProfile(fields, callback)
-//
-//        verifyRequest(request, 0)
-//    }
+    @Test
+    fun `get Profile fail when auth code invalid `() {
+        //#1. Mock data
+        val accessTokenSlot = slot<HttpUrlEncodedRequest>()
+        val openApiSlot = slot<IHttpRequest>()
+        every {
+            accessTokenHttpClient.send(capture(accessTokenSlot)).getJSON()
+        } returns JSONObject(DataHelper.accessTokenData)
+        every {
+            httpClient.send(capture(openApiSlot)).getJSON()
+        } returns JSONObject(DataHelper.profile)
+        val fields = arrayOf("id", "birthday", "gender", "picture", "name")
+
+        openApiStorage.setAuthCode("") //Set authCode invalid
+        //#2. Start
+        mock.getProfile(fields, object : ZaloOpenApiCallback {
+            override fun onResult(data: JSONObject?) {
+                //#3. Verify
+                assertSlotRequest(accessTokenSlot, openApiSlot, fields)
+                val failResult = "{\"error\":-1019,\"message\":\"OAuth Code is invalid\"}"
+                assertThat(data.toString()).isEqualTo(failResult)
+            }
+        })
+    }
 
     @Test
     fun `send Message via App`() {

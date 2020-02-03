@@ -171,7 +171,7 @@ class ServiceMapManager private constructor() : BaseModule() {
                     val decryptString = ServiceMapTools.decryptString(str)
                     return@withContext JSONObject(decryptString)
                 } catch (e: Exception) {
-                    Log.w("DownloadServiceMapFilesAsyncTask", e)
+                    Log.w("getServiceMapFiles", e)
                 }
             }
             return@withContext null

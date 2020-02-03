@@ -31,7 +31,8 @@ class ZaloOpenApi : BaseModule() {
 
     private var job = Job()
     var scope = CoroutineScope(Dispatchers.IO + job)
-    var accessTokenHttpClient = HttpClient(ServiceMapManager.getInstance().urlFor(ServiceMapManager.KEY_URL_OAUTH))
+    var accessTokenHttpClient =
+        HttpClient(ServiceMapManager.getInstance().urlFor(ServiceMapManager.KEY_URL_OAUTH))
     var httpClient =
         HttpClient(ServiceMapManager.getInstance().urlFor(ServiceMapManager.KEY_URL_GRAPH))
 

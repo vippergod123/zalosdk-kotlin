@@ -7,19 +7,22 @@ import com.zing.zalo.zalosdk.oauth.callback.GetZaloLoginStatus
 import com.zing.zalo.zalosdk.oauth.callback.ValidateOAuthCodeCallback
 
 @Keep
-interface IAuthenticateCompleteListener
-{
+interface IAuthenticateCompleteListener {
     fun onAuthenticateSuccess(uid: Long, code: String, data: Map<String, Any>)
     fun onAuthenticateError(errorCode: Int, message: String)
 }
 
 @Keep
-interface IAuthenticator
-{
+interface IAuthenticator {
     fun authenticate(activity: Activity, via: LoginVia, listener: IAuthenticateCompleteListener?)
     fun registerZalo(activity: Activity, listener: IAuthenticateCompleteListener?)
     fun isAuthenticate(code: String, callback: ValidateOAuthCodeCallback?): Boolean
     fun unAuthenticate()
     fun getZaloLoginStatus(callback: GetZaloLoginStatus?)
-    fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean
+    fun onActivityResult(
+        activity: Activity,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ): Boolean
 }

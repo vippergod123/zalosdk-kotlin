@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
 class OpenApi(
     var context: Context,
     var isBroadcastRegistered: Boolean,
-    private var httpClient:HttpClient,
+    private var httpClient: HttpClient,
     private var accessTokenHttpClient: HttpClient,
     var scope: CoroutineScope
 ) : IZaloOpenApi {
@@ -40,7 +40,8 @@ class OpenApi(
 
 
     private var openApiStorage = OpenApiStorage(context.applicationContext)
-    private var accessTokenRequest = HttpUrlEncodedRequest(Constant.api.AUTH_MOBILE_ACCESS_TOKEN_PATH)
+    private var accessTokenRequest =
+        HttpUrlEncodedRequest(Constant.api.AUTH_MOBILE_ACCESS_TOKEN_PATH)
 
     override var accessToken = ""
     override var accessTokenExpiredTime = 0L
@@ -244,7 +245,7 @@ class OpenApi(
         return ""
     }
 
-    fun isAccessTokenValid(): Boolean {
+    private fun isAccessTokenValid(): Boolean {
         if (!TextUtils.isEmpty(accessToken) && accessTokenExpiredTime > System.currentTimeMillis()) return true
 
         Log.w("isAccessTokenValid", "Token is not valid")
@@ -377,7 +378,10 @@ class OpenApi(
         if (TextUtils.isEmpty(oauthCode)) throw OpenApiException("Auth code is invalid - Login again!")
         accessTokenRequest.addQueryStringParameter("code", oauthCode)
         accessTokenRequest.addQueryStringParameter("pkg_name", AppInfo.getPackageName(context))
-        accessTokenRequest.addQueryStringParameter("sign_key", AppInfo.getApplicationHashKey(context) ?: "")
+        accessTokenRequest.addQueryStringParameter(
+            "sign_key",
+            AppInfo.getApplicationHashKey(context) ?: ""
+        )
         accessTokenRequest.addQueryStringParameter("app_id", AppInfo.getAppId(context))
         accessTokenRequest.addQueryStringParameter("version", Constant.VERSION)
         accessTokenRequest.addQueryStringParameter(
@@ -395,8 +399,10 @@ class OpenApi(
         )
         accessTokenRequest.addHeader("gid", DeviceTracking.getInstance().getDeviceId() ?: "")
 
-        val jsonObject = accessTokenHttpClient.send(accessTokenRequest).getJSON() ?: return ZaloOAuthResultCode.RESULTCODE_ZALO_UNKNOWN_ERROR
-        val errorCode = jsonObject.optInt("error", ZaloOAuthResultCode.RESULTCODE_ZALO_UNKNOWN_ERROR)
+        val jsonObject = accessTokenHttpClient.send(accessTokenRequest).getJSON()
+            ?: return ZaloOAuthResultCode.RESULTCODE_ZALO_UNKNOWN_ERROR
+        val errorCode =
+            jsonObject.optInt("error", ZaloOAuthResultCode.RESULTCODE_ZALO_UNKNOWN_ERROR)
         if (errorCode == 0 && jsonObject.has("data")) {
 
             val data = jsonObject.getJSONObject("data")

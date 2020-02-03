@@ -52,7 +52,7 @@ class SdkTracking private constructor() : BaseModule(), ISdkTracking {
         if (TextUtils.isEmpty(sdkId) ||
             TextUtils.isEmpty(privateKey)
         ) {
-            runGetSdkIDAsyncTask()
+            runGetSdkIDTask()
         }
     }
 
@@ -66,19 +66,19 @@ class SdkTracking private constructor() : BaseModule(), ISdkTracking {
 
     override fun getSDKId(): String? {
         if (TextUtils.isEmpty(sdkId)) {
-            runGetSdkIDAsyncTask()
+            runGetSdkIDTask()
         }
         return sdkId
     }
 
     override fun getPrivateKey(): String? {
         if (TextUtils.isEmpty(privateKey)) {
-            runGetSdkIDAsyncTask()
+            runGetSdkIDTask()
         }
         return privateKey
     }
 
-    private fun runGetSdkIDAsyncTask() {
+    private fun runGetSdkIDTask() {
         if (loading.get() || !hasContext) {
             return
         }

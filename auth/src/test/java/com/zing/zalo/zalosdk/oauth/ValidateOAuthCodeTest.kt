@@ -2,10 +2,13 @@ package com.zing.zalo.zalosdk.oauth
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import com.zing.zalo.zalosdk.oauth.helper.AuthStorage
-import com.zing.zalo.zalosdk.oauth.callback.ValidateOAuthCodeCallback
+import com.google.common.truth.Truth.assertThat
+import com.zing.zalo.zalosdk.core.Constant
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpUrlEncodedRequest
+import com.zing.zalo.zalosdk.oauth.callback.ValidateOAuthCodeCallback
+import com.zing.zalo.zalosdk.oauth.helper.AppInfoHelper
+import com.zing.zalo.zalosdk.oauth.helper.AuthStorage
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -15,20 +18,19 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import com.google.common.truth.Truth.assertThat
-import com.zing.zalo.zalosdk.core.Constant
 import java.io.ByteArrayOutputStream
-import com.zing.zalo.zalosdk.oauth.helper.AppInfoHelper
 
 @RunWith(RobolectricTestRunner::class)
 class ValidateOAuthCodeTest {
-    private val resultAuth = JSONObject("""{
+    private val resultAuth = JSONObject(
+        """{
         "data":{
             "msg":"The code is still valid",
             "uid":12345,
             "expires_in":1568446493935
         },"error":0
-    }""")
+    }"""
+    )
 
 
     private lateinit var context: Context
@@ -60,7 +62,7 @@ class ValidateOAuthCodeTest {
         every { httpClient.send(capture(request)).getJSON() } returns resultAuth
 
         //2 run
-        sut.isAuthenticate("abc", object:
+        sut.isAuthenticate("abc", object :
             ValidateOAuthCodeCallback {
             override fun onValidateComplete(
                 validated: Boolean,
@@ -81,8 +83,10 @@ class ValidateOAuthCodeTest {
                 request.captured.encodeBody(outputStream)
                 val byteArray = outputStream.toByteArray()
                 val body = String(byteArray)
-                assertThat(body).isEqualTo("app_id=${AppInfoHelper.appId}" +
-                        "&code=abc&version=${Constant.VERSION}&frm=sdk")
+                assertThat(body).isEqualTo(
+                    "app_id=${AppInfoHelper.appId}" +
+                            "&code=abc&version=${Constant.VERSION}&frm=sdk"
+                )
 
             }
 

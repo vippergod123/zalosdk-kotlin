@@ -1,7 +1,6 @@
 package com.zing.zalo.zalosdk.oauth.callback
 
-interface ValidateOAuthCodeCallback
-{
+interface ValidateOAuthCodeCallback {
     /**
      * This method is called after complete oath code verification on server side
      * @param validated

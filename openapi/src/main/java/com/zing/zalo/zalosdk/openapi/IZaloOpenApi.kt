@@ -44,6 +44,6 @@ interface IZaloOpenApi {
         @Nullable callback: ZaloPluginCallback?
     )
 
-    var accessToken:String
+    var accessToken: String
     var accessTokenExpiredTime: Long
 }

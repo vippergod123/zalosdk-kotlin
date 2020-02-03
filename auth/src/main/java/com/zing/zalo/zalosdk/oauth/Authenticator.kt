@@ -28,7 +28,8 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
         WeakReference<IAuthenticateCompleteListener>(null)
     private var bIsZaloLoginSuccessful = false
     private var bIsZaloOutOfDate: Boolean = false
-    var httpClient: HttpClient = HttpClient(ServiceMapManager.getInstance().urlFor(ServiceMapManager.KEY_URL_OAUTH))
+    var httpClient: HttpClient =
+        HttpClient(ServiceMapManager.getInstance().urlFor(ServiceMapManager.KEY_URL_OAUTH))
 
     private fun setOAuthCompleteListener(listener: IAuthenticateCompleteListener) {
         wListener = WeakReference(listener)
@@ -37,12 +38,17 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
     var receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (Constant.AUTHORIZATION_LOGIN_SUCCESSFUL_ACTION == intent.action) {
-                bIsZaloLoginSuccessful = intent.getBooleanExtra(Constant.EXTRA_AUTHORIZATION_LOGIN_SUCCESSFUL, false)
+                bIsZaloLoginSuccessful =
+                    intent.getBooleanExtra(Constant.EXTRA_AUTHORIZATION_LOGIN_SUCCESSFUL, false)
             }
         }
     }
 
-    override fun authenticate(activity: Activity, via: LoginVia, listener: IAuthenticateCompleteListener?) {
+    override fun authenticate(
+        activity: Activity,
+        via: LoginVia,
+        listener: IAuthenticateCompleteListener?
+    ) {
         if (listener == null) throw IllegalArgumentException("AuthCompleteListenerI must be set.")
         setOAuthCompleteListener(listener)
         sendOAuthRequest(activity, via)
@@ -57,7 +63,12 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
 
     override fun isAuthenticate(code: String, callback: ValidateOAuthCodeCallback?): Boolean {
         if (code.isEmpty()) {
-            callback?.onValidateComplete(false, ZaloOAuthResultCode.RESULTCODE_ZALO_OAUTH_INVALID, -1, null)
+            callback?.onValidateComplete(
+                false,
+                ZaloOAuthResultCode.RESULTCODE_ZALO_OAUTH_INVALID,
+                -1,
+                null
+            )
             return false
         }
 
@@ -117,14 +128,18 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
         } catch (ex: SecurityException) {
             bIsZaloOutOfDate = true
 
-            val errorMsg = ZaloOAuthResultCode.findErrorMessageByID(ZaloOAuthResultCode.RESULTCODE_ZALO_OUT_OF_DATE)
-            wListener.get()?.onAuthenticateError(ZaloOAuthResultCode.RESULTCODE_ZALO_OUT_OF_DATE, errorMsg)
+            val errorMsg =
+                ZaloOAuthResultCode.findErrorMessageByID(ZaloOAuthResultCode.RESULTCODE_ZALO_OUT_OF_DATE)
+            wListener.get()
+                ?.onAuthenticateError(ZaloOAuthResultCode.RESULTCODE_ZALO_OUT_OF_DATE, errorMsg)
             //tra ve error code
         } catch (ex: ActivityNotFoundException) {
             bIsZaloOutOfDate = true
 
-            val errorMsg = ZaloOAuthResultCode.findErrorMessageByID(ZaloOAuthResultCode.RESULTCODE_ZALO_OUT_OF_DATE)
-            wListener.get()?.onAuthenticateError(ZaloOAuthResultCode.RESULTCODE_ZALO_OUT_OF_DATE, errorMsg)
+            val errorMsg =
+                ZaloOAuthResultCode.findErrorMessageByID(ZaloOAuthResultCode.RESULTCODE_ZALO_OUT_OF_DATE)
+            wListener.get()
+                ?.onAuthenticateError(ZaloOAuthResultCode.RESULTCODE_ZALO_OUT_OF_DATE, errorMsg)
             //tra ve error code
         }
 
@@ -220,7 +235,12 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
 
     }
 
-    override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+    override fun onActivityResult(
+        activity: Activity,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ): Boolean {
         if (requestCode == Constant.ZALO_AUTHENTICATE_REQUEST_CODE) {
             receiveAuthData(activity, data)
             return true
@@ -278,7 +298,8 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
                 if (bIsZaloLoginSuccessful) {
                     authenticate(activity, LoginVia.APP, wListener.get())
                 } else {
-                    wListener.get()?.onAuthenticateError(ZaloOAuthResultCode.RESULTCODE_USER_BACK, "")
+                    wListener.get()
+                        ?.onAuthenticateError(ZaloOAuthResultCode.RESULTCODE_USER_BACK, "")
                 }
             }
 
@@ -294,7 +315,7 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
                         if (msg.isNotEmpty()) errorMsg = msg
                     }
                 } catch (ex: Exception) {
-                    Log.w("receiveAuthData","zalo return empty message")
+                    Log.w("receiveAuthData", "zalo return empty message")
                 }
 
                 wListener.get()?.onAuthenticateError(e, errorMsg)

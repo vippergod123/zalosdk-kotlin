@@ -65,7 +65,7 @@ object ZaloOAuthResultCode {
             RESULTCODE_ZALO_SDK_NO_INTERNET_ACCESS -> Resources.getSystem().getString(R.string.no_network)
             RESULTCODE_ZALO_APPLICATION_NOT_INSTALLED -> Resources.getSystem().getString(R.string.zalo_app_not_installed)
             RESULTCODE_ZALO_OUT_OF_DATE -> Resources.getSystem().getString(R.string.zalo_app_out_of_date)
-            RESULTCODE_ZALO_OAUTH_INVALID ->  "OAuth Code is invalid"
+            RESULTCODE_ZALO_OAUTH_INVALID -> "OAuth Code is invalid"
             else -> "Không thể đăng nhập Zalo."
         }
     }

@@ -1,7 +1,6 @@
 package com.zing.zalo.zalosdk.analytics
 
 import android.content.Context
-import android.os.HandlerThread
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.zing.zalo.devicetrackingsdk.DeviceTracking
@@ -14,7 +13,6 @@ import com.zing.zalo.zalosdk.core.helper.Utils
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpUrlEncodedRequest
 import com.zing.zalo.zalosdk.core.log.Log
-import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

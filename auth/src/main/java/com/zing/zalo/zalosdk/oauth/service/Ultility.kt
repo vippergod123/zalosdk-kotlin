@@ -4,8 +4,7 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
 
-internal object Utility
-{
+internal object Utility {
     private const val HASH_ALGORITHM_SHA1 = "SHA-1"
 
     fun sha1hash(bytes: ByteArray): String? {

@@ -2,8 +2,7 @@ package com.zing.zalo.zalosdk.oauth.web
 
 import com.zing.zalo.zalosdk.oauth.R
 
-class ZaloWebLoginFragment : ZaloWebLoginBaseFragment()
-{
+class ZaloWebLoginFragment : ZaloWebLoginBaseFragment() {
 
     override fun onResume() {
         setTitle(getString(R.string.txt_title_login_zalo))

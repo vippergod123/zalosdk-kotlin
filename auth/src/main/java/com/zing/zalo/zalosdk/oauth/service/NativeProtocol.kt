@@ -4,8 +4,7 @@ import android.content.Context
 import android.content.Intent
 
 
-internal object NativeProtocol
-{
+internal object NativeProtocol {
     val CMD_GET_LOGIN_STATUS = 10001
     private val INTENT_ACTION_PLATFORM_SERVICE = "com.zing.zalo.action.PlatformService"
     private val INTENT_PACKAGE_PLATFORM_SERVICE = "com.zing.zalo"

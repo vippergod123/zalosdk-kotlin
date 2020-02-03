@@ -12,19 +12,17 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
-import com.zing.zalo.zalosdk.oauth.R
-import com.zing.zalo.zalosdk.oauth.ZaloSDK
 import com.zing.zalo.zalosdk.core.helper.AppInfo
 import com.zing.zalo.zalosdk.core.helper.Utils
 import com.zing.zalo.zalosdk.core.log.Log
 import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
+import com.zing.zalo.zalosdk.oauth.R
 import java.io.UnsupportedEncodingException
 import java.lang.ref.WeakReference
 import java.net.URLEncoder
 import java.util.regex.Pattern
 
-abstract class ZaloWebLoginBaseFragment : Fragment()
-{
+abstract class ZaloWebLoginBaseFragment : Fragment() {
     private var listener: ZaloWebLoginBaseFragmentListener? = null
     private lateinit var webView: WebView
     lateinit var progressBar: ProgressBar
@@ -33,7 +31,8 @@ abstract class ZaloWebLoginBaseFragment : Fragment()
         //		private var WEB_LOGIN_URL: String = if (Constant.IS_DEV == true) "http://dev-oauth.zaloapp.com/v3/auth?app_id="
 //		else "https://oauth.zaloapp.com/v3/auth?app_id="
         private var WEB_LOGIN_URL: String =
-            ServiceMapManager.getInstance().urlFor(ServiceMapManager.KEY_URL_OAUTH, "/v3/auth?app_id=")
+            ServiceMapManager.getInstance()
+                .urlFor(ServiceMapManager.KEY_URL_OAUTH, "/v3/auth?app_id=")
         private val WZUIN = Pattern.compile("(wzuin)([^;][\\D\\w])*")
     }
 
@@ -51,7 +50,11 @@ abstract class ZaloWebLoginBaseFragment : Fragment()
         listener = null
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(R.layout.zalosdk_fragment_zalo_web_login, container, false)
         setupWebView(view)
 
@@ -69,8 +72,22 @@ abstract class ZaloWebLoginBaseFragment : Fragment()
         if (listener != null) listener!!.setTitle(title)
     }
 
-    open fun onLoginCompleted(error: Int, uid: Long, oauth: String, zProtect: Int, name: String, isRegister: Boolean) {
-        if (listener != null) listener!!.onLoginCompleted(error, uid, oauth, zProtect, name, isRegister)
+    open fun onLoginCompleted(
+        error: Int,
+        uid: Long,
+        oauth: String,
+        zProtect: Int,
+        name: String,
+        isRegister: Boolean
+    ) {
+        if (listener != null) listener!!.onLoginCompleted(
+            error,
+            uid,
+            oauth,
+            zProtect,
+            name,
+            isRegister
+        )
     }
 
     @Suppress("DEPRECATION")
@@ -137,6 +154,13 @@ abstract class ZaloWebLoginBaseFragment : Fragment()
 
     interface ZaloWebLoginBaseFragmentListener {
         fun setTitle(title: String)
-        fun onLoginCompleted(error: Int, uid: Long, oauth: String, zprotect: Int, name: String, isRegister: Boolean)
+        fun onLoginCompleted(
+            error: Int,
+            uid: Long,
+            oauth: String,
+            zprotect: Int,
+            name: String,
+            isRegister: Boolean
+        )
     }
 }
