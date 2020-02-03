@@ -3,14 +3,14 @@ package com.zing.zalo.zalosdk.oauth.service
 import android.content.Context
 import android.os.Bundle
 import android.os.Looper
+import com.zing.zalo.zalosdk.core.log.Log
 import org.json.JSONObject
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 
-open class ZaloService
-{
+open class ZaloService {
     companion object {
         private val lock = ReentrantLock()
         private val condition = lock.newCondition()
@@ -29,13 +29,14 @@ open class ZaloService
                 if (bundle != null) {
                     try {
                         if (bundle.getInt(NativeProtocol.KEY_RESULT_ERROR_CODE) == 0) {
-                            val data = JSONObject(bundle.getString(NativeProtocol.KEY_RESULT_DATA)!!)
+                            val data =
+                                JSONObject(bundle.getString(NativeProtocol.KEY_RESULT_DATA)!!)
                             if (data.has("isUserLogged")) {
                                 waitingResult.set(if (data.getBoolean("isUserLogged")) 1 else 0)
                             }
                         }
                     } catch (e: Exception) {
-                        e.printStackTrace()
+                        Log.e("getUserLoggedStatus", e)
                     }
 
                 }

@@ -5,8 +5,7 @@ import android.content.Context
 import com.zing.zalo.zalosdk.oauth.R
 
 @SuppressLint("StaticFieldLeak")
-object ZaloWebRegisterFragment : ZaloWebLoginBaseFragment()
-{
+object ZaloWebRegisterFragment : ZaloWebLoginBaseFragment() {
     override fun onResume() {
         super.onResume()
         setTitle(getString(R.string.txt_regis_acc))

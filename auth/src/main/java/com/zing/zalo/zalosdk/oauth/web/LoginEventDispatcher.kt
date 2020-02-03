@@ -7,11 +7,14 @@ import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.zing.zalo.zalosdk.core.log.Log
 import com.zing.zalo.zalosdk.oauth.Constant
 import java.lang.ref.WeakReference
 
-class LoginEventDispatcher(var that: WeakReference<ZaloWebLoginBaseFragment>, var callbackUrl: String) : WebViewClient()
-{
+class LoginEventDispatcher(
+    var that: WeakReference<ZaloWebLoginBaseFragment>,
+    var callbackUrl: String
+) : WebViewClient() {
 
     override fun onPageFinished(view: WebView?, url: String?) {
         super.onPageFinished(view, url)
@@ -23,7 +26,11 @@ class LoginEventDispatcher(var that: WeakReference<ZaloWebLoginBaseFragment>, va
         if (that.get() != null) that.get()!!.progressBar.visibility = View.VISIBLE
     }
 
-    override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+    override fun onReceivedError(
+        view: WebView?,
+        request: WebResourceRequest?,
+        error: WebResourceError?
+    ) {
         super.onReceivedError(view, request, error)
 
         if (that.get() != null) {
@@ -53,18 +60,25 @@ class LoginEventDispatcher(var that: WeakReference<ZaloWebLoginBaseFragment>, va
             if (uri.getQueryParameter("error") != null) {
                 error = Integer.parseInt(uri.getQueryParameter("error").toString())
             } else {
-                uid = java.lang.Long.parseLong(uri.getQueryParameter("uid").toString())
+                uid = (uri.getQueryParameter("uid").toString()).toLong()
                 code = uri.getQueryParameter("code")
                 name = uri.getQueryParameter("display_name")
                 val tmp = uri.getQueryParameter("zprotect")
                 if (tmp != null) zProtect = Integer.parseInt(tmp)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("processCallbackUrl", e)
         }
 
 
-        if (that.get() != null) that.get()!!.onLoginCompleted(error, uid, code!!, zProtect, name!!, false)
+        if (that.get() != null) that.get()!!.onLoginCompleted(
+            error,
+            uid,
+            code!!,
+            zProtect,
+            name!!,
+            false
+        )
         return true
     }
 }

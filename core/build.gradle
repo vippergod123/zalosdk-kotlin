@@ -16,12 +16,14 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion as Integer
         targetSdkVersion rootProject.ext.targetSdkVersion as Integer
 
+        consumerProguardFiles 'proguard-rules.pro'
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -68,15 +70,16 @@ apply from: '../bintray.gradle'
 dependencies {
     //noinspection GradleCompatible
     api rootProject.ext.androidSupportV4
+    api rootProject.ext.kotlinCoroutinesCore
+    api rootProject.ext.kotlinCoroutinesAndroid
+
 
 //    Dependencies
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    //Todo: check the under-line
-
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     //Unit Test
+
     def powerMockVersion = '1.7.0RC2'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.robolectric:robolectric:4.1'
@@ -85,15 +88,14 @@ dependencies {
     testImplementation "com.google.truth:truth:0.43"
     testImplementation 'org.mockito:mockito-core:2.4.0'
 
+    def powerMockVersion = '1.7.0RC2'
     testImplementation "org.powermock:powermock-core:$powerMockVersion"
     testImplementation "org.powermock:powermock-module-junit4:$powerMockVersion"
     testImplementation "org.powermock:powermock-api-mockito2:$powerMockVersion"
-    testImplementation "org.json:json:20140107"
 
     testImplementation 'io.mockk:mockk:1.9.3'
-}
-repositories {
-    mavenCentral()
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.2'
+
 }
 
 

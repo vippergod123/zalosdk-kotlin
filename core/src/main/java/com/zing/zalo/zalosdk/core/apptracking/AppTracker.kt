@@ -3,6 +3,7 @@ package com.zing.zalo.zalosdk.core.apptracking
 import android.content.Context
 import android.os.Build
 import android.text.TextUtils
+import com.zing.zalo.devicetrackingsdk.DeviceTracking
 import com.zing.zalo.devicetrackingsdk.SdkTracking
 import com.zing.zalo.zalosdk.core.Constant
 import com.zing.zalo.zalosdk.core.helper.*
@@ -20,19 +21,24 @@ class AppTracker : BaseModule(), IAppTracker {
         var installedPackagedNames = arrayListOf<String>()
     }
 
-    var httpClient = HttpClient(ServiceMapManager.urlFor(ServiceMapManager.KEY_URL_CENTRALIZED))
+    var httpClient = HttpClient(ServiceMapManager.getInstance().urlFor(ServiceMapManager.KEY_URL_CENTRALIZED))
     var expiredTime = 0L
     var scanId = ""
 
-    lateinit var appTrackerStorage: AppTrackerStorage
-    lateinit var storage: Storage
-    lateinit var sdkTracking: SdkTracking
-    lateinit var deviceId: String
+    internal lateinit var appTrackerStorage: AppTrackerStorage
+    internal lateinit var storage: Storage
+    internal lateinit var sdkTracking: SdkTracking
+    internal lateinit var deviceId: String
     private var submitRetry = 0
     override var listener: AppTrackerListener? = null
 
     override fun onStart(context: Context) {
         super.onStart(context)
+
+        storage = Storage(context)
+        appTrackerStorage = AppTrackerStorage(context)
+        sdkTracking = SdkTracking.getInstance()
+        deviceId = DeviceTracking.getInstance().getDeviceId() ?: ""
 
         if (!needToScanInstalledApp()) {
             Log.v("App Tracker run():", "not expired yet! ")

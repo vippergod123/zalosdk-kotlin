@@ -10,33 +10,24 @@ import android.os.Build
 import android.os.Environment
 import android.os.Process
 import com.zing.zalo.zalosdk.core.Constant
-import com.zing.zalo.zalosdk.core.http.HttpClient
-import com.zing.zalo.zalosdk.core.http.HttpMultipartRequest
 import com.zing.zalo.zalosdk.core.log.Log
 import org.jetbrains.annotations.NotNull
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.*
-import java.lang.Double.parseDouble
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
-import java.net.HttpURLConnection
-import java.security.*
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import java.util.*
 import java.util.concurrent.TimeUnit
-import javax.crypto.BadPaddingException
-import javax.crypto.Cipher
-import javax.crypto.IllegalBlockSizeException
-import javax.crypto.NoSuchPaddingException
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.SecretKeySpec
 
 object Utils {
     private var language: String? = null
 
     @SuppressLint("WrongConstant")
     fun isPermissionGranted(context: Context, permission: String): Boolean {
-        val permissionCheck = if (android.os.Build.VERSION.SDK_INT >= 23) {
+        val permissionCheck = if (Build.VERSION.SDK_INT >= 23) {
             context.checkSelfPermission(permission)
         } else {
             context.packageManager.checkPermission(permission, context.packageName)
@@ -62,10 +53,6 @@ object Utils {
         } else Locale.getDefault().language
     }
 
-    fun setLanguage(lang: String) {
-        language = lang
-    }
-
     @Throws(IOException::class)
     fun readFileData(file: File): String {
         val fis = FileInputStream(file)
@@ -82,17 +69,6 @@ object Utils {
 
         fis.close()
         return stringBuilder.toString()
-    }
-
-    fun isNumber(value: String): Boolean {
-        var numeric = true
-        try {
-            parseDouble(value)
-        } catch (e: NumberFormatException) {
-            Log.w("isNumber", e)
-            numeric = false
-        }
-        return numeric
     }
 
     fun isPackageExisted(context: Context, namePackage: String): Boolean {
@@ -258,36 +234,6 @@ object Utils {
         return null
     }
 
-//    @SuppressLint("TrulyRandom")
-//    @Throws(
-//        NoSuchAlgorithmException::class,
-//        NoSuchPaddingException::class,
-//        InvalidKeyException::class,
-//        InvalidAlgorithmParameterException::class,
-//        IllegalBlockSizeException::class,
-//        BadPaddingException::class,
-//        UnsupportedEncodingException::class,
-//        NoSuchProviderException::class
-//    )
-//    fun encrypt(keyInStr: String, dataToEncrypt: String): ByteArray {
-//
-//        val keyInBinary = keyInStr.toByteArray()
-//        val vectorBytes = ByteArray(16)
-//        for (i in 0..15) {
-//            vectorBytes[i] = 0
-//        }
-//        val secretKeySpec = SecretKeySpec(keyInBinary, "AES")
-//        val ivSpec = IvParameterSpec(vectorBytes)
-//
-//        val c = Cipher.getInstance("AES/CBC/PKCS5Padding")
-//        c.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivSpec)
-//
-//        return c.doFinal(dataToEncrypt.toByteArray(charset("UTF-8")))
-//    }
-
-
-
-
     //#region private supportive method
     private fun md5(input: String): String {
         var res = ""
@@ -351,8 +297,6 @@ object Utils {
         return null
     }
 
-
-
     fun getCurrentProcessName(context: Context): String {
         try {
             val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -393,7 +337,7 @@ object Utils {
                 }
             }
         } catch (ex: Exception) {
-            Log.w("getVersionCodeOfPackage",ex)
+            Log.w("getVersionCodeOfPackage", ex)
         }
 
         return -1L

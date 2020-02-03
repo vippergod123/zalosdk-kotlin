@@ -4,11 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import java.util.*
 
 
-internal object ZaloSignatureValidator
-{
+internal object ZaloSignatureValidator {
     private val ZALO_DEBUG_HASH = "701554e30e4dadc7e21e132746ee0c4922bad83f"
     private val ZALO_RELEASE_HASH = "9487ba76b32e9e36785fb4c3540021f85af8d7b7"
 

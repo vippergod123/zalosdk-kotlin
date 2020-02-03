@@ -1,8 +1,10 @@
-package com.zing.zalo.zalosdk.core
+package com.zing.zalo.zalosdk.core.servicemap
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
+import com.zing.zalo.zalosdk.core.Constant
+import com.zing.zalo.zalosdk.core.helper.DataHelper
 import com.zing.zalo.zalosdk.core.helper.TestUtils
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpGetRequest
@@ -13,6 +15,9 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -20,6 +25,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 
+@ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
 class ServiceMapTest {
     private val RESULT =
@@ -41,6 +47,8 @@ class ServiceMapTest {
     @MockK private lateinit var client: HttpClient
     private lateinit var sut: ServiceMapManager
 
+    private val testScope = TestCoroutineScope()
+
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxUnitFun = true)
@@ -50,9 +58,10 @@ class ServiceMapTest {
         sut.httpClient = client
         sut.storage = storage
 
-        every { storage.getKeyUrlCentralized() } returns "centralized"
-        every { storage.getKeyUrlOauth() } returns "oauth"
-        every { storage.getKeyUrlGraph() } returns "graph"
+        val serviceMapData = DataHelper.serviceMap
+        every { storage.getKeyUrlCentralized() } returns serviceMapData.URL_CENTRALIZED
+        every { storage.getKeyUrlOauth() } returns serviceMapData.URL_OAUTH
+        every { storage.getKeyUrlGraph() } returns serviceMapData.URL_GRAPH
     }
 
     @After
@@ -66,7 +75,9 @@ class ServiceMapTest {
         every { storage.getExpireTime() } returns System.currentTimeMillis() + 1000 * 60 * 59 * 24
 
         //2. run
+        sut.scope = testScope
         sut.start(context)
+
         TestUtils.waitTaskRunInBackgroundAndForeground()
 
         //3. verify
@@ -76,6 +87,8 @@ class ServiceMapTest {
     @Test
     fun downloadServiceMapTestInDevMode() {
         //1. mock
+        Constant.DEV_MODE = true
+        every { storage.getExpireTime() } returns 0L
         val requests = mutableListOf<HttpGetRequest>()
 
         every { client.send(capture(requests)) } returns response1 andThen response2
@@ -85,18 +98,58 @@ class ServiceMapTest {
         every { storage.getExpireTime() } returns 0L
 
         //2. run
+        sut.scope = testScope
         sut.start(context)
 
         //3. verify
         //3.a load from cache
-        verify(exactly = 1) { storage.getKeyUrlCentralized() }
-        verify(exactly = 1) { storage.getKeyUrlGraph() }
-        verify(exactly = 1) { storage.getKeyUrlOauth() }
+        verifyLoadFromCache(1)
 
         //3.b save to cache
-        verify(exactly = 1) { storage.setKeyUrlCentralized("https://centralized.zaloapp.com") }
-        verify(exactly = 1) { storage.setKeyUrlGraph("https://graph.zaloapp.com") }
-        verify(exactly = 1) { storage.setKeyUrlOauth("https://oauth.zaloapp.com") }
+        val WEB_LOGIN_PATH = "/v3/auth?app_id="
+
+        val urlOauth = "https://oauth.zaloapp.com/v3/auth?app_id="
+        val urlGraph = "https://graph.zaloapp.com/v3/auth?app_id="
+        val urlCentralized = "https://centralized.zaloapp.com/v3/auth?app_id="
+        Thread.sleep(1000)
+
+        val testUrlOauth = ServiceMapManager.getInstance().urlFor(ServiceMapManager.KEY_URL_OAUTH, WEB_LOGIN_PATH)
+        val testUrlGraph = ServiceMapManager.getInstance().urlFor(ServiceMapManager.KEY_URL_GRAPH, WEB_LOGIN_PATH)
+        val testUrlCentralized =
+            ServiceMapManager.getInstance().urlFor(ServiceMapManager.KEY_URL_CENTRALIZED, WEB_LOGIN_PATH)
+
+        //3.c return results
+        assertThat(urlOauth).isEqualTo(testUrlOauth)
+        assertThat(urlGraph).isEqualTo(testUrlGraph)
+        assertThat(urlCentralized).isEqualTo(testUrlCentralized)
+
+        assertThat(requests.size).isEqualTo(0)
+    }
+
+
+    @Test
+    fun `download ServiceMap Test Live Mode`() = runBlockingTest {
+        //1. mock
+        Constant.DEV_MODE = false
+        every { storage.getExpireTime() } returns 0L
+        val requests = mutableListOf<HttpGetRequest>()
+
+        every { client.send(capture(requests)) } returns response1 andThen response2
+
+        every { response1.getText() } returns "ABC"
+        every { response2.getText() } returns RESULT
+        every { storage.getExpireTime() } returns 0L
+
+        //2. run
+        sut.scope = testScope
+        sut.start(context)
+
+        //3. verify
+        //3.a load from cache
+        verifyLoadFromCache(1)
+        Thread.sleep(1000)
+        //3.b save to cache
+        verifySaveCache(1)
 
         val WEB_LOGIN_PATH = "/v3/auth?app_id="
 
@@ -104,10 +157,13 @@ class ServiceMapTest {
         val urlGraph = "https://graph.zaloapp.com/v3/auth?app_id="
         val urlCentralized = "https://centralized.zaloapp.com/v3/auth?app_id="
 
-        val testUrlOauth = ServiceMapManager.urlFor(ServiceMapManager.KEY_URL_OAUTH, WEB_LOGIN_PATH)
-        val testUrlGraph = ServiceMapManager.urlFor(ServiceMapManager.KEY_URL_GRAPH, WEB_LOGIN_PATH)
+        val testUrlOauth =
+            ServiceMapManager.getInstance().urlFor(ServiceMapManager.KEY_URL_OAUTH, WEB_LOGIN_PATH)
+        val testUrlGraph =
+            ServiceMapManager.getInstance().urlFor(ServiceMapManager.KEY_URL_GRAPH, WEB_LOGIN_PATH)
         val testUrlCentralized =
-            ServiceMapManager.urlFor(ServiceMapManager.KEY_URL_CENTRALIZED, WEB_LOGIN_PATH)
+            ServiceMapManager.getInstance()
+                .urlFor(ServiceMapManager.KEY_URL_CENTRALIZED, WEB_LOGIN_PATH)
 
         //3.c return results
         assertThat(urlOauth).isEqualTo(testUrlOauth)
@@ -119,5 +175,15 @@ class ServiceMapTest {
         assertThat(requests[1].getUrl("")).isEqualTo(SERVICE_MAP_URLS[1])
     }
 
+    private fun verifySaveCache(times:Int ) {
+        verify(exactly = times) { storage.setKeyUrlCentralized("https://centralized.zaloapp.com") }
+        verify(exactly = times) { storage.setKeyUrlGraph("https://graph.zaloapp.com") }
+        verify(exactly = times) { storage.setKeyUrlOauth("https://oauth.zaloapp.com") }
+    }
 
+    private fun verifyLoadFromCache(times:Int ) {
+        verify(exactly = times) { storage.getKeyUrlCentralized() }
+        verify(exactly = times) { storage.getKeyUrlGraph() }
+        verify(exactly = times) { storage.getKeyUrlOauth() }
+    }
 }

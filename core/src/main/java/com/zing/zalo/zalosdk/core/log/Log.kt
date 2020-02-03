@@ -1,6 +1,6 @@
 package com.zing.zalo.zalosdk.core.log
 
-import java.util.*
+import java.util.Locale
 
 
 object Log {

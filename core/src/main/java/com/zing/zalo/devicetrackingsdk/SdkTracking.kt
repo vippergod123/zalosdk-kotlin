@@ -1,8 +1,6 @@
 package com.zing.zalo.devicetrackingsdk
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.os.AsyncTask
 import android.text.TextUtils
 import com.zing.zalo.zalosdk.core.Constant
 import com.zing.zalo.zalosdk.core.helper.AppInfo
@@ -13,40 +11,48 @@ import com.zing.zalo.zalosdk.core.http.HttpUrlEncodedRequest
 import com.zing.zalo.zalosdk.core.log.Log
 import com.zing.zalo.zalosdk.core.module.BaseModule
 import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.json.JSONException
-import org.json.JSONObject
 import java.util.concurrent.atomic.AtomicBoolean
 
-@SuppressLint("StaticFieldLeak")
-class SdkTracking private constructor(): BaseModule(), ISdkTracking {
+class SdkTracking private constructor() : BaseModule(), ISdkTracking {
     internal var storage: Storage? = null
     private val loading = AtomicBoolean(false)
     private var sdkId: String? = null
     private var privateKey: String? = null
 
     var httpClient = HttpClient(
-        ServiceMapManager.urlFor(
+        ServiceMapManager.getInstance().urlFor(
             ServiceMapManager.KEY_URL_CENTRALIZED
         )
     )
 
     companion object {
         private val instance = SdkTracking()
-        fun getInstance() : SdkTracking { return instance }
+        fun getInstance(): SdkTracking {
+            return instance
+        }
     }
+
+    private var job = Job()
+    var scope = CoroutineScope(Dispatchers.IO + job)
 
     override fun onStart(context: Context) {
         super.onStart(context)
 
-        if(storage == null) {
+        if (storage == null) {
             storage = Storage(context)
         }
 
         sdkId = storage?.getString(Constant.sharedPreference.PREF_SDK_ID)
         privateKey = storage?.getString(Constant.sharedPreference.PREF_PRIVATE_KEY)
-        if(TextUtils.isEmpty(sdkId) ||
-            TextUtils.isEmpty(privateKey)) {
-            runGetSdkIDAsyncTask()
+        if (TextUtils.isEmpty(sdkId) ||
+            TextUtils.isEmpty(privateKey)
+        ) {
+            runGetSdkIDTask()
         }
     }
 
@@ -59,29 +65,28 @@ class SdkTracking private constructor(): BaseModule(), ISdkTracking {
 
 
     override fun getSDKId(): String? {
-        if(TextUtils.isEmpty(sdkId)) {
-            runGetSdkIDAsyncTask()
+        if (TextUtils.isEmpty(sdkId)) {
+            runGetSdkIDTask()
         }
         return sdkId
     }
 
     override fun getPrivateKey(): String? {
-        if(TextUtils.isEmpty(privateKey)) {
-            runGetSdkIDAsyncTask()
+        if (TextUtils.isEmpty(privateKey)) {
+            runGetSdkIDTask()
         }
         return privateKey
     }
 
-    private fun runGetSdkIDAsyncTask() {
-        if(loading.get() || !hasContext) {
+    private fun runGetSdkIDTask() {
+        if (loading.get() || !hasContext) {
             return
         }
 
         loading.set(true)
-        val task = GetSdkIdAsyncTask(context!!, httpClient) {
-            sdkId, privateKey ->
+        callSdkIdRequest(context!!, httpClient) { sdkId, privateKey ->
 
-            if(sdkId != null && privateKey != null) {
+            if (sdkId != null && privateKey != null) {
                 this.sdkId = sdkId
                 this.privateKey = privateKey
                 storage?.setString(Constant.sharedPreference.PREF_PRIVATE_KEY, privateKey)
@@ -90,48 +95,42 @@ class SdkTracking private constructor(): BaseModule(), ISdkTracking {
 
             loading.set(false)
         }
-        task.execute()
     }
-}
 
-private typealias GetSdkIdAsyncTaskCallback = (String?, String?) -> Unit
-@SuppressLint("StaticFieldLeak")
-class GetSdkIdAsyncTask(
-    private val context: Context,
-    private val httpClient: HttpClient,
-    private var callback: GetSdkIdAsyncTaskCallback
-) : AsyncTask<Void, Void, JSONObject>() {
+    private fun callSdkIdRequest(
+        context: Context,
+        httpClient: HttpClient,
+        callback: (String?, String?) -> Unit
+    ) {
+        scope.launch {
+            try {
+                val deviceIdData = DeviceInfo.prepareDeviceIdData(context).toString()
+                val request = HttpUrlEncodedRequest(Constant.api.API_SDK_ID)
+                request.addParameter("appId", AppInfo.getAppId(context))
+                request.addParameter("sdkv", DeviceInfo.getSDKVersion())
+                request.addParameter("pl", "android")
+                request.addParameter("osv", DeviceInfo.getOSVersion())
+                request.addParameter("model", DeviceInfo.getModel())
+                request.addParameter("screenSize", DeviceInfo.getScreenSize(context))
+                request.addParameter("device", deviceIdData)
+                request.addParameter("ref", AppInfo.getReferrer(context))
 
-    override fun doInBackground(vararg params: Void?): JSONObject? {
-        try {
-            val deviceIdData = DeviceInfo.prepareDeviceIdData(context).toString()
-            val request = HttpUrlEncodedRequest(Constant.api.API_SDK_ID)
-            request.addParameter("appId", AppInfo.getAppId(context))
-            request.addParameter("sdkv", DeviceInfo.getSDKVersion())
-            request.addParameter("pl", "android")
-            request.addParameter("osv", DeviceInfo.getOSVersion())
-            request.addParameter("model", DeviceInfo.getModel())
-            request.addParameter("screenSize", DeviceInfo.getScreenSize(context))
-            request.addParameter("device", deviceIdData)
-            request.addParameter("ref", AppInfo.getReferrer(context))
-
-            val jsonObject = httpClient.send(request).getJSON()
-            val errorCode = jsonObject?.getInt("error")
-            if (errorCode == 0) {
-                return jsonObject.getJSONObject("data")
+                val jsonObject = httpClient.send(request).getJSON()
+                val errorCode = jsonObject?.getInt("error")
+                if (errorCode == 0) {
+                    val data = jsonObject.getJSONObject("data")
+                    val sId = data?.optString("sdkId")
+                    val pKey = data?.optString("privateKey")
+                    callback(sId, pKey)
+                    return@launch
+                }
+            } catch (ex: JSONException) {
+                Log.e("GetSdkId", ex)
+            } catch (ex: Exception) {
+                Log.e("GetSdkId", ex)
             }
-        } catch (ex: JSONException) {
-            Log.e("GetSdkId", ex)
-        } catch (ex: Exception) {
-            Log.e("GetSdkId", ex)
+            callback(null, null)
+            return@launch
         }
-        return null
-    }
-
-    override fun onPostExecute(result: JSONObject?) {
-        super.onPostExecute(result)
-
-        callback(result?.optString("sdkId"),
-            result?.optString("privateKey"))
     }
 }

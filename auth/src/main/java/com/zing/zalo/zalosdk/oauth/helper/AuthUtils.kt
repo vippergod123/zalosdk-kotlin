@@ -12,9 +12,9 @@ import com.zing.zalo.zalosdk.oauth.BrowserLoginActivity
 
 object AuthUtils {
     @SuppressLint("StaticFieldLeak")
-    lateinit var settingsManager:SettingsManager
+    lateinit var settingsManager: SettingsManager
 
-    fun canUseBrowserLogin(context: Context): Boolean {
+    internal fun canUseBrowserLogin(context: Context): Boolean {
 
         if (!AuthUtils::settingsManager.isInitialized)
             settingsManager = SettingsManager.getInstance()

@@ -92,14 +92,12 @@ class EventDataSource(var context: Context) {
             open()
             database.delete(TABLE_EVENT, null, null)
         } catch (ex: Exception) {
-            if (ex.message == null)
-                ex.printStackTrace()
-            else
-                Log.e("EventDataSource", "clearEventsTable - $ex")
+            Log.e("EventDataSource - clearEventsTable", "$ex")
         } finally {
             close()
         }
     }
+
     //#region private supportive method
     private fun open() {
         database = dbHelper.writableDatabase

@@ -1,7 +1,6 @@
 package com.zing.zalo.zalosdk.oauth
 
-enum class LoginVia
-{
+enum class LoginVia {
     /**
      * Login via web
      */

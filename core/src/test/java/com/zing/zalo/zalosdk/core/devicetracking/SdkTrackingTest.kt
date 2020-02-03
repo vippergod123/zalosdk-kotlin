@@ -17,6 +17,8 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.slot
 import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.json.JSONObject
 import org.junit.After
 import org.junit.Before
@@ -26,14 +28,19 @@ import org.robolectric.RobolectricTestRunner
 import java.io.ByteArrayOutputStream
 import java.net.URLEncoder
 
+@ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
 class SdkTrackingTest {
     private lateinit var context: Context
 
-    @MockK private lateinit var client: HttpClient
-    @MockK private lateinit var resp: HttpResponse
-    @MockK private lateinit var sdkStorage: Storage
+    @MockK
+    private lateinit var client: HttpClient
+    @MockK
+    private lateinit var resp: HttpResponse
+    @MockK
+    private lateinit var sdkStorage: Storage
 
+    private val testScope = TestCoroutineScope()
     lateinit var sut: SdkTracking
     @Before
     fun setup() {
@@ -42,6 +49,9 @@ class SdkTrackingTest {
         sut = SdkTracking.getInstance()
         sut.storage = sdkStorage
         sut.httpClient = client
+        sut.scope = testScope
+
+
 
         AppInfoHelper.setup()
     }
@@ -84,8 +94,8 @@ class SdkTrackingTest {
         sut.start(context)
 
         //#3. Verify
-        verify() { sdkStorage.setString(PREF_SDK_ID, "1234") }
-        verify() { sdkStorage.setString(PREF_PRIVATE_KEY, "abcdef") }
+        verify { sdkStorage.setString(PREF_SDK_ID, "1234") }
+        verify { sdkStorage.setString(PREF_PRIVATE_KEY, "abcdef") }
         assertThat(sut.getSDKId()).isEqualTo("1234")
         assertThat(sut.getPrivateKey()).isEqualTo("abcdef")
 
@@ -102,8 +112,9 @@ class SdkTrackingTest {
         assertThat(body.contains("pl=android")).isTrue()
         assertThat(body.contains("appId=${AppInfoHelper.appId}")).isTrue()
 
-        val dIdResult = "{\"dId\":\"${AppInfoHelper.advertiserId}\",\"aId\":\"unknown\",\"mod\":\"robolectric\",\"ser\":\"unknown\"}"
-        assertThat(body.contains(URLEncoder.encode(dIdResult,"UTF-8"))).isTrue()
+        val dIdResult =
+            "{\"dId\":\"${AppInfoHelper.advertiserId}\",\"aId\":\"unknown\",\"mod\":\"robolectric\",\"ser\":\"unknown\"}"
+        assertThat(body.contains(URLEncoder.encode(dIdResult, "UTF-8"))).isTrue()
     }
 
     @Test

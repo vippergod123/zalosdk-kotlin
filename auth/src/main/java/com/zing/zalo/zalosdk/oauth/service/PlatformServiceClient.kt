@@ -9,8 +9,8 @@ import com.zing.zalo.zalosdk.core.helper.AppInfo
 import com.zing.zalo.zalosdk.core.log.Log
 
 
-class PlatformServiceClient(var context: Context, private val requestMessage: Int) : ServiceConnection
-{
+class PlatformServiceClient(var context: Context, private val requestMessage: Int) :
+    ServiceConnection {
     private val handler: Handler
     private var listener: CompletedListener? = null
     private var running: Boolean = false
@@ -95,7 +95,7 @@ class PlatformServiceClient(var context: Context, private val requestMessage: In
             try {
                 context.unbindService(this)
             } catch (e: IllegalArgumentException) {
-                Log.e("PlatformServiceClient: handleMessage() ", e )
+                Log.e("PlatformServiceClient: handleMessage() ", e)
             }
 
         }

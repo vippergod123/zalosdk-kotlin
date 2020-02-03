@@ -1,21 +1,47 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+-verbose
+-keepattributes MethodParameters,LineNumberTable,LocalVariableTable,LocalVariableTypeTable
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+#Android's module
+-dontwarn androidx.**
+-keep class androidx.** { *; }
+-keep interface androidx.** { *;    }
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+#ZDK"s module
+-keep class com.zing.zalo.zalosdk.core.log.** { *;}
+
+#Device Tracking
+-keepclasseswithmembers class com.zing.zalo.devicetrackingsdk.DeviceTracking { *; }
+-keepclasseswithmembers class com.zing.zalo.devicetrackingsdk.model.PreloadInfo {*;}
+
+#Helper
+-keepclassmembers class com.zing.zalo.zalosdk.core.helper.DeviceInfo { *;}
+-keep class com.zing.zalo.zalosdk.core.helper.** {  *;}
+
+-keep class com.zing.zalo.zalosdk.core.module.** {
+ *;
+}
+
+-keepclasseswithmembers class com.zing.zalo.zalosdk.core.http.** { *;}
+-keepclasseswithmembers class com.zing.zalo.zalosdk.core.apptracking.** {  *;}
+
+#Service Map
+-keep class com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager {
+  public *;
+}
+
+-keep class com.zing.zalo.zalosdk.core.settings.SettingsManager {
+  public *;
+}
+
+# -keep public class * extends android.content.BroadcastReceiver
+#Android"s module
+#-keep public class * extends android.app.Activity
+# -keep public class * extends android.app.Application
+# -keep public class * extends android.app.Service
+# -keep public class * extends android.content.BroadcastReceiver
+#-keep class android.content.ContentProvider { *;}
+
+
+#print mapping
+-printmapping proguard.map

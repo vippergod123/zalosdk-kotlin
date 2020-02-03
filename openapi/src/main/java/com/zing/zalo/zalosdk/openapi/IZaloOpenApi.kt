@@ -1,7 +1,7 @@
 package com.zing.zalo.zalosdk.openapi
 
-import androidx.annotation.Nullable
 import com.zing.zalo.zalosdk.openapi.model.FeedData
+import org.jetbrains.annotations.Nullable
 
 interface IZaloOpenApi {
     fun getProfile(fields: Array<String>, @Nullable callback: ZaloOpenApiCallback)
@@ -36,11 +36,14 @@ interface IZaloOpenApi {
 
     fun shareMessage(
         feedData: FeedData,
-        callback: ZaloPluginCallback
+        @Nullable callback: ZaloPluginCallback?
     )
 
     fun shareFeed(
         feedData: FeedData,
-        callback: ZaloPluginCallback
+        @Nullable callback: ZaloPluginCallback?
     )
+
+    var accessToken: String
+    var accessTokenExpiredTime: Long
 }

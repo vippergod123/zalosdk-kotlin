@@ -27,11 +27,14 @@ object ModuleManager {
         val sm = SettingsManager.getInstance()
         val smm = ServiceMapManager.getInstance()
 
+        modules.add(smm)
+        modules.add(sm)
+        modules.add(st)
         dt.sdkTracking = st
         modules.add(dt)
-        modules.add(st)
-        modules.add(sm)
-        modules.add(smm)
+
+
+
     }
 
     fun addModule(module: IModule) {

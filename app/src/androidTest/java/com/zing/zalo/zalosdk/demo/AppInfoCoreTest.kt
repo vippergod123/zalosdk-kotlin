@@ -2,9 +2,8 @@ package com.zing.zalo.zalosdk.demo
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.UiObjectNotFoundException
-import com.zing.zalo.zalosdk.core.apptracking.AppTracker
-import com.zing.zalo.zalosdk.oauth.Constant
 import com.zing.zalo.zalosdk.core.helper.AppInfo
+import com.zing.zalo.zalosdk.oauth.Constant
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -30,7 +29,10 @@ class AppInfoCoreTest : AppBase() {
     @Test
     @Throws(UiObjectNotFoundException::class, IOException::class)
     fun testAppInfoPackage() {
-        val isExist = AppInfo.isPackageExists(context, Constant.core.ZALO_PACKAGE_NAME)
+        //Todo: switch
+        val isExist = AppInfo.isPackageExists(context, "com.zing.zalo")
+//        val isExist = AppInfo.isPackageExists(context, Constant.core.ZALO_PACKAGE_NAME)
+        
         assertEquals(isExist, true)
 
         val packageName = AppInfo.getPackageName(context)

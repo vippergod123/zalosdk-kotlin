@@ -8,6 +8,7 @@ import android.os.Looper
 import android.telephony.TelephonyManager
 import android.text.TextUtils
 import android.view.WindowManager
+import androidx.annotation.Keep
 import com.zing.zalo.devicetrackingsdk.model.PreloadInfo
 import com.zing.zalo.zalosdk.core.Constant
 import com.zing.zalo.zalosdk.core.log.Log

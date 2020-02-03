@@ -18,6 +18,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.slot
 import io.mockk.verify
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.json.JSONObject
 import org.junit.After
 import org.junit.Before
@@ -32,10 +33,14 @@ import java.net.URLEncoder
 @RunWith(RobolectricTestRunner::class)
 class DeviceTrackingTest {
     private lateinit var context: Context
-    @MockK private lateinit var client: HttpClient
-    @MockK private lateinit var resp: HttpResponse
-    @MockK private lateinit var sdkTracking: SdkTracking
+    @MockK
+    private lateinit var client: HttpClient
+    @MockK
+    private lateinit var resp: HttpResponse
+    @MockK
+    private lateinit var sdkTracking: SdkTracking
     lateinit var sut: DeviceTracking
+    private val testScope = TestCoroutineScope()
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxUnitFun = true)
@@ -43,6 +48,7 @@ class DeviceTrackingTest {
         sut = DeviceTracking.getInstance()
         sut.httpClient = client
         sut.sdkTracking = sdkTracking
+        sut.scope = testScope
 
         every { sdkTracking.getSDKId() } returns "sdk-id"
         AppInfoHelper.setup()
@@ -77,7 +83,8 @@ class DeviceTrackingTest {
     @Test
     fun `GetDeviceId Not Cached`() {
         //#1. Setup mock data
-        val json = JSONObject("{ error: 0, data: { deviceId:'1234', expiredTime:${System.currentTimeMillis() + 1000} } }")
+        val json =
+            JSONObject("{ error: 0, data: { deviceId:'1234', expiredTime:${System.currentTimeMillis() + 1000} } }")
         val slot = slot<HttpUrlEncodedRequest>()
         every { client.send(capture(slot)) } returns resp
         every { resp.getJSON() } returns json
@@ -102,10 +109,11 @@ class DeviceTrackingTest {
         assertThat(body.contains("pl=android")).isTrue()
         assertThat(body.contains("appId=${AppInfoHelper.appId}")).isTrue()
         assertThat(body.contains("oauthCode=${DataHelper.authCode}")).isTrue()
-        val dIdResult = "{\"dId\":\"${AppInfoHelper.advertiserId}\",\"aId\":\"unknown\",\"mod\":\"robolectric\",\"ser\":\"unknown\"}"
-        assertThat(body.contains(URLEncoder.encode(dIdResult,"UTF-8"))).isTrue()
+        val dIdResult =
+            "{\"dId\":\"${AppInfoHelper.advertiserId}\",\"aId\":\"unknown\",\"mod\":\"robolectric\",\"ser\":\"unknown\"}"
+        assertThat(body.contains(URLEncoder.encode(dIdResult, "UTF-8"))).isTrue()
         val appNameResult = "\"an\":\"${AppInfoHelper.appName}\""
-        assertThat(body.contains(URLEncoder.encode(appNameResult,"UTF-8"))).isTrue()
+        assertThat(body.contains(URLEncoder.encode(appNameResult, "UTF-8"))).isTrue()
 
     }
 
@@ -117,7 +125,8 @@ class DeviceTrackingTest {
         data.put(DeviceTracking.KEY_DEVICE_ID_EXPIRED_TIME, System.currentTimeMillis() - 5000)
         Utils.writeToFile(context, data.toString(), DeviceTracking.DID_FILE_NAME)
 
-        val json = JSONObject("{ error: 0, data: { deviceId:'45678', expiredTime:${System.currentTimeMillis() + 1000} } }")
+        val json =
+            JSONObject("{ error: 0, data: { deviceId:'45678', expiredTime:${System.currentTimeMillis() + 1000} } }")
         val slot = slot<HttpUrlEncodedRequest>()
         every { client.send(capture(slot)) } returns resp
         every { resp.getJSON() } returns json
@@ -133,7 +142,8 @@ class DeviceTrackingTest {
 
     @Test
     fun `GetDeviceId Multiple times`() {
-        val json = JSONObject("{ error: 0, data: { deviceId:'1234', expiredTime:${System.currentTimeMillis() + 1000} } }")
+        val json =
+            JSONObject("{ error: 0, data: { deviceId:'1234', expiredTime:${System.currentTimeMillis() + 1000} } }")
         every { client.send(any()) } returns resp
         every { resp.getJSON() } returns json
 
