@@ -1,12 +1,18 @@
 apply plugin: 'com.android.library'
+
 apply plugin: 'kotlin-android'
+
 apply plugin: 'kotlin-android-extensions'
+
+apply plugin: 'com.jfrog.bintray'
+
+apply plugin: 'maven-publish'
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion as Integer
     buildToolsVersion rootProject.ext.buildToolsVersion as String
 
     testOptions.unitTests.includeAndroidResources = true
-
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion as Integer
@@ -22,8 +28,43 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
 }
+
+
+
+def nameLib = 'analytics'
+ext {
+    bintrayName =  rootProject.ext.bintrayName + '.' + nameLib
+    bintrayRepo = rootProject.ext.bintrayRepo
+    libVersion = rootProject.ext.zdklibVersion
+
+    publishedGroupId = rootProject.ext.libGroup
+    libraryName = nameLib
+    artifact = nameLib // core in 'com.zing.zalo.zalosdk:core:1.0'
+
+    libraryDescription = 'A widget to load WebView as an Overlay.'
+
+    siteUrl = rootProject.ext.siteUrl
+    gitUrl = rootProject.ext.gitUrl
+
+    libraryVersion = rootProject.ext.zdklibVersion
+
+    developerId = rootProject.ext.developerId
+    developerName = rootProject.ext.developerName
+    developerEmail = rootProject.ext.developerEmail
+
+    licenseName =  rootProject.ext.licenseName
+    licenseUrl =  rootProject.ext.licenseUrl
+    allLicenses =  rootProject.ext.allLicenses
+}
+
+bintray {
+    pkg {
+        userOrg = rootProject.ext.userOrg
+    }
+}
+
+apply from: '../bintray.gradle'
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'

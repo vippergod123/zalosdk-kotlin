@@ -64,9 +64,7 @@ object ModuleManager {
             }
         })
 
-        Class.forName("com.zing.zalo.zalosdk.oauth.ZaloSDK")
-        Class.forName("com.zing.zalo.zalosdk.openapi.ZaloOpenApi")
-        Class.forName("com.zing.zalo.zalosdk.analytics.EventTracker")
+        importModule()
     }
 
     private fun onHasDeviceId(context: Context, deviceId: String) {
@@ -89,5 +87,16 @@ object ModuleManager {
 
         }
         addModule(at)
+    }
+
+    private fun importModule() {
+        try {
+            Class.forName("com.zing.zalo.zalosdk.oauth.ZaloSDK")
+            Class.forName("com.zing.zalo.zalosdk.openapi.ZaloOpenApi")
+            Class.forName("com.zing.zalo.zalosdk.analytics.EventTracker")
+        } catch (ex: Exception) {
+            Log.w(ex)
+        }
+
     }
 }

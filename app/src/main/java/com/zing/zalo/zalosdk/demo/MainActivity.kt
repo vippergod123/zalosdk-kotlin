@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.zing.zalo.zalosdk.analytics.EventTracker
 import com.zing.zalo.zalosdk.analytics.EventTrackerListener
 import com.zing.zalo.zalosdk.analytics.model.Event
+import com.zing.zalo.devicetrackingsdk.DeviceTracking
+import com.zing.zalo.devicetrackingsdk.SdkTracking
 import com.zing.zalo.zalosdk.core.apptracking.AppTracker
 import com.zing.zalo.zalosdk.core.apptracking.AppTrackerListener
 import com.zing.zalo.zalosdk.core.helper.AppInfo
@@ -75,12 +77,12 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
         }
     }
 
-    private val eventTrackerListener = object : EventTrackerListener {
-        override fun dispatchComplete() {
-            super.dispatchComplete()
-            Log.d("got Main Activity ")
-        }
-    }
+//    private val eventTrackerListener = object : EventTrackerListener {
+//        override fun dispatchComplete() {
+//            super.dispatchComplete()
+//            Log.d("got Main Activity ")
+//        }
+//    }
 
     //#region override activity method
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -204,11 +206,11 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
 
         eventTrackingButton.setOnClickListener {
 
-            val eventTracker = EventTracker.getInstance()
-
-            eventTracker.addEvent(mockEvent())
-            eventTracker.setListener(eventTrackerListener)
-            eventTracker.dispatchEventImmediate(mockEvent())
+//            val eventTracker = EventTracker.getInstance()
+//
+//            eventTracker.addEvent(mockEvent())
+//            eventTracker.setListener(eventTrackerListener)
+//            eventTracker.dispatchEventImmediate(mockEvent())
         }
 
         openApiButton.setOnClickListener {
@@ -226,14 +228,14 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
             .setPositiveButton(android.R.string.yes, null).show()
     }
 
-    private fun mockEvent(): Event {
-        val timeStamp = System.currentTimeMillis()
-        val action = "action-$timeStamp"
-        val params = mutableMapOf<String, String>()
-
-        params["name"] = "datahelper-$timeStamp"
-        params["age"] = timeStamp.toString()
-        return Event(action, params, timeStamp)
-    }
+//    private fun mockEvent(): Event {
+//        val timeStamp = System.currentTimeMillis()
+//        val action = "action-$timeStamp"
+//        val params = mutableMapOf<String, String>()
+//
+//        params["name"] = "datahelper-$timeStamp"
+//        params["age"] = timeStamp.toString()
+//        return Event(action, params, timeStamp)
+//    }
 
 }
