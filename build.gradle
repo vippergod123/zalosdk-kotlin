@@ -40,7 +40,7 @@ ext {
     minSdkVersion = 14
 
     //bintray jfrog
-    zdklibVersion = '1.0'
+    zdklibVersion = '1.2'
     bintrayRepo = 'ZaloSDK'
     libGroup = 'com.zing.zalo.zalosdk' //group
     siteUrl = 'https://zalogit2.zing.vn/zalosdk/zalosdk-kotlin'
@@ -55,7 +55,7 @@ ext {
     licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
     allLicenses = ["Apache-2.0"]
 
-    userOrg = 'christruong'  //important
+    userOrg = 'zalo'  //important
 }
 
 task clean(type: Delete) {

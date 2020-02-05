@@ -80,7 +80,6 @@ dependencies {
 
     //Unit Test
 
-    def powerMockVersion = '1.7.0RC2'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.robolectric:robolectric:4.1'
 
