@@ -29,7 +29,7 @@ allprojects {
 
 ext {
     androidSupportV4 = "com.android.support:support-v4:28.0.0"
-    bintrayName = 'com.zing.zalo.zalosdk'
+    bintrayName = 'com.zing.zalo.zalosdk.kotlin'
     kotlinCoroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2"
     kotlinCoroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.0"
     playServiceAdsVersion = '15.0.0'
@@ -42,7 +42,7 @@ ext {
     //bintray jfrog
     zdklibVersion = '1.2'
     bintrayRepo = 'ZaloSDK'
-    libGroup = 'com.zing.zalo.zalosdk' //group
+    libGroup = 'com.zing.zalo.zalosdk.kotlin' //group
     siteUrl = 'https://zalogit2.zing.vn/zalosdk/zalosdk-kotlin'
     gitUrl = 'https://zalogit2.zing.vn/zalosdk/zalosdk-kotlin.git'
     issueUrl = 'https://zalogit2.zing.vn/zalosdk/zalosdk-kotlin/issues'
