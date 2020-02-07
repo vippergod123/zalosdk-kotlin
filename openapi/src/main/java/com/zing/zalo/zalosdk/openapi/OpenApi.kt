@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit
 
 class OpenApi(
     var context: Context,
+    var oauthCode: String?,
     var isBroadcastRegistered: Boolean,
     private var httpClient: HttpClient,
     private var accessTokenHttpClient: HttpClient,
@@ -374,9 +375,9 @@ class OpenApi(
 
     private fun makeGetAccessTokenRequest(): Int {
 
-        val oauthCode = openApiStorage.getOAuthCode() ?: ""
-        if (TextUtils.isEmpty(oauthCode)) throw OpenApiException("Auth code is invalid - Login again!")
-        accessTokenRequest.addQueryStringParameter("code", oauthCode)
+        val authCode = oauthCode?: ""
+        if (TextUtils.isEmpty(authCode)) throw OpenApiException("Auth code is invalid - Login again!")
+        accessTokenRequest.addQueryStringParameter("code", authCode)
         accessTokenRequest.addQueryStringParameter("pkg_name", AppInfo.getPackageName(context))
         accessTokenRequest.addQueryStringParameter(
             "sign_key",

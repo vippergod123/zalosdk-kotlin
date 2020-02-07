@@ -1,10 +1,6 @@
 -verbose
 
--keep class com.zing.zalo.zalosdk.openapi.ZaloOpenApi$Companion { com.zing.zalo.zalosdk.openapi.ZaloOpenApi getInstance(); }
 
--keepclassmembers class com.zing.zalo.zalosdk.openapi.ZaloOpenApi {
-    public *;
-}
 -keep class com.zing.zalo.zalosdk.openapi.model.** { *; }
 -keep interface com.zing.zalo.zalosdk.openapi.ZaloOpenApiCallback {*;}
 -keep interface com.zing.zalo.zalosdk.openapi.ZaloPluginCallback {*;}

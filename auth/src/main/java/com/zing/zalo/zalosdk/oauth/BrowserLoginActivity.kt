@@ -46,7 +46,7 @@ class BrowserLoginActivity : Activity() {
             intent.putExtra("data", extra.toString())
         }
 
-        ZaloSDK.getInstance().onActivityResult(
+        ZaloSDK.Instance.onActivityResult(
             this,
             Constant.ZALO_AUTHENTICATE_REQUEST_CODE,
             0,

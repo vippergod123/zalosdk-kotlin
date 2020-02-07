@@ -13,6 +13,7 @@ import com.zing.zalo.zalosdk.core.http.BaseHttpRequest
 import com.zing.zalo.zalosdk.core.http.HttpClient
 import com.zing.zalo.zalosdk.core.http.HttpUrlEncodedRequest
 import com.zing.zalo.zalosdk.core.http.IHttpRequest
+import com.zing.zalo.zalosdk.core.log.Log
 import com.zing.zalo.zalosdk.openapi.helper.AppInfoHelper
 import com.zing.zalo.zalosdk.openapi.helper.DataHelper
 import com.zing.zalo.zalosdk.openapi.helper.DeviceHelper
@@ -46,13 +47,13 @@ class ZaloOpenApiTest {
     private lateinit var httpClient: HttpClient
     @MockK
     private lateinit var accessTokenHttpClient: HttpClient
-    @MockK
-    private lateinit var openApi: IZaloOpenApi
 
     private lateinit var mock: ZaloOpenApi
 
     @ExperimentalCoroutinesApi
     private val testScope = TestCoroutineScope()
+
+    private var isBroadcastRegistered = false
 
     @Before
     fun setup() {
@@ -62,12 +63,19 @@ class ZaloOpenApiTest {
         packageMgr = shadowOf(context.packageManager)
         mockData(System.currentTimeMillis() - 10000)
 
-        mock = spyk(recordPrivateCalls = true)
-        mock.openApi = openApi
-        mock.accessTokenHttpClient = accessTokenHttpClient
-        mock.httpClient = httpClient
-        mock.scope = testScope
-        mock.start(context)
+        mock = ZaloOpenApi(
+            context,
+            DataHelper.authCode
+        )
+        mock.openApi = OpenApi(
+            context,
+            DataHelper.authCode,
+            isBroadcastRegistered,
+            httpClient,
+            accessTokenHttpClient,
+            testScope
+        )
+
     }
 
     @Test
@@ -100,8 +108,8 @@ class ZaloOpenApiTest {
         val accessTokenSlot = slot<HttpUrlEncodedRequest>()
         val openApiSlot = slot<IHttpRequest>()
 
-        mock.openApi.accessToken = DataHelper.accessToken
-        mock.openApi.accessTokenExpiredTime =
+        mock.openApi?.accessToken = DataHelper.accessToken
+        mock.openApi?.accessTokenExpiredTime =
             System.currentTimeMillis() + System.currentTimeMillis() + Utils.convertTimeToMilliSeconds(
                 1,
                 TimeUnit.HOURS
@@ -125,7 +133,7 @@ class ZaloOpenApiTest {
     }
 
     @Test
-    fun `get Profile fail when auth code invalid `() {
+    fun `get Profile fail when auth code invalid `() = runBlockingTest {
         //#1. Mock data
         val accessTokenSlot = slot<HttpUrlEncodedRequest>()
         val openApiSlot = slot<IHttpRequest>()
@@ -137,8 +145,18 @@ class ZaloOpenApiTest {
         } returns JSONObject(DataHelper.profile)
         val fields = arrayOf("id", "birthday", "gender", "picture", "name")
 
-        openApiStorage.setAuthCode("") //Set authCode invalid
+        mock.openApi =
+            OpenApi( //set authCode invalid
+                context,
+                "",
+                isBroadcastRegistered,
+                httpClient,
+                accessTokenHttpClient,
+                testScope
+            )
         //#2. Start
+        Log.d(Thread.currentThread().name)
+
         mock.getProfile(fields, object : ZaloOpenApiCallback {
             override fun onResult(data: JSONObject?) {
                 //#3. Verify
@@ -173,7 +191,15 @@ class ZaloOpenApiTest {
         every { ctx.packageManager } returns context.packageManager
 
         //2. run
-        mock.start(ctx)
+        mock.openApi =
+            OpenApi( //set authCode invalid
+                ctx,
+                DataHelper.authCode,
+                isBroadcastRegistered,
+                httpClient,
+                accessTokenHttpClient,
+                testScope
+            )
         mock.shareMessage(mockFeedData(), null)
 
         //3.a verify
@@ -187,7 +213,7 @@ class ZaloOpenApiTest {
     fun `share post via App`() {
         //1. mock
         mockZaloInstalled()
-        mock.isBroadcastRegistered = false
+        isBroadcastRegistered = false
         val broadcastReceiver = slot<BroadcastReceiver>()
         val receiverFilter = slot<IntentFilter>()
         val intent = slot<Intent>()
@@ -208,7 +234,15 @@ class ZaloOpenApiTest {
         every { ctx.packageManager } returns context.packageManager
 
         //2. run
-        mock.start(ctx)
+        mock.openApi =
+            OpenApi( //set authCode invalid
+                ctx,
+                DataHelper.authCode,
+                isBroadcastRegistered,
+                httpClient,
+                accessTokenHttpClient,
+                testScope
+            )
         mock.shareFeed(mockFeedData(), null)
 
         //3.a verify

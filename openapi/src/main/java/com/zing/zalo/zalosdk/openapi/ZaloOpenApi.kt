@@ -2,8 +2,6 @@ package com.zing.zalo.zalosdk.openapi
 
 import android.content.Context
 import com.zing.zalo.zalosdk.core.http.HttpClient
-import com.zing.zalo.zalosdk.core.module.BaseModule
-import com.zing.zalo.zalosdk.core.module.ModuleManager
 import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
 import com.zing.zalo.zalosdk.openapi.model.FeedData
 import kotlinx.coroutines.CoroutineScope
@@ -11,23 +9,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import org.jetbrains.annotations.Nullable
 
-class ZaloOpenApi : BaseModule() {
+class ZaloOpenApi(context: Context, oauthCode: String?){
 
     companion object {
-        private val instance = ZaloOpenApi()
 
-
-        fun getInstance(): ZaloOpenApi {
-            return instance
-        }
-
-        init {
-            ModuleManager.addModule(instance)
-        }
+        internal var isBroadcastRegistered = false
     }
-
-    internal lateinit var openApi: IZaloOpenApi
-    internal var isBroadcastRegistered = false
 
     private var job = Job()
     var scope = CoroutineScope(Dispatchers.IO + job)
@@ -36,16 +23,15 @@ class ZaloOpenApi : BaseModule() {
     var httpClient =
         HttpClient(ServiceMapManager.getInstance().urlFor(ServiceMapManager.KEY_URL_GRAPH))
 
-    override fun onStart(context: Context) {
-        super.onStart(context)
-        openApi = OpenApi(
+    internal var openApi: IZaloOpenApi? =
+        OpenApi(
             context,
+            oauthCode,
             isBroadcastRegistered,
             httpClient,
             accessTokenHttpClient,
             scope
         )
-    }
 
     /**
      * Get Zalo user's profile
@@ -54,7 +40,7 @@ class ZaloOpenApi : BaseModule() {
      * @param callback
      */
     fun getProfile(fields: Array<String>, @Nullable callback: ZaloOpenApiCallback) {
-        openApi.getProfile(fields, callback)
+        openApi?.getProfile(fields, callback)
     }
 
     /**
@@ -71,7 +57,7 @@ class ZaloOpenApi : BaseModule() {
         count: Int,
         @Nullable callback: ZaloOpenApiCallback
     ) {
-        openApi.getFriendListUsedApp(fields, position, count, callback)
+        openApi?.getFriendListUsedApp(fields, position, count, callback)
     }
 
 
@@ -90,7 +76,7 @@ class ZaloOpenApi : BaseModule() {
         count: Int,
         @Nullable callback: ZaloOpenApiCallback
     ) {
-        openApi.getFriendListInvitable(fields, position, count, callback)
+        openApi?.getFriendListInvitable(fields, position, count, callback)
     }
 
 
@@ -105,7 +91,7 @@ class ZaloOpenApi : BaseModule() {
         message: String,
         @Nullable callback: ZaloOpenApiCallback
     ) {
-        openApi.inviteFriendUseApp(friendId, message, callback)
+        openApi?.inviteFriendUseApp(friendId, message, callback)
     }
 
 
@@ -117,7 +103,7 @@ class ZaloOpenApi : BaseModule() {
      * @param callback ZaloOpenApiCallback
      */
     fun postToWall(link: String, msg: String, @Nullable callback: ZaloOpenApiCallback) {
-        openApi.postToWall(link, msg, callback)
+        openApi?.postToWall(link, msg, callback)
     }
 
     /**
@@ -135,7 +121,7 @@ class ZaloOpenApi : BaseModule() {
         link: String,
         @Nullable callback: ZaloOpenApiCallback
     ) {
-        openApi.sendMsgToFriend(friendId, msg, link, callback)
+        openApi?.sendMsgToFriend(friendId, msg, link, callback)
     }
 
     /**
@@ -148,7 +134,7 @@ class ZaloOpenApi : BaseModule() {
         feedData: FeedData,
         callback: ZaloPluginCallback?
     ) {
-        openApi.shareMessage(feedData, callback)
+        openApi?.shareMessage(feedData, callback)
     }
 
     /**
@@ -161,10 +147,8 @@ class ZaloOpenApi : BaseModule() {
         feedData: FeedData,
         callback: ZaloPluginCallback?
     ) {
-        openApi.shareFeed(feedData, callback)
+        openApi?.shareFeed(feedData, callback)
     }
-    //#region private supportive method
 
-    //#endregion
+
 }
-

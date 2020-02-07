@@ -16,14 +16,10 @@ import com.zing.zalo.zalosdk.oauth.helper.AuthStorage
 class ZaloSDK : BaseModule() {
     @Keep
     companion object {
-        private val instance = ZaloSDK()
-
-        fun getInstance(): ZaloSDK {
-            return instance
-        }
+        val Instance = ZaloSDK()
 
         init {
-            ModuleManager.addModule(instance)
+            ModuleManager.addModule(Instance)
         }
     }
 
@@ -49,12 +45,18 @@ class ZaloSDK : BaseModule() {
     fun authenticate(
         activity: Activity,
         loginVia: LoginVia,
-        listener: IAuthenticateCompleteListener
+        listener: IAuthenticateCompleteListener?
     ) {
         if (checkInitialize())
             mAuthenticator?.authenticate(activity, loginVia, listener)
     }
 
+    /**
+     * Get authentication code
+     */
+    fun getOauthCode() :String?  {
+        return mStorage?.getOAuthCode()
+    }
 
     /**
      * Logout current Zalo's account
@@ -64,12 +66,12 @@ class ZaloSDK : BaseModule() {
             mAuthenticator?.unAuthenticate()
     }
 
-    fun registerZalo(activity: Activity, listener: IAuthenticateCompleteListener) {
+    fun registerZalo(activity: Activity, listener: IAuthenticateCompleteListener?) {
         if (checkInitialize())
             mAuthenticator?.registerZalo(activity, listener)
     }
 
-    fun getZaloLoginStatus(callback: GetZaloLoginStatus) {
+    fun getZaloLoginStatus(callback: GetZaloLoginStatus?) {
         if (checkInitialize())
             mAuthenticator?.getZaloLoginStatus(callback)
     }
@@ -79,7 +81,7 @@ class ZaloSDK : BaseModule() {
      * @param callback Callback will be called after verify with server. If passed null, no server verification will be made.
      * @return True if oauth code cached, otherwise false
      */
-    fun isAuthenticate(callback: ValidateOAuthCodeCallback): Boolean {
+    fun isAuthenticate(callback: ValidateOAuthCodeCallback?): Boolean {
         if (checkInitialize()) {
             return mAuthenticator?.isAuthenticate(mStorage?.getOAuthCode().toString(), callback)!!
         }
@@ -102,7 +104,7 @@ class ZaloSDK : BaseModule() {
     }
 
     private fun checkInitialize(): Boolean {
-        if (getInstance().hasContext && mAuthenticator != null)
+        if (hasContext && mAuthenticator != null)
             return true
 
         return false
@@ -112,13 +114,14 @@ class ZaloSDK : BaseModule() {
         val res = context.resources
         try {
             if (res.getString(R.string.zalosdk_app_id).equals("missing-app-id")) {
-                Log.e("Missing zalosdk_app_id in strings.xml!!");
+                Log.e("Missing zalosdk_app_id in strings.xml!!")
             }
 
             if (res.getString(R.string.zalosdk_login_protocol_schema).equals("missing-protocol-schema")) {
-                Log.e("Missing zalosdk_login_protocol_schema in strings.xml, please define it as \"zalo-[app_id]\" !!");
+                Log.e("Missing zalosdk_login_protocol_schema in strings.xml, please define it as \"zalo-[app_id]\" !!")
             }
         } catch (ignored: Exception) {
+            Log.e("ZaloSDK", ignored)
         }
     }
 }

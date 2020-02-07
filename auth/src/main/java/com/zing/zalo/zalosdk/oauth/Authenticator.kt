@@ -73,7 +73,7 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
         }
 
         val appID = AppInfo.getAppId(mContext)
-        val appVersion = ZaloSDK.getInstance().getVersion()
+        val appVersion = ZaloSDK.Instance.getVersion()
         val isOnline = Utils.isOnline(mContext)
 
         val task = ValidateOAuthCodeTask(httpClient, code, appID, appVersion, isOnline, callback)
