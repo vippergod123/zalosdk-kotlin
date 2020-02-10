@@ -9,12 +9,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiObjectNotFoundException
 import androidx.test.uiautomator.UiSelector
-import com.zing.zalo.zalosdk.oauth.helper.AuthUtils
-import com.zing.zalo.zalosdk.oauth.WebLoginActivity
-import com.zing.zalo.zalosdk.core.SharedPreferenceConstant
-import com.zing.zalo.zalosdk.core.helper.AppInfo
-import com.zing.zalo.zalosdk.core.helper.Storage
-import com.zing.zalo.zalosdk.core.settings.SettingsManager
+import com.zing.zalo.zalosdk.kotlin.oauth.helper.AuthUtils
+import com.zing.zalo.zalosdk.kotlin.oauth.WebLoginActivity
+import com.zing.zalo.zalosdk.kotlin.core.SharedPreferenceConstant
+import com.zing.zalo.zalosdk.kotlin.core.helper.AppInfo
+import com.zing.zalo.zalosdk.kotlin.core.helper.Storage
+import com.zing.zalo.zalosdk.kotlin.core.settings.SettingsManager
 import io.mockk.MockKAnnotations
 import org.hamcrest.core.IsNull.notNullValue
 import org.junit.Assert.*
@@ -83,7 +83,7 @@ class AuthenticateTest : AppBase() {
         //#2
 
         val inst = InstrumentationRegistry.getInstrumentation()
-        val monitor = inst.addMonitor("com.zing.zalo.zalosdk.oauth.WebLoginActivity", null, false)
+        val monitor = inst.addMonitor("com.zing.zalo.zalosdk.kotlin.oauth.WebLoginActivity", null, false)
 
         clickButtonWithText("Login Web")
 
@@ -155,7 +155,7 @@ class AuthenticateTest : AppBase() {
     @Throws(UiObjectNotFoundException::class, IOException::class, InterruptedException::class)
     fun registerZaloViaWebSuccess() {
         val inst = InstrumentationRegistry.getInstrumentation()
-        val monitor = inst.addMonitor("com.zing.zalo.zalosdk.oauth.WebLoginActivity", null, false)
+        val monitor = inst.addMonitor("com.zing.zalo.zalosdk.kotlin.oauth.WebLoginActivity", null, false)
 
         clickButtonWithText("REGISTER")
 

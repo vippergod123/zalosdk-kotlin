@@ -5,11 +5,11 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.zing.zalo.zalosdk.oauth.ZaloSDK
-import com.zing.zalo.zalosdk.openapi.ZaloOpenApi
-import com.zing.zalo.zalosdk.openapi.ZaloOpenApiCallback
-import com.zing.zalo.zalosdk.openapi.ZaloPluginCallback
-import com.zing.zalo.zalosdk.openapi.model.FeedData
+import com.zing.zalo.zalosdk.kotlin.oauth.ZaloSDK
+import com.zing.zalo.zalosdk.kotlin.openapi.ZaloOpenApi
+import com.zing.zalo.zalosdk.kotlin.openapi.ZaloOpenApiCallback
+import com.zing.zalo.zalosdk.kotlin.openapi.ZaloPluginCallback
+import com.zing.zalo.zalosdk.kotlin.openapi.model.FeedData
 import org.json.JSONObject
 
 class OpenApiActivity : AppCompatActivity(), ZaloOpenApiCallback, ZaloPluginCallback {

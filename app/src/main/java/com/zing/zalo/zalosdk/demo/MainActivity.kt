@@ -5,27 +5,21 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.zing.zalo.zalosdk.analytics.EventTracker
-import com.zing.zalo.zalosdk.analytics.EventTrackerListener
-import com.zing.zalo.zalosdk.analytics.model.Event
-import com.zing.zalo.devicetrackingsdk.DeviceTracking
-import com.zing.zalo.devicetrackingsdk.SdkTracking
-import com.zing.zalo.zalosdk.core.apptracking.AppTracker
-import com.zing.zalo.zalosdk.core.apptracking.AppTrackerListener
-import com.zing.zalo.zalosdk.core.helper.AppInfo
-import com.zing.zalo.zalosdk.core.log.Log
-import com.zing.zalo.zalosdk.oauth.Constant
-import com.zing.zalo.zalosdk.oauth.IAuthenticateCompleteListener
-import com.zing.zalo.zalosdk.oauth.LoginVia
-import com.zing.zalo.zalosdk.oauth.ZaloSDK
-import com.zing.zalo.zalosdk.oauth.callback.GetZaloLoginStatus
-import com.zing.zalo.zalosdk.oauth.callback.ValidateOAuthCodeCallback
-import com.zing.zalo.zalosdk.oauth.helper.AuthStorage
+import com.zing.zalo.zalosdk.kotlin.core.apptracking.AppTracker
+import com.zing.zalo.zalosdk.kotlin.core.apptracking.AppTrackerListener
+import com.zing.zalo.zalosdk.kotlin.core.helper.AppInfo
+import com.zing.zalo.zalosdk.kotlin.core.log.Log
+import com.zing.zalo.zalosdk.kotlin.oauth.Constant
+import com.zing.zalo.zalosdk.kotlin.oauth.IAuthenticateCompleteListener
+import com.zing.zalo.zalosdk.kotlin.oauth.LoginVia
+import com.zing.zalo.zalosdk.kotlin.oauth.ZaloSDK
+import com.zing.zalo.zalosdk.kotlin.oauth.callback.GetZaloLoginStatus
+import com.zing.zalo.zalosdk.kotlin.oauth.callback.ValidateOAuthCodeCallback
+import com.zing.zalo.zalosdk.kotlin.oauth.helper.AuthStorage
 
 
 class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLoginStatus {

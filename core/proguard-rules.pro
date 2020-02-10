@@ -8,29 +8,29 @@
 
 
 #ZDK"s module
--keep class com.zing.zalo.zalosdk.core.log.** { *;}
+-keep class com.zing.zalo.zalosdk.kotlin.core.log.** { *;}
 
 #Device Tracking
--keepclasseswithmembers class com.zing.zalo.devicetrackingsdk.DeviceTracking { *; }
--keepclasseswithmembers class com.zing.zalo.devicetrackingsdk.model.PreloadInfo {*;}
+-keepclasseswithmembers class com.zing.zalo.zalosdk.kotlin.core.devicetrackingsdk.DeviceTracking { *; }
+-keepclasseswithmembers class com.zing.zalo.zalosdk.kotlin.core.devicetrackingsdk.model.PreloadInfo {*;}
 
 #Helper
--keepclassmembers class com.zing.zalo.zalosdk.core.helper.DeviceInfo { *;}
--keep class com.zing.zalo.zalosdk.core.helper.** {  *;}
+-keepclassmembers class com.zing.zalo.zalosdk.kotlin.core.helper.DeviceInfo { *;}
+-keep class com.zing.zalo.zalosdk.kotlin.core.helper.** {  *;}
 
--keep class com.zing.zalo.zalosdk.core.module.** {
+-keep class com.zing.zalo.zalosdk.kotlin.core.module.** {
  *;
 }
 
--keepclasseswithmembers class com.zing.zalo.zalosdk.core.http.** { *;}
--keepclasseswithmembers class com.zing.zalo.zalosdk.core.apptracking.** {  *;}
+-keepclasseswithmembers class com.zing.zalo.zalosdk.kotlin.core.http.** { *;}
+-keepclasseswithmembers class com.zing.zalo.zalosdk.kotlin.core.apptracking.** {  *;}
 
 #Service Map
--keep class com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager {
+-keep class com.zing.zalo.zalosdk.kotlin.core.servicemap.ServiceMapManager {
   public *;
 }
 
--keep class com.zing.zalo.zalosdk.core.settings.SettingsManager {
+-keep class com.zing.zalo.zalosdk.kotlin.core.settings.SettingsManager {
   public *;
 }
 

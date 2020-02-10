@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.zing.zalo.zalosdk.oauth">
+    package="com.zing.zalo.zalosdk.kotlin.oauth">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.zing.zalo.permission.ACCESS_THIRD_PARTY_APP_AUTHORIZATION" />
 
     <application>
         <activity
-            android:name="com.zing.zalo.zalosdk.oauth.WebLoginActivity"
+            android:name="com.zing.zalo.zalosdk.kotlin.oauth.WebLoginActivity"
             android:theme="@style/FixThemeForLoginWebview"
             android:windowSoftInputMode="stateHidden|stateAlwaysHidden"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="sensor" />
 
 
-        <activity android:name="com.zing.zalo.zalosdk.oauth.BrowserLoginActivity">
+        <activity android:name="com.zing.zalo.zalosdk.kotlin.oauth.BrowserLoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

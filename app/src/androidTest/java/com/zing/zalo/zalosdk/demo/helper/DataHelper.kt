@@ -1,6 +1,6 @@
 package com.zing.zalo.zalosdk.demo.helper
 
-import com.zing.zalo.zalosdk.analytics.model.Event
+import com.zing.zalo.zalosdk.kotlin.analytics.model.Event
 
 object DataHelper {
     fun mockEvent(): Event {

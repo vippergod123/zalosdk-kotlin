@@ -2,8 +2,7 @@ package com.zing.zalo.zalosdk.demo
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.UiObjectNotFoundException
-import com.zing.zalo.zalosdk.core.helper.AppInfo
-import com.zing.zalo.zalosdk.oauth.Constant
+import com.zing.zalo.zalosdk.kotlin.core.helper.AppInfo
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test

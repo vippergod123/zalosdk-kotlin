@@ -1,9 +1,15 @@
 package com.zing.zalo.zalosdk.openapi
 
 import android.content.Context
-import com.zing.zalo.zalosdk.core.http.HttpClient
-import com.zing.zalo.zalosdk.core.servicemap.ServiceMapManager
-import com.zing.zalo.zalosdk.openapi.model.FeedData
+import com.zing.zalo.zalosdk.kotlin.core.http.HttpClient
+import com.zing.zalo.zalosdk.kotlin.core.module.BaseModule
+import com.zing.zalo.zalosdk.kotlin.core.module.ModuleManager
+import com.zing.zalo.zalosdk.kotlin.core.servicemap.ServiceMapManager
+import com.zing.zalo.zalosdk.kotlin.openapi.IZaloOpenApi
+import com.zing.zalo.zalosdk.kotlin.openapi.OpenApi
+import com.zing.zalo.zalosdk.kotlin.openapi.ZaloOpenApiCallback
+import com.zing.zalo.zalosdk.kotlin.openapi.ZaloPluginCallback
+import com.zing.zalo.zalosdk.kotlin.openapi.model.FeedData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

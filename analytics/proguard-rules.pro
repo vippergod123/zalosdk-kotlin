@@ -1,15 +1,15 @@
 -verbose
--repackageclasses com.zing.zalo.zalosdk.core.analytics
+-repackageclasses com.zing.zalo.zalosdk.kotlin.core.analytics
 
--keepclasseswithmembers class com.zing.zalo.zalosdk.analytics.EventTracker { *; }
--keepclasseswithmembers class com.zing.zalo.zalosdk.analytics.EventTrackerListener { *; }
--keepclasseswithmembers class com.zing.zalo.zalosdk.analytics.IEventTracker { *; }
--keepclasseswithmembers class com.zing.zalo.zalosdk.analytics.model.Event {*;}
--keepclasseswithmembers class com.zing.zalo.zalosdk.analytics.EventTracker$Companion { com.zing.zalo.zalosdk.analytics.EventTracker getInstance(); }
-#-keepclasseswithmembers interface com.zing.zalo.zalosdk.analytics.IEventTracker {*;}
+-keepclasseswithmembers class com.zing.zalo.zalosdk.kotlin.analytics.EventTracker { *; }
+-keepclasseswithmembers class com.zing.zalo.zalosdk.kotlin.analytics.EventTrackerListener { *; }
+-keepclasseswithmembers class com.zing.zalo.zalosdk.kotlin.analytics.IEventTracker { *; }
+-keepclasseswithmembers class com.zing.zalo.zalosdk.kotlin.analytics.model.Event {*;}
+-keepclasseswithmembers class com.zing.zalo.zalosdk.kotlin.analytics.EventTracker$Companion { com.zing.zalo.zalosdk.kotlin.analytics.EventTracker getInstance(); }
+#-keepclasseswithmembers interface com.zing.zalo.zalosdk.kotlin.analytics.IEventTracker {*;}
 #
-#-keep public interface com.zing.zalo.devicetrackingsdk.ZingAnalyticsManager$CheckPreloadListener {*;}
-#-keep public interface com.zing.zalo.devicetrackingsdk.abstracts.* {*;}
+#-keep public interface com.zing.zalo.zalosdk.kotlin.core.devicetrackingsdk.ZingAnalyticsManager$CheckPreloadListener {*;}
+#-keep public interface com.zing.zalo.zalosdk.kotlin.core.devicetrackingsdk.abstracts.* {*;}
 
 #
 #-keep public class * extends android.app.Activity
@@ -48,8 +48,8 @@
 #
 
 
-#-keep public com.zing.zalo.zalosdk.analytics.model.Event {*;}
-#-keep class com.zing.zalo.zalosdk.analytics.EventTracker
+#-keep public com.zing.zalo.zalosdk.kotlin.analytics.model.Event {*;}
+#-keep class com.zing.zalo.zalosdk.kotlin.analytics.EventTracker
 #
 #-keep public class * extends android.content.Context
 #-keep public class * extends android.content.ContentValues

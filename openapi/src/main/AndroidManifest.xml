@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.zing.zalo.zalosdk.openapi">
+    package="com.zing.zalo.zalosdk.kotlin.openapi">
 
     <application android:supportsRtl="true">
 

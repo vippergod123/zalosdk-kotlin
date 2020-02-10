@@ -1,4 +1,4 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.zing.zalo.zalosdk.analytics">
+    package="com.zing.zalo.zalosdk.kotlin.analytics">
 
 </manifest>
