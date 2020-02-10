@@ -38,19 +38,18 @@ class OpenApiActivity : AppCompatActivity(), ZaloOpenApiCallback, ZaloPluginCall
 
     private lateinit var callBackTextView: TextView
 
+    private lateinit var zaloSDKClone:ZaloSDK
 
     private lateinit var zaloOpenApi: ZaloOpenApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_open_api)
         bindUI()
+        configureLogic()
         configureUI()
         bindViewsListener()
 
-        zaloOpenApi = ZaloOpenApi(
-            this,
-            ZaloSDK.Instance.getOauthCode()
-        )
+
     }
 
     //#region private supportive method
@@ -71,11 +70,19 @@ class OpenApiActivity : AppCompatActivity(), ZaloOpenApiCallback, ZaloPluginCall
 
     }
 
+    private fun configureLogic() {
+        zaloSDKClone = ZaloSDK(this)
+        zaloOpenApi = ZaloOpenApi(
+            this,
+            zaloSDKClone.getOauthCode()
+        )
+    }
+
     private fun bindViewsListener() {
         getProfileButton.setOnClickListener {
             val fields = arrayOf("id", "birthday", "gender", "picture", "name")
 //            ZaloOpenApi.getInstance().getProfile(fields, this)
-            zaloOpenApi.getProfile(fields,this)
+            zaloOpenApi.getProfile(fields, this)
         }
         getFriendListUsedAppButton.setOnClickListener {
             val fields = arrayOf("id", "name", "gender", "picture")

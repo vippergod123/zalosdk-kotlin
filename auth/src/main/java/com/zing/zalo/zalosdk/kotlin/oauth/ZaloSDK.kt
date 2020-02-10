@@ -8,7 +8,7 @@ import com.zing.zalo.zalosdk.kotlin.oauth.callback.GetZaloLoginStatus
 import com.zing.zalo.zalosdk.kotlin.oauth.callback.ValidateOAuthCodeCallback
 import com.zing.zalo.zalosdk.kotlin.oauth.helper.AuthStorage
 
-class ZaloSDKClone(context: Context) {
+class ZaloSDK(context: Context) {
 
     private var mStorage = AuthStorage(context)
     private var mAuthenticator = Authenticator(context, mStorage)

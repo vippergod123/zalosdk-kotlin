@@ -9,8 +9,11 @@ import org.json.JSONObject
 
 class BrowserLoginActivity : Activity() {
 
+    private lateinit var zaloSDK: ZaloSDK
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        zaloSDK = ZaloSDK(this)
         if (handleBrowserCallback()) {
             finish()
         }
@@ -46,7 +49,7 @@ class BrowserLoginActivity : Activity() {
             intent.putExtra("data", extra.toString())
         }
 
-        ZaloSDK.Instance.onActivityResult(
+        zaloSDK.onActivityResult(
             this,
             Constant.ZALO_AUTHENTICATE_REQUEST_CODE,
             0,

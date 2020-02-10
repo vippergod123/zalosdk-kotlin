@@ -28,20 +28,24 @@ class WebLoginActivity : FragmentActivity(),
     private lateinit var titleView: TextView
     private lateinit var backButton: ImageView
 
+    private lateinit var zaloSDK: ZaloSDK
+
     private var registerOnly: Boolean = false
     private var frameLayoutId: Int = 0
+
 
     companion object {
         fun newIntent(context: Context, registerOnly: Boolean): Intent {
             val intent = Intent(context, WebLoginActivity::class.java)
             intent.putExtra("registerOnly", registerOnly)
+
             return intent
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        ZaloSDK.Instance.onActivityResult(this, requestCode, resultCode, data)
+        zaloSDK.onActivityResult(this, requestCode, resultCode, data)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,13 +53,10 @@ class WebLoginActivity : FragmentActivity(),
         changeStatusBarColor()
         registerOnly = intent.getBooleanExtra("registerOnly", false)
         //show web login view
-        setContentView(R.layout.zalosdk_activity_zalo_web_login)
-        frameLayoutId = R.id.zalosdk_weblogin_container
-        frameLayout = findViewById(frameLayoutId)
+        initLateVar()
+        configureUI()
+        bindViewListener()
 
-        titleView = findViewById(R.id.zalosdk_txt_title)
-        backButton = findViewById(R.id.zalosdk_back_control)
-        backButton.setOnClickListener(this)
 
         if (savedInstanceState == null) {
             if (registerOnly) {
@@ -117,6 +118,23 @@ class WebLoginActivity : FragmentActivity(),
         if (backButton.visibility == View.VISIBLE) {
             super.onBackPressed()
         }
+    }
+
+    private fun configureUI() {
+        setContentView(R.layout.zalosdk_activity_zalo_web_login)
+        frameLayoutId = R.id.zalosdk_weblogin_container
+        frameLayout = findViewById(frameLayoutId)
+
+        titleView = findViewById(R.id.zalosdk_txt_title)
+        backButton = findViewById(R.id.zalosdk_back_control)
+    }
+
+    private fun initLateVar() {
+        zaloSDK = ZaloSDK(this)
+    }
+
+    private fun bindViewListener() {
+        backButton.setOnClickListener(this)
     }
 
     private fun changeStatusBarColor() {

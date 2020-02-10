@@ -11,7 +11,7 @@
 #    public *;
 # }
 
--keepclassmembers class com.zing.zalo.zalosdk.kotlin.oauth.ZaloSDK { *;}
+#-keepclassmembers class com.zing.zalo.zalosdk.kotlin.oauth.ZaloSDK { *;}
 -keep enum  com.zing.zalo.zalosdk.kotlin.oauth.LoginVia { *;}
 -keep class com.zing.zalo.zalosdk.kotlin.oauth.callback.** { *;}
 

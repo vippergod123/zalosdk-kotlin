@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.text.TextUtils
 import android.util.Base64
+import com.zing.zalo.zalosdk.kotlin.core.Constant
 import com.zing.zalo.zalosdk.kotlin.core.helper.Utils.isExternalStorageReadable
 import com.zing.zalo.zalosdk.kotlin.core.log.Log
 import java.io.File
@@ -113,6 +114,10 @@ object AppInfo {
 
     fun getAppName(context: Context): String {
         return getPropertyAsT(context, "appName") ?: ""
+    }
+
+    fun getSDKVersion(): String {
+        return Constant.VERSION
     }
 
     fun getVersionName(context: Context): String {

@@ -22,7 +22,7 @@ import java.io.UnsupportedEncodingException
 import java.lang.ref.WeakReference
 import java.net.URLEncoder
 
-class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
+class Authenticator(val context: Context, private val mStorage: AuthStorage) :
     IAuthenticator {
     private var wListener: WeakReference<IAuthenticateCompleteListener> =
         WeakReference<IAuthenticateCompleteListener>(null)
@@ -72,9 +72,9 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
             return false
         }
 
-        val appID = AppInfo.getAppId(mContext)
-        val appVersion = ZaloSDK.Instance.getVersion()
-        val isOnline = Utils.isOnline(mContext)
+        val appID = AppInfo.getAppId(context)
+        val appVersion = AppInfo.getSDKVersion()
+        val isOnline = Utils.isOnline(context)
 
         val task = ValidateOAuthCodeTask(httpClient, code, appID, appVersion, isOnline, callback)
         task.execute()
@@ -82,7 +82,7 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
     }
 
     private fun sendOAuthRequest(activity: Activity, loginVia: LoginVia) {
-        val isZaloInstalled = AppInfo.isPackageExists(mContext, Constant.core.ZALO_PACKAGE_NAME)
+        val isZaloInstalled = AppInfo.isPackageExists(context, Constant.core.ZALO_PACKAGE_NAME)
         val settingsManager = SettingsManager.getInstance()
 
         when (loginVia) {
@@ -92,7 +92,7 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
                 } else {
                     wListener.get()?.onAuthenticateError(
                         ZaloOAuthResultCode.RESULTCODE_ZALO_APPLICATION_NOT_INSTALLED,
-                        mContext.getString(R.string.zalo_app_not_installed)
+                        context.getString(R.string.zalo_app_not_installed)
                     )
                 }
             }
@@ -146,14 +146,14 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
     }
 
     fun loginViaWeb(activity: Activity) {
-        if (!Utils.isOnline(mContext)) {
+        if (!Utils.isOnline(context)) {
             wListener.get()?.onAuthenticateError(
                 ZaloOAuthResultCode.RESULTCODE_ZALO_WEBVIEW_NO_NETWORK,
-                mContext.getString(R.string.no_network)
+                context.getString(R.string.no_network)
             )
         }
 
-        if (AuthUtils.canUseBrowserLogin(mContext)) {
+        if (AuthUtils.canUseBrowserLogin(context)) {
             loginViaBrowser(activity)
         } else {
             loginViaWebView(activity)
@@ -215,7 +215,7 @@ class Authenticator(val mContext: Context, private val mStorage: AuthStorage) :
         if (callback == null) return
         ZTaskExecutor.queueRunnable(Runnable {
             try {
-                val status = ZaloService().getUserLoggedStatus(mContext)
+                val status = ZaloService().getUserLoggedStatus(context)
                 callback.onGetZaloLoginStatusCompleted(status)
             } catch (e: InterruptedException) {
                 Log.w("getZaloLoginStatus", e)

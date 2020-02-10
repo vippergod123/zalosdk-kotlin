@@ -13,10 +13,7 @@ import com.zing.zalo.zalosdk.kotlin.core.apptracking.AppTracker
 import com.zing.zalo.zalosdk.kotlin.core.apptracking.AppTrackerListener
 import com.zing.zalo.zalosdk.kotlin.core.helper.AppInfo
 import com.zing.zalo.zalosdk.kotlin.core.log.Log
-import com.zing.zalo.zalosdk.kotlin.oauth.Constant
-import com.zing.zalo.zalosdk.kotlin.oauth.IAuthenticateCompleteListener
-import com.zing.zalo.zalosdk.kotlin.oauth.LoginVia
-import com.zing.zalo.zalosdk.kotlin.oauth.ZaloSDK
+import com.zing.zalo.zalosdk.kotlin.oauth.*
 import com.zing.zalo.zalosdk.kotlin.oauth.callback.GetZaloLoginStatus
 import com.zing.zalo.zalosdk.kotlin.oauth.callback.ValidateOAuthCodeCallback
 import com.zing.zalo.zalosdk.kotlin.oauth.helper.AuthStorage
@@ -38,6 +35,8 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
     private lateinit var userIDTextView: TextView
 
     private lateinit var mStorage: AuthStorage
+    
+    private lateinit var zaloSDK:ZaloSDK
 
     private val appTrackerListener: AppTrackerListener = object : AppTrackerListener {
         override fun onAppTrackerCompleted(
@@ -84,6 +83,7 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
         setContentView(R.layout.activity_main)
         Log.setLogLevel()
         bindUI()
+        configureLogic()
         configureUI()
         bindViewsListener()
     }
@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        ZaloSDK.Instance.onActivityResult(this, requestCode, resultCode, data)
+        zaloSDK.onActivityResult(this, requestCode, resultCode, data)
     }
     //#endregion
 
@@ -161,36 +161,39 @@ class MainActivity : AppCompatActivity(), ValidateOAuthCodeCallback, GetZaloLogi
 
 
         appIDTextView.text = "App ID: ${AppInfo.getAppId(this)}"
-        authCodeTextView.text = "Auth code: ${ZaloSDK.Instance.getOauthCode()}"
+        authCodeTextView.text = "Auth code: ${zaloSDK.getOauthCode()}"
         userIDTextView.text = "User ID: ${mStorage.getZaloDisplayName()}"
     }
 
+    private fun configureLogic() {
+        zaloSDK = ZaloSDK(this)
+    }
     private fun bindViewsListener() {
         loginMobileButton.setOnClickListener {
-            ZaloSDK.Instance.unAuthenticate()
-            ZaloSDK.Instance.authenticate(this, LoginVia.APP, authenticateListener)
+            zaloSDK.unAuthenticate()
+            zaloSDK.authenticate(this, LoginVia.APP, authenticateListener)
         }
 
         loginWebButton.setOnClickListener {
-            ZaloSDK.Instance.unAuthenticate()
-            ZaloSDK.Instance.authenticate(this, LoginVia.WEB, authenticateListener)
+            zaloSDK.unAuthenticate()
+            zaloSDK.authenticate(this, LoginVia.WEB, authenticateListener)
         }
         loginViaButton.setOnClickListener {
-            ZaloSDK.Instance.unAuthenticate()
-            ZaloSDK.Instance.authenticate(this, LoginVia.APP_OR_WEB, authenticateListener)
+            zaloSDK.unAuthenticate()
+            zaloSDK.authenticate(this, LoginVia.APP_OR_WEB, authenticateListener)
         }
 
         registerButton.setOnClickListener {
             //			ZaloSDK.unAuthenticate()
-            ZaloSDK.Instance.registerZalo(this, authenticateListener)
+            zaloSDK.registerZalo(this, authenticateListener)
         }
 
         validateButton.setOnClickListener {
-            ZaloSDK.Instance.isAuthenticate(this)
+            zaloSDK.isAuthenticate(this)
         }
 
         checkAppLoginButton.setOnClickListener {
-            ZaloSDK.Instance.getZaloLoginStatus(this)
+            zaloSDK.getZaloLoginStatus(this)
         }
 
         appTrackingButton.setOnClickListener {

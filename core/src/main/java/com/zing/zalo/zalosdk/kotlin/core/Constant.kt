@@ -7,7 +7,7 @@ import androidx.annotation.Keep
 
 @Keep
 object Constant {
-    const val VERSION = "4.0"
+    const val VERSION = "4.0" // what ??
     //    const val DEV_MODE = true
     var DEV_MODE = false
     const val ZALO_PACKAGE_NAME = "com.zing.zalo"
