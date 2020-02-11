@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity" android:orientation="vertical">
+
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Login Mobile"
+            android:id="@+id/login_mobile_button" style="@style/Widget.AppCompat.Button.Colored"
+            android:backgroundTint="#05A3E5"/>
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Login Via"
+            android:id="@+id/login_via_button" style="@style/Widget.AppCompat.Button.Colored"
+            android:backgroundTint="#05A3E5"/>
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Login Web"
+            android:id="@+id/login_web_button" style="@style/Widget.AppCompat.Button.Colored"
+            android:backgroundTint="#05A3E5"/>
+
+    <Button
+            android:id="@+id/register_button"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:backgroundTint="#05A3E5"
+            android:gravity="center"
+            android:text="REGISTER" />
+
+    <Button
+            android:id="@+id/validate_oauth_code_button"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:backgroundTint="#05A3E5"
+            android:gravity="center"
+            android:text="VALIDATE OAUTH CODE" />
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Check App Login"
+            android:id="@+id/check_app_login_button" style="@style/Widget.AppCompat.Button.Colored"
+            android:backgroundTint="#05A3E5"/>
+
+    <Button
+            android:id="@+id/app_tracking_button"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:backgroundTint="#05A3E5"
+            android:gravity="center"
+            android:text="App Tracking" />
+
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Event Tracking"
+            android:id="@+id/event_tracking_button"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:backgroundTint="#05A3E5" />
+            
+    <Button
+            android:id="@+id/open_api_button"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:backgroundTint="#05A3E5"
+            android:gravity="center"
+            android:text="Open Api" />
+
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/app_id_text_view"/>
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/user_id_text_view"/>
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/auth_code_text_view" android:maxLines="3"/>
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/login_status_text_view" android:maxLines="3"/>
+
+</LinearLayout>

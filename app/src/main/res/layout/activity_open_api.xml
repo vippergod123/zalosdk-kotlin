@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity" android:orientation="vertical">
+
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Get Profile"
+            android:id="@+id/get_profile_button" style="@style/Widget.AppCompat.Button.Colored"
+            android:backgroundTint="#05A3E5"/>
+
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Get Friend List Used App"
+            android:id="@+id/get_friend_list_used_app_button" style="@style/Widget.AppCompat.Button.Colored"
+            android:backgroundTint="#05A3E5"/>
+
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Get Friend List Invitable"
+            android:id="@+id/get_friend_list_invitable_button" style="@style/Widget.AppCompat.Button.Colored"
+            android:backgroundTint="#05A3E5"/>
+
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Invite Friend Use App"
+            android:id="@+id/invite_friend_use_app_button" style="@style/Widget.AppCompat.Button.Colored"
+            android:backgroundTint="#05A3E5"/>
+
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Send Message To Friend"
+            android:id="@+id/send_message_to_friend_button" style="@style/Widget.AppCompat.Button.Colored"
+            android:backgroundTint="#05A3E5"/>
+
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Post To Wall"
+            android:id="@+id/post_to_wall_button" style="@style/Widget.AppCompat.Button.Colored"
+            android:backgroundTint="#05A3E5"/>
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Send Message Via App"
+            android:id="@+id/send_message_via_app_button" style="@style/Widget.AppCompat.Button.Colored"
+            android:backgroundTint="#05A3E5"/>
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Share Post Via App"
+            android:id="@+id/share_post_via_app" style="@style/Widget.AppCompat.Button.Colored"
+            android:backgroundTint="#05A3E5"/>
+
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Callback result will be shown here"
+                android:id="@+id/callback_text_view"/>
+    </ScrollView>
+
+</LinearLayout>

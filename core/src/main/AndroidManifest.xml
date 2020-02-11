@@ -1,0 +1,14 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.zing.zalo.zalosdk.kotlin.core">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <application>
+        <provider
+            tools:replace="android:authorities"
+            android:authorities="{$applicationId}"
+            android:name="com.zing.zalo.zalosdk.kotlin.core.module.ZaloSDKInitProvider"
+            android:exported="false" />
+
+    </application>
+</manifest>

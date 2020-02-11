@@ -1,0 +1,9 @@
+<resources>
+    <string name="zalosdk_app_name">ZaloSDK</string>
+    <string name="zalosdk_processing">လုပ္ေဆာင္ေနသည္</string>
+    <string name="txt_regis_acc">မွတ္ပုံတင္မည္</string>
+    <string name="txt_title_login_zalo">Zalo နဲ႔အတူ Login ျပဳလုပ္မည္</string>
+    <string name="zalo_app_not_installed">သင်က app ကို Zalo install လုပ်မရ</string>
+    <string name="zalo_app_out_of_date">Zalo နေ့စွဲထဲကဖြစ်ပါတယ်</string>
+    <string name="no_network">Network ကိုမတည်မငြိမ်နောက်မှထပ်ကြိုးစားကျေးဇူးပြုပြီး</string>
+</resources>
