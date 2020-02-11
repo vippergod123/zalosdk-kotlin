@@ -40,12 +40,12 @@ ext {
     minSdkVersion = 14
 
     //bintray jfrog
-    zdklibVersion = '1.2'
-    bintrayRepo = 'ZaloSDK'
+    zdklibVersion = '1.0'
+    bintrayRepo = 'ZaloSDKKotlin'
     libGroup = 'com.zing.zalo.zalosdk.kotlin' //group
-    siteUrl = 'https://zalogit2.zing.vn/zalosdk/zalosdk-kotlin'
-    gitUrl = 'https://zalogit2.zing.vn/zalosdk/zalosdk-kotlin.git'
-    issueUrl = 'https://zalogit2.zing.vn/zalosdk/zalosdk-kotlin/issues'
+    siteUrl = 'https://github.com/VNG-Zalo/zalosdk-kotlin'
+    gitUrl = 'https://github.com/VNG-Zalo/zalosdk-kotlin.git'
+    issueUrl = 'https://github.com/VNG-Zalo/zalosdk-kotlin/issues'
 
     developerId = 'duytruong'
     developerName = 'Duy Truong'
@@ -55,7 +55,7 @@ ext {
     licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
     allLicenses = ["Apache-2.0"]
 
-    userOrg = 'zalo'  //important
+    userOrg = 'vng'  //important
 }
 
 task clean(type: Delete) {

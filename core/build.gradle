@@ -41,7 +41,7 @@ ext {
 
     publishedGroupId = rootProject.ext.libGroup
     libraryName = nameLib
-    artifact = nameLib // core in 'com.zing.zalo.zalosdk:core:1.0'
+    artifact = nameLib // core in 'com.zing.zalo.zalosdk.kotlin:core:'
 
     libraryDescription = 'A widget to load WebView as an Overlay.'
 
@@ -96,11 +96,3 @@ dependencies {
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.2'
 
 }
-
-
-//Add these lines to publish library to bintray
-//Place it at the end of the file
-//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
-//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
-
-

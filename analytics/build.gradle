@@ -40,7 +40,7 @@ ext {
 
     publishedGroupId = rootProject.ext.libGroup
     libraryName = nameLib
-    artifact = nameLib // core in 'com.zing.zalo.zalosdk:core:1.0'
+    artifact = nameLib // analytics in 'com.zing.zalo.zalosdk.kotlin:analytics:'
 
     libraryDescription = 'A widget to load WebView as an Overlay.'
 
